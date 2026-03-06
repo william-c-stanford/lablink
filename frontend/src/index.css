@@ -1,0 +1,470 @@
+/*
+ * LabLink Global Stylesheet
+ * Neuromorphic Design System — Light mode only
+ *
+ * Design tokens extracted from LandingPage.html reference design.
+ * All components inherit these custom properties by default.
+ *
+ * Import order (CSS spec requires @import before all other rules):
+ *   1. Google Fonts @import url()   ← must come first
+ *   2. @import "tailwindcss"        ← Tailwind v4 base + preflight
+ *   3. @theme {}                    ← Tailwind theme extension
+ *   4. :root {}                     ← Custom property tokens
+ *   5. Base resets                  ← HTML element defaults
+ *   6. Neuromorphic utility classes ← .nm-outset, .nm-inset, etc.
+ *   7. Animation utilities          ← @keyframes + helper classes
+ *   8. Status badge colours         ← .status-uploading/parsing/parsed/failed
+ */
+
+/* ─── 1. Google Fonts ────────────────────────────────────────────────────── */
+/*
+ * Plus Jakarta Sans — body copy, headings, UI labels
+ * JetBrains Mono    — code snippets, data values, monospaced displays
+ *
+ * Also loaded via <link> in index.html for the fastest first paint;
+ * this @import acts as a reliable fallback for CSS-only environments
+ * (e.g. storybook, email renderers, print).
+ *
+ * Must appear before any other rules (CSS spec §6.3).
+ */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+/* ─── 2. Tailwind CSS v4 ─────────────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ─── 3. Tailwind Theme Extension ────────────────────────────────────────── */
+/*
+ * Expose design tokens to Tailwind's JIT engine so utility classes like
+ * `bg-nm-bg`, `text-nm-blue`, `shadow-nm-md` are available in TSX files.
+ *
+ * These mirror the :root custom properties below so both systems stay
+ * in sync — the @theme block teaches Tailwind, :root teaches the cascade.
+ */
+@theme {
+  /* Colours */
+  --color-nm-bg:          #f5f7fa;
+  --color-nm-blue:        #3b82f6;
+  --color-nm-blue-hover:  #2563eb;
+  --color-nm-light:       #ffffff;
+  --color-nm-text:        #1e293b;
+  --color-nm-muted:       #64748b;
+  --color-nm-subtle:      #94a3b8;
+  --color-nm-success:     #22c55e;
+  --color-nm-warning:     #f97316;
+  --color-nm-danger:      #ef4444;
+  --color-nm-info:        #6366f1;
+
+  /* Font families */
+  --font-family-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-family-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+
+  /* Border radius */
+  --radius-sm:  0.5rem;
+  --radius-md:  0.75rem;
+  --radius-lg:  1rem;
+  --radius-xl:  1.5rem;
+  --radius-2xl: 2.5rem;
+
+  /* Box shadows — neuromorphic scale */
+  --shadow-nm-xs:        2px 2px 4px rgba(174, 185, 201, 0.40), -2px -2px 4px rgba(255, 255, 255, 0.90);
+  --shadow-nm-sm:        4px 4px 8px rgba(174, 185, 201, 0.40), -4px -4px 8px rgba(255, 255, 255, 0.90);
+  --shadow-nm-md:        8px 8px 16px rgba(174, 185, 201, 0.40), -8px -8px 16px rgba(255, 255, 255, 0.90);
+  --shadow-nm-lg:        12px 12px 24px rgba(174, 185, 201, 0.40), -12px -12px 24px rgba(255, 255, 255, 0.90);
+  --shadow-nm-inset-sm:  inset 4px 4px 8px rgba(174, 185, 201, 0.40), inset -4px -4px 8px rgba(255, 255, 255, 0.90);
+  --shadow-nm-inset-md:  inset 6px 6px 12px rgba(174, 185, 201, 0.40), inset -6px -6px 12px rgba(255, 255, 255, 0.90);
+  --shadow-nm-glow-blue: 0 0 25px rgba(59, 130, 246, 0.40), 8px 8px 16px rgba(174, 185, 201, 0.40), -8px -8px 16px rgba(255, 255, 255, 0.90);
+}
+
+/* ─── 4. Design Tokens (CSS Custom Properties) ───────────────────────────── */
+/*
+ * These CSS custom properties are the single source of truth for the
+ * LabLink neuromorphic palette. All component styles MUST reference these
+ * variables — never hard-code raw colour or shadow values in component CSS.
+ *
+ * Token naming convention:
+ *   --bg, --blue, --light         → core palette (matches LandingPage.html)
+ *   --shadow-dark, --shadow-light → neuromorphic shadow pair
+ *   --nm-shadow-*                 → composed shadow strings (raise scale)
+ *   --nm-inset-*                  → composed shadow strings (press scale)
+ *   --nm-glow-blue*               → blue ambient glow variants
+ *   --font-sans, --font-mono      → typeface stacks
+ *   --transition-*                → easing presets
+ *   --z-*                         → z-index layer tokens
+ */
+:root {
+  /* ── Surfaces ──────────────────────────────────────────────────────────── */
+  --bg:    #f5f7fa;   /* primary background — the "clay" neuromorphic surface */
+  --light: #ffffff;   /* pure white — cards, modals, overlays */
+
+  /* ── Brand ─────────────────────────────────────────────────────────────── */
+  --blue:             #3b82f6;              /* primary accent  (Tailwind blue-500) */
+  --blue-hover:       #2563eb;              /* accent on hover (Tailwind blue-600) */
+  --blue-glow:        rgba(59, 130, 246, 0.40);  /* ambient glow spread */
+  --blue-glow-strong: rgba(59, 130, 246, 0.60);  /* hover glow spread    */
+
+  /* ── Neuromorphic shadow pair ───────────────────────────────────────────── */
+  /* Exact values from LandingPage.html :root — do NOT change these */
+  --shadow-dark:  rgba(174, 185, 201, 0.40); /* dark shadow  (bottom-right) */
+  --shadow-light: rgba(255, 255, 255, 0.90); /* light shadow (top-left)     */
+
+  /* ── Typography ─────────────────────────────────────────────────────────── */
+  --text-dark:   #1e293b;  /* primary text — Tailwind slate-800  */
+  --text-muted:  #64748b;  /* secondary text — Tailwind slate-500 */
+  --text-subtle: #94a3b8;  /* tertiary / placeholders — slate-400 */
+
+  /* ── Semantic colours ───────────────────────────────────────────────────── */
+  --color-success: #22c55e;  /* green-500  — parsed / healthy  */
+  --color-warning: #f97316;  /* orange-500 — parsing / caution */
+  --color-danger:  #ef4444;  /* red-500    — failed / error    */
+  --color-info:    #6366f1;  /* indigo-500 — uploading / info  */
+
+  /* ── Border radius ──────────────────────────────────────────────────────── */
+  --radius-sm:  0.5rem;    /*  8px — small badges, chips    */
+  --radius-md:  0.75rem;   /* 12px — inputs, small cards    */
+  --radius-lg:  1rem;      /* 16px — panels                 */
+  --radius-xl:  1.5rem;    /* 24px — modals, large cards    */
+  --radius-2xl: 2.5rem;    /* 40px — hero widgets           */
+
+  /* ── Neuromorphic shadow scales ─────────────────────────────────────────── */
+  /* Raised (outset) shadows — element floats above the surface */
+  --nm-shadow-xs: 2px  2px  4px  var(--shadow-dark), -2px  -2px  4px  var(--shadow-light);
+  --nm-shadow-sm: 4px  4px  8px  var(--shadow-dark), -4px  -4px  8px  var(--shadow-light);
+  --nm-shadow-md: 8px  8px  16px var(--shadow-dark), -8px  -8px  16px var(--shadow-light);
+  --nm-shadow-lg: 12px 12px 24px var(--shadow-dark), -12px -12px 24px var(--shadow-light);
+
+  /* Inset shadows — element appears pressed into the surface */
+  --nm-inset-xs:     inset 2px 2px 4px  var(--shadow-dark), inset -2px -2px 4px  var(--shadow-light);
+  --nm-inset-sm:     inset 4px 4px 8px  var(--shadow-dark), inset -4px -4px 8px  var(--shadow-light);
+  --nm-inset-md:     inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+  --nm-inset-circle: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+
+  /* Blue glow variants */
+  --nm-glow-blue:       0 0 25px var(--blue-glow),        var(--nm-shadow-md);
+  --nm-glow-blue-hover: 0 0 40px var(--blue-glow-strong), var(--nm-shadow-sm);
+
+  /* ── Transition presets ─────────────────────────────────────────────────── */
+  --transition-fast:    all 0.15s ease;
+  --transition-default: all 0.20s ease;
+  --transition-slow:    all 0.30s ease;
+
+  /* ── Font families ──────────────────────────────────────────────────────── */
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+
+  /* ── Z-index layers ─────────────────────────────────────────────────────── */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
+  --z-nav:     400;
+}
+
+/* ─── 5. Base Reset & Normalization ──────────────────────────────────────── */
+/*
+ * Minimal, purposeful reset — Tailwind's preflight handles most normalization.
+ * These additions enforce the neuromorphic typography and palette defaults
+ * so every element starts from the correct base without extra class noise.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Smooth scrolling for in-page anchors (e.g. #dashboard) */
+  scroll-behavior: smooth;
+  /* Prevent iOS text-size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Subpixel font rendering — essential for the Plus Jakarta Sans weight range */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  /* Neuromorphic base palette */
+  background-color: var(--bg);
+  color: var(--text-dark);
+
+  /* Plus Jakarta Sans as the universal body typeface */
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.6;
+  font-size: 1rem;
+
+  /* Light-only design — explicitly disable dark-mode cascade */
+  color-scheme: light;
+
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* React root — full height and stacking context */
+#root {
+  min-height: 100vh;
+  isolation: isolate;
+}
+
+/* Headings — tighter tracking matches the LandingPage.html heading style */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  color: var(--text-dark);
+}
+
+/* Code and numeric data — JetBrains Mono for monospaced clarity */
+code,
+kbd,
+samp,
+pre,
+.font-mono {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+/* Links — unstyled by default; individual components apply brand colour */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Global focus ring — brand blue, keyboard-only (not on mouse click) */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Buttons — base reset; component classes apply neuromorphic styling */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+/* Media — block + max-width prevents overflow */
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+/* Text selection — blue tint on the brand palette */
+::selection {
+  background-color: rgba(59, 130, 246, 0.20);
+  color: var(--text-dark);
+}
+
+/* Scrollbar — narrow + palette-matched on Webkit (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(174, 185, 201, 0.50);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(174, 185, 201, 0.75);
+}
+
+/* ─── 6. Neuromorphic Utility Classes ────────────────────────────────────── */
+/*
+ * These classes mirror the exact shadow values from LandingPage.html.
+ * Apply them directly on HTML elements or compose them in component classes.
+ *
+ * Reference: LandingPage.html <style> block, classes .nm-outset / .nm-inset /
+ *            .nm-btn / .nm-btn-active / .nm-circle-pressed / .nm-glow-blue
+ */
+
+/* nm-outset — raised panel / card (floats above the surface) */
+.nm-outset {
+  background: var(--bg);
+  box-shadow: var(--nm-shadow-md);
+}
+
+/* nm-inset — pressed / recessed surface (sunken into the surface) */
+.nm-inset {
+  background: var(--bg);
+  box-shadow: var(--nm-inset-md);
+}
+
+/* nm-btn — interactive button at rest */
+.nm-btn {
+  background: var(--bg);
+  box-shadow: var(--nm-shadow-sm);
+  transition: var(--transition-default);
+}
+
+/* nm-btn:hover — shadow reduces to give a "push-in" sensation */
+.nm-btn:hover:not(:disabled) {
+  box-shadow: var(--nm-shadow-xs);
+  transform: translateY(1px);
+}
+
+/* nm-btn-active — fully pressed / selected state */
+.nm-btn-active,
+.nm-btn:active:not(:disabled) {
+  background: var(--bg);
+  box-shadow: var(--nm-inset-xs);
+  transform: translateY(1px);
+}
+
+/* nm-btn:disabled — flattened, no interaction affordance */
+.nm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* nm-circle-pressed — step indicator circles (from "How It Works" section) */
+.nm-circle-pressed {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: var(--nm-inset-circle);
+  background: var(--bg);
+}
+
+/* nm-glow-blue — raised element with blue ambient glow (CTAs, logo icon) */
+.nm-glow-blue {
+  box-shadow: var(--nm-glow-blue) !important;
+}
+.nm-glow-blue:hover {
+  box-shadow: var(--nm-glow-blue-hover) !important;
+}
+
+/* nm-card — standard raised card with xl rounded corners */
+.nm-card {
+  background: var(--bg);
+  box-shadow: var(--nm-shadow-md);
+  border-radius: var(--radius-2xl);
+}
+
+/* nm-input — sunken text input / textarea */
+.nm-input {
+  background: var(--bg);
+  box-shadow: var(--nm-inset-sm);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  transition: var(--transition-fast);
+}
+.nm-input:focus {
+  outline: 2px solid var(--blue);
+  outline-offset: 0;
+  box-shadow: var(--nm-inset-sm), 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.nm-input::placeholder {
+  color: var(--text-subtle);
+}
+
+/* nm-sidebar — fixed sidebar panel */
+.nm-sidebar {
+  background: var(--bg);
+  box-shadow: var(--nm-shadow-md);
+}
+
+/* nm-badge — pill-shaped raised status chip */
+.nm-badge {
+  background: var(--bg);
+  box-shadow: var(--nm-shadow-xs);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2em 0.7em;
+}
+
+/* ─── 7. Animation Utilities ─────────────────────────────────────────────── */
+
+/* drawLine — SVG path stroke-dashoffset draw-in (LandingPage hero animation) */
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+.animate-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 3s ease-out forwards;
+}
+
+/* pulseDot — status indicator breathing animation */
+@keyframes pulseDot {
+  0%, 100% { opacity: 1;   transform: scale(1);    }
+  50%       { opacity: 0.6; transform: scale(0.85); }
+}
+
+.animate-pulse-dot {
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+/* fadeIn — content entrance (panels, toasts, dropdowns) */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* shimmer — skeleton loading state */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(174, 185, 201, 0.15) 25%,
+    rgba(174, 185, 201, 0.30) 50%,
+    rgba(174, 185, 201, 0.15) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* ─── 8. Status Badge Colours ────────────────────────────────────────────── */
+/*
+ * Applied to upload/parsing status pills throughout the app.
+ * Background is a low-opacity tint of the semantic colour;
+ * foreground uses the full semantic token for legibility.
+ */
+
+.status-uploading {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: var(--color-info);
+}
+
+.status-parsing {
+  background-color: rgba(249, 115, 22, 0.12);
+  color: var(--color-warning);
+}
+
+.status-parsed {
+  background-color: rgba(34, 197, 94, 0.12);
+  color: var(--color-success);
+}
+
+.status-failed {
+  background-color: rgba(239, 68, 68, 0.12);
+  color: var(--color-danger);
+}

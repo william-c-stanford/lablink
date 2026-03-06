@@ -1,0 +1,25 @@
+# LabLink Agent Configuration
+# Copy to ~/.lablink/agent.yaml and customise.
+#
+# Run 'lablink-agent register --api-url https://app.lablink.io/api/v1'
+# to complete the pairing flow and populate agent_id and agent_token.
+
+# URL of the LabLink backend API.
+api_url: "https://app.lablink.io/api/v1"
+
+# Populated automatically by 'lablink-agent register'.
+agent_id: ""  # Set after registration
+agent_token: ""  # Set after registration
+
+# Log verbosity: debug | info | warn | error
+log_level: "info"
+
+# Directories to watch for new instrument output files.
+watched_folders:
+  - path: "/path/to/instrument/output"
+    extensions: [".csv", ".tsv", ".txt"]
+  - path: "/path/to/another/instrument"
+    extensions: [".xml", ".json", ".rdml"]
+
+# Optional HTTP/HTTPS proxy. Also respects HTTP_PROXY / HTTPS_PROXY env vars.
+# proxy_url: "http://proxy.corp.com:8080"  # Optional

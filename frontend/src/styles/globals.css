@@ -1,0 +1,277 @@
+/**
+ * LabLink Global Styles — Neuromorphic Design System
+ *
+ * Design tokens extracted from LandingPage.html:
+ *   --bg:           #f5f7fa  (surface grey — the "clay")
+ *   --blue:         #3b82f6  (accent / primary action)
+ *   --light:        #ffffff
+ *   --shadow-dark:  rgba(174, 185, 201, 0.4)  (dark shadow for depth)
+ *   --shadow-light: rgba(255, 255, 255, 0.9)  (light highlight for lift)
+ *   --text-dark:    #1e293b
+ *
+ * Shadow utility classes (mirrors LandingPage.html exactly):
+ *   nm-outset      — raised card / panel
+ *   nm-inset       — sunken / recessed area
+ *   nm-btn         — interactive button (default raised state)
+ *   nm-btn-hover   — button pressed down 1px, softer shadow
+ *   nm-btn-active  — button fully pressed (inset)
+ *   nm-glow-blue   — raised + blue ambient glow
+ */
+
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Tailwind v4 theme tokens
+   ────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Fonts */
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Brand colours */
+  --color-nm-bg:        #f5f7fa;
+  --color-nm-blue:      #3b82f6;
+  --color-nm-blue-dark: #2563eb;
+  --color-nm-light:     #ffffff;
+  --color-nm-text:      #1e293b;
+  --color-nm-muted:     #64748b;
+  --color-nm-border:    #e2e8f0;
+
+  /* Neuromorphic shadow components */
+  --nm-shadow-dark:  rgba(174, 185, 201, 0.4);
+  --nm-shadow-light: rgba(255, 255, 255, 0.9);
+
+  /* Pre-composed shadow values — referenced in utilities below */
+  --nm-shadow-outset:      8px 8px 16px var(--nm-shadow-dark), -8px -8px 16px var(--nm-shadow-light);
+  --nm-shadow-inset:       inset 6px 6px 12px var(--nm-shadow-dark), inset -6px -6px 12px var(--nm-shadow-light);
+  --nm-shadow-btn:         4px 4px 8px var(--nm-shadow-dark), -4px -4px 8px var(--nm-shadow-light);
+  --nm-shadow-btn-hover:   2px 2px 4px var(--nm-shadow-dark), -2px -2px 4px var(--nm-shadow-light);
+  --nm-shadow-btn-active:  inset 2px 2px 4px var(--nm-shadow-dark), inset -2px -2px 4px var(--nm-shadow-light);
+  --nm-shadow-glow-blue:   0 0 25px rgba(59, 130, 246, 0.4), 8px 8px 16px var(--nm-shadow-dark), -8px -8px 16px var(--nm-shadow-light);
+  --nm-shadow-glow-hover:  0 0 40px rgba(59, 130, 246, 0.6), 4px 4px 8px var(--nm-shadow-dark), -4px -4px 8px var(--nm-shadow-light);
+  --nm-shadow-circle:      inset 5px 5px 10px var(--nm-shadow-dark), inset -5px -5px 10px var(--nm-shadow-light);
+
+  /* Radii */
+  --radius-nm-sm:    12px;
+  --radius-nm-md:    16px;
+  --radius-nm-lg:    24px;
+  --radius-nm-xl:    32px;
+  --radius-nm-2xl:   40px;
+  --radius-nm-full:  9999px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   CSS custom properties (for direct use in box-shadow etc.)
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --bg:           #f5f7fa;
+  --blue:         #3b82f6;
+  --light:        #ffffff;
+  --shadow-dark:  rgba(174, 185, 201, 0.4);
+  --shadow-light: rgba(255, 255, 255, 0.9);
+  --text-dark:    #1e293b;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Base / reset
+   ────────────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  background-color: #f5f7fa;
+  color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+}
+
+/* Remove default focus ring and replace with accessible alternative */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Neuromorphic utility classes (mirrors LandingPage.html exactly)
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* Raised / outset panel */
+.nm-outset {
+  background: var(--bg);
+  box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+}
+
+/* Sunken / inset surface */
+.nm-inset {
+  background: var(--bg);
+  box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+}
+
+/* Interactive button — default */
+.nm-btn {
+  background: var(--bg);
+  box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Button hover: slides 1px down, shadow reduces */
+.nm-btn:hover:not(:disabled) {
+  box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+  transform: translateY(1px);
+}
+
+/* Button active/pressed: fully inset */
+.nm-btn:active:not(:disabled),
+.nm-btn-active {
+  background: var(--bg);
+  box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+  transform: translateY(0);
+}
+
+/* Disabled state */
+.nm-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow: 2px 2px 5px var(--shadow-dark), -2px -2px 5px var(--shadow-light);
+}
+
+/* Blue glow — for primary CTA buttons */
+.nm-glow-blue {
+  box-shadow:
+    0 0 25px rgba(59, 130, 246, 0.4),
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light) !important;
+}
+
+.nm-glow-blue:hover:not(:disabled) {
+  box-shadow:
+    0 0 40px rgba(59, 130, 246, 0.6),
+    4px 4px 8px var(--shadow-dark),
+    -4px -4px 8px var(--shadow-light) !important;
+  transform: translateY(1px);
+}
+
+/* Circle / icon button pressed state */
+.nm-circle-pressed {
+  box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Typography utilities
+   ────────────────────────────────────────────────────────────────────────── */
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Scroll bar — subtle, matches surface
+   ────────────────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f7fa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(174, 185, 201, 0.6);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(174, 185, 201, 0.9);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Animation keyframes
+   ────────────────────────────────────────────────────────────────────────── */
+
+@keyframes drawLine {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
+  50%       { box-shadow: 0 0 40px rgba(59, 130, 246, 0.7); }
+}
+
+.animate-draw {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawLine 3s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.animate-slide-right {
+  animation: slideInRight 0.2s ease-out both;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Dialog / Modal overlay
+   ────────────────────────────────────────────────────────────────────────── */
+
+.nm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 41, 59, 0.35);
+  backdrop-filter: blur(4px);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.nm-modal-panel {
+  background: var(--bg);
+  box-shadow: 24px 24px 48px var(--shadow-dark), -24px -24px 48px var(--shadow-light);
+  border-radius: 32px;
+  max-width: 90vw;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease-out both;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Toast notifications
+   ────────────────────────────────────────────────────────────────────────── */
+
+.nm-toast {
+  background: var(--bg);
+  box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  max-width: 360px;
+  width: 100%;
+  animation: slideInRight 0.25s ease-out both;
+}

@@ -1,0 +1,166 @@
+goal: >
+  Build the React frontend and Go desktop agent for the LabLink lab data
+  integration platform. The backend (FastAPI, 45+ endpoints, 16 ORM models,
+  5 parsers, MCP server) is already complete. The frontend follows the
+  neuromorphic design system from LandingPage.html (light grey #f5f7fa,
+  raised/inset shadows, Plus Jakarta Sans font, blue #3b82f6 accent).
+  The Go agent watches instrument output directories, queues files in BBolt,
+  and uploads to the backend API with automatic retry.
+
+constraints:
+  - Frontend: React 19 + TypeScript 5 + Vite + Tailwind CSS 4
+  - UI components: shadcn/ui customized with neuromorphic shadow system
+  - Routing: TanStack Router (type-safe, file-based conventions)
+  - State: Zustand (UI state) + TanStack Query (server state)
+  - API client: Auto-generated from backend OpenAPI spec
+  - Charts: Plotly.js with instrument-specific components
+  - Testing: Vitest + React Testing Library + MSW for API mocking
+  - Real-time: SSE (Server-Sent Events) for upload status and agent monitoring
+  - Design: Light-only neuromorphic (no dark mode)
+  - Go agent: Go 1.22+, fsnotify v1.9, BBolt, Cobra CLI
+  - Agent auth: 6-digit pairing code registration flow
+  - Agent watches multiple directories, auto-detect instrument type (no hints)
+  - Agent auto-update via GitHub Releases API
+  - Frontend lives in frontend/ directory, Go agent in agent/ directory
+  - Must work with the existing backend at src/lablink/ and backend/app/
+  - Follow plans/lablink-product-roadmap.md as the authoritative spec
+  - Follow CLAUDE.md project conventions
+
+acceptance_criteria:
+  # Frontend - Core Pages
+  - Dashboard page shows recent uploads, experiment status, connected agent count, and upload activity chart
+  - Uploads page lists all uploads with status badges (uploading/parsing/parsed/failed), supports drag-and-drop manual upload
+  - Search page provides full-text search with filters (instrument type, date range, project)
+  - Experiments page shows experiment list with state machine status, create/edit/transition actions
+  - Agent status panel shows connected agents with live heartbeat, queue depth, and upload progress via SSE
+
+  # Frontend - Design System
+  - Neuromorphic design tokens extracted from LandingPage.html (--bg, --shadow-dark, --shadow-light, --blue, nm-outset, nm-inset, nm-btn classes)
+  - All shadcn/ui components customized with neuromorphic shadows (no default shadcn styling)
+  - Plus Jakarta Sans for body text, JetBrains Mono for code/data
+  - Responsive layout (sidebar navigation on desktop, bottom nav on mobile)
+
+  # Frontend - Charts
+  - SpectrophotometerChart: wavelength scan (x=nm, y=absorbance) + bar chart for 260/280 ratios
+  - PlateHeatmap: 96/384-well grid colored by absorbance value
+  - ChromatogramChart: retention time vs signal with labeled peaks
+  - PCRAmplificationChart: cycle number vs fluorescence with Ct threshold line
+
+  # Frontend - API & State
+  - OpenAPI client auto-generated and typed
+  - TanStack Query hooks for all API endpoints with proper cache invalidation
+  - Zustand store for UI state (sidebar collapsed, active filters, toast notifications)
+  - SSE hook (useSSE) connecting to /api/v1/sse/updates for real-time events
+  - Auth flow: login/register pages, JWT stored in memory (not localStorage), refresh on 401
+
+  # Frontend - Testing
+  - Vitest + RTL tests for all page components
+  - MSW handlers mocking the Envelope[T] response pattern
+  - At least 30 frontend test cases covering core flows
+
+  # Go Agent - Core
+  - Cobra CLI with subcommands: start, register, status, version
+  - fsnotify watcher monitoring multiple directories simultaneously
+  - 5-second file stability check (no size change) before queuing
+  - Extension whitelist filter (.csv, .tsv, .xml, .json, .txt, .rdml, .eds, .cdf)
+  - BBolt persistent queue with retry counter and dead letter bucket
+  - HTTPS multipart upload with exponential backoff (1s, 5s, 25s), 3 max retries
+  - 60-second heartbeat to /api/v1/agents/{id}/heartbeat
+  - Structured JSON logging (zerolog or slog)
+
+  # Go Agent - Registration
+  - 'lablink-agent register' generates 6-digit pairing code
+  - Displays code in terminal, polls backend for approval
+  - User enters code in dashboard Agent Settings to approve
+  - On approval, agent receives API token, stores in config
+
+  # Go Agent - Auto-Update
+  - Check GitHub Releases API on startup + every 24 hours
+  - Compare semver version, download new binary if available
+  - Verify SHA-256 checksum before replacing
+  - Graceful restart after update
+
+  # Go Agent - Config
+  - YAML config file (~/.lablink/agent.yaml)
+  - watched_folders list with path + extension filter per folder
+  - api_url, agent_id, agent_token fields
+  - proxy support (HTTP_PROXY/HTTPS_PROXY + config file)
+  - Example config at agent/configs/lablink-agent.example.yaml
+
+  # Integration
+  - Frontend proxies API requests to backend in dev (Vite proxy config)
+  - Frontend builds to frontend/dist/ for production serving
+  - Go agent cross-compiles for linux/amd64, darwin/arm64, windows/amd64
+
+ontology_schema:
+  name: LabLinkFrontendAgent
+  description: Frontend dashboard and desktop agent for lab data integration
+  fields:
+    - name: frontend
+      type: object
+      description: React application with neuromorphic design
+    - name: pages
+      type: array
+      description: Dashboard, Uploads, Search, Experiments pages
+    - name: components
+      type: array
+      description: Shared UI components (layout, charts, forms, data display)
+    - name: api_client
+      type: object
+      description: Auto-generated OpenAPI TypeScript client
+    - name: agent
+      type: object
+      description: Go desktop agent (watcher, queue, uploader, heartbeat)
+    - name: agent_config
+      type: object
+      description: YAML configuration for watched folders and API connection
+
+evaluation_principles:
+  - name: design_fidelity
+    weight: 0.25
+    description: Frontend matches neuromorphic design from LandingPage.html exactly
+  - name: type_safety
+    weight: 0.20
+    description: Full TypeScript coverage, TanStack Router type-safe routes, generated API types
+  - name: agent_reliability
+    weight: 0.20
+    description: Go agent handles network failures, partial files, queue overflow gracefully
+  - name: test_coverage
+    weight: 0.15
+    description: Frontend tests with Vitest+RTL, Go tests with testing package
+  - name: real_time_ux
+    weight: 0.10
+    description: SSE provides smooth real-time updates for upload status and agent monitoring
+  - name: code_quality
+    weight: 0.10
+    description: Clean separation of concerns, follows project conventions in CLAUDE.md
+
+exit_conditions:
+  - All acceptance criteria pass verification
+  - Frontend dev server starts without errors (npm run dev)
+  - Go agent compiles without errors (go build)
+  - All frontend tests pass (npm run test)
+  - All Go tests pass (go test ./...)
+  - Neuromorphic design visually matches LandingPage.html reference
+
+metadata:
+  version: "1.0.0"
+  ambiguity_score: 0.08
+  source: agent-based-interview
+  timestamp: "2026-03-06T16:45:00Z"
+  interview_decisions:
+    api_client: auto-generated-openapi
+    ui_framework: shadcn-ui-tailwind
+    routing: tanstack-router
+    realtime: sse-from-start
+    state_management: zustand-plus-tanstack-query
+    page_scope: core-4-pages
+    testing: vitest-rtl-msw
+    design: light-only-neuromorphic
+    charts: instrument-specific-plotly
+    manual_upload: drag-and-drop-included
+    agent_ux: headless-daemon-dashboard-monitoring
+    agent_auth: pairing-code-registration
+    agent_watch: multiple-dirs-auto-detect
+    agent_update: github-releases-auto-update
+    dark_mode: none

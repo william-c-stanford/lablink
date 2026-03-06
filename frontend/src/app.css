@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+}
+
+@layer base {
+  :root {
+    --bg: #f5f7fa;
+    --blue: #3b82f6;
+    --light: #ffffff;
+    --shadow-dark: rgba(174, 185, 201, 0.4);
+    --shadow-light: rgba(255, 255, 255, 0.9);
+    --text-dark: #1e293b;
+
+    --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    color: var(--text-dark);
+    background-color: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  .nm-outset {
+    background: var(--bg);
+    box-shadow:
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light);
+  }
+
+  .nm-inset {
+    background: var(--bg);
+    box-shadow:
+      inset 6px 6px 12px var(--shadow-dark),
+      inset -6px -6px 12px var(--shadow-light);
+  }
+
+  .nm-btn {
+    background: var(--bg);
+    box-shadow:
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light);
+    transition: all 0.2s ease;
+  }
+
+  .nm-btn:hover {
+    box-shadow:
+      2px 2px 4px var(--shadow-dark),
+      -2px -2px 4px var(--shadow-light);
+    transform: translateY(1px);
+  }
+
+  .nm-btn-active {
+    background: var(--bg);
+    box-shadow:
+      inset 2px 2px 4px var(--shadow-dark),
+      inset -2px -2px 4px var(--shadow-light);
+  }
+
+  .nm-glow-blue {
+    box-shadow:
+      0 0 25px rgba(59, 130, 246, 0.4),
+      8px 8px 16px var(--shadow-dark),
+      -8px -8px 16px var(--shadow-light) !important;
+  }
+
+  .nm-glow-blue:hover {
+    box-shadow:
+      0 0 40px rgba(59, 130, 246, 0.6),
+      4px 4px 8px var(--shadow-dark),
+      -4px -4px 8px var(--shadow-light) !important;
+  }
+}
