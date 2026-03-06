@@ -1,0 +1,470 @@
+Page: LabLink - Autonomous Lab Integration Update
+
+```html
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabLink — Connect Lab Instruments in Minutes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --blue: #3b82f6;
+            --light: #ffffff;
+            --shadow-dark: rgba(174, 185, 201, 0.4);
+            --shadow-light: rgba(255, 255, 255, 0.9);
+            --text-dark: #1e293b;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--bg);
+        }
+        .nm-outset {
+            background: var(--bg);
+            box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+        }
+        .nm-inset {
+            background: var(--bg);
+            box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
+        }
+        .nm-btn {
+            background: var(--bg);
+            box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
+            transition: all 0.2s ease;
+        }
+        .nm-btn:hover {
+            box-shadow: 2px 2px 4px var(--shadow-dark), -2px -2px 4px var(--shadow-light);
+            transform: translateY(1px);
+        }
+        .nm-btn-active {
+            background: var(--bg);
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+        /* Hero Line Drawing Animation */
+        @keyframes drawLine {
+            to { stroke-dashoffset: 0; }
+        }
+        .animate-draw {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 3s ease-out forwards;
+        }
+        .nm-circle-pressed {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light);
+        }
+        .nm-glow-blue {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light) !important;
+        }
+        .nm-glow-blue:hover {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light) !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="fixed top-0 w-full z-50 bg-[#f5f7fa]/80 backdrop-blur-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-24">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 bg-[#3b82f6] nm-glow-blue rounded-xl flex items-center justify-center">
+                            <iconify-icon icon="lucide:link-2" class="text-2xl text-white"></iconify-icon>
+                        </div>
+                        <span class="text-2xl font-extrabold tracking-tight text-[#0f172a]">LabLink</span>
+                    </div>
+                    <div class="hidden md:flex items-center space-x-10 font-semibold text-slate-500">
+                        <a href="#problem" class="hover:text-[#3b82f6] transition-colors" id="nav-problem-link">Problem</a>
+                        <a href="#solution" class="hover:text-[#3b82f6] transition-colors" id="nav-solution-link">Solution</a>
+                        <a href="#how-it-works" class="hover:text-[#3b82f6] transition-colors" id="nav-how-link">How it Works</a>
+                        <a href="#waitlist" class="nm-btn bg-[#3b82f6] text-white nm-glow-blue px-8 py-3 rounded-full transition-all" id="nav-cta-waitlist">Join Waitlist</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <header class="pt-40 pb-20 lg:pt-56 lg:pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col lg:flex-row items-center gap-20">
+                    <!-- Hero Content -->
+                    <div class="lg:w-1/2 space-y-8">
+                        <div class="inline-flex items-center gap-2 nm-inset px-4 py-2 rounded-full">
+                            <span class="w-2 h-2 rounded-full bg-[#3b82f6] animate-pulse"></span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Pre-launch Early Access</span>
+                        </div>
+                        <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight leading-tight text-slate-900">
+                            Stop Being Human <br/>
+                            <span class="text-[#3b82f6]">Middleware.</span>
+                        </h1>
+                        <p class="text-xl text-slate-500 leading-relaxed max-w-xl font-medium">
+                            Scientists waste 20-30% of their time manually copy-pasting data. LabLink captures instrument data automatically so you can focus on discoveries.
+                        </p>
+                        <div class="pt-4">
+                            <a href="#waitlist" class="nm-btn text-white bg-[#3b82f6] nm-glow-blue px-10 py-5 rounded-2xl font-bold text-xl inline-flex items-center gap-3 group" id="hero-primary-cta">
+                                Join Early Access List
+                                <iconify-icon icon="lucide:arrow-right" class="group-hover:translate-x-1 transition-transform"></iconify-icon>
+                            </a>
+                            <p class="text-sm text-slate-400 mt-6 font-medium">Priority onboarding for first 100 labs.</p>
+                        </div>
+                    </div>
+
+                    <!-- Hero Animation -->
+                    <div class="lg:w-1/2 w-full">
+                        <div class="nm-outset rounded-[40px] p-10 relative overflow-hidden">
+                            <div class="flex items-center justify-between mb-12">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full nm-inset"></div>
+                                    <div class="w-3 h-3 rounded-full nm-inset"></div>
+                                    <div class="w-3 h-3 rounded-full nm-inset"></div>
+                                </div>
+                                <div class="nm-inset px-4 py-1.5 rounded-lg text-[10px] font-mono text-slate-400">ANALYTICAL_ENGINE_V2</div>
+                            </div>
+                            <div class="h-[300px] w-full flex items-center justify-center">
+                                <svg class="w-full h-full" viewBox="0 0 400 200" preserveAspectRatio="none">
+                                    <path d="M0,150 Q50,140 100,100 T200,80 T300,40 T400,20" fill="none" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" class="animate-draw opacity-40" />
+                                    <path d="M0,160 Q60,150 120,110 T240,90 T360,50 T400,30" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" class="animate-draw" style="animation-delay: 0.5s" />
+                                    <circle cx="400" cy="30" r="6" fill="#3b82f6" class="nm-outset" />
+                                </svg>
+                            </div>
+                            <div class="mt-8 flex justify-between items-center opacity-60">
+                                <span class="text-xs font-mono">SCANNING...</span>
+                                <span class="text-xs font-mono text-[#3b82f6]">88.2% ACCURACY</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Trust Strip -->
+        <section class="py-16 bg-[#f5f7fa]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-12">
+                    <div class="flex flex-col items-center md:items-start">
+                        <p class="text-4xl font-extrabold text-slate-900 tracking-tighter mb-1">70-80%</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">File Watch Coverage</p>
+                    </div>
+                    <div class="w-px h-12 bg-slate-200 hidden md:block"></div>
+                    <div class="flex flex-col items-center md:items-start">
+                        <p class="text-4xl font-extrabold text-slate-900 tracking-tighter mb-1">5 MIN</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Setup Latency</p>
+                    </div>
+                    <div class="w-px h-12 bg-slate-200 hidden md:block"></div>
+                    <div class="flex flex-col items-center md:items-start">
+                        <p class="text-4xl font-extrabold text-slate-900 tracking-tighter mb-1">25+</p>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Core Instruments</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section id="problem" class="py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-24">
+                    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-8">Your Lab's Data Gap</h2>
+                    <p class="text-xl text-slate-500 font-medium leading-relaxed">Current manual workflows are invisible taxes on your research speed. We connect the endpoints.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- Pain Point 1 -->
+                    <div class="nm-inset p-12 rounded-[40px] group transition-all">
+                        <div class="w-14 h-14 bg-[#ef4444] text-white rounded-2xl flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(239,68,68,0.4)]">
+                            <iconify-icon icon="lucide:clock-4" class="text-2xl"></iconify-icon>
+                        </div>
+                        <p class="text-4xl font-extrabold text-[#ef4444] mb-4 tracking-tighter">230 HRS/YR</p>
+                        <h4 class="text-lg font-bold text-slate-500 uppercase tracking-wide mb-4">The Copy-Paste Tax</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">Researchers spend 1 hour per day on manual entry. That's PhD talent performing clerical tasks at scale.</p>
+                    </div>
+
+                    <!-- Pain Point 2 -->
+                    <div class="nm-inset p-12 rounded-[40px] group transition-all">
+                        <div class="w-14 h-14 bg-[#f97316] text-white rounded-2xl flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(249,115,22,0.4)]">
+                            <iconify-icon icon="lucide:alert-circle" class="text-2xl"></iconify-icon>
+                        </div>
+                        <p class="text-4xl font-extrabold text-[#f97316] mb-4 tracking-tighter">7% ERRORS</p>
+                        <h4 class="text-lg font-bold text-slate-500 uppercase tracking-wide mb-4">Transcription Risk</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">When humans re-type data, 14% of errors become clinically significant. One typo can invalidate months of work.</p>
+                    </div>
+
+                    <!-- Pain Point 3 -->
+                    <div class="nm-inset p-12 rounded-[40px] group transition-all">
+                        <div class="w-14 h-14 bg-[#6366f1] text-white rounded-2xl flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+                            <iconify-icon icon="lucide:database" class="text-2xl"></iconify-icon>
+                        </div>
+                        <p class="text-4xl font-extrabold text-[#6366f1] mb-4 tracking-tighter">65% SHEETS</p>
+                        <h4 class="text-lg font-bold text-slate-500 uppercase tracking-wide mb-4">Spreadsheet Graveyards</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">Data ends up scattered across personal laptops and USB drives, invisible to the rest of your organization.</p>
+                    </div>
+
+                    <!-- Pain Point 4 -->
+                    <div class="nm-inset p-12 rounded-[40px] group transition-all">
+                        <div class="w-14 h-14 bg-[#fbbf24] text-white rounded-2xl flex items-center justify-center mb-8 shadow-[0_0_20px_rgba(251,191,36,0.4)]">
+                            <iconify-icon icon="lucide:shield-off" class="text-2xl"></iconify-icon>
+                        </div>
+                        <p class="text-4xl font-extrabold text-[#fbbf24] mb-4 tracking-tighter">17% LOSS</p>
+                        <h4 class="text-lg font-bold text-slate-500 uppercase tracking-wide mb-4">The Bus Factor</h4>
+                        <p class="text-slate-500 leading-relaxed font-medium">When key people leave, their custom parsing scripts and manual pipelines leave with them.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section id="solution" class="py-32 bg-[#f5f7fa]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-8">Built for Science</h2>
+                    <p class="text-xl text-slate-500 font-medium leading-relaxed">The integration layer that works with your instruments as they are today.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="nm-outset p-12 rounded-[40px] hover:scale-[1.02] transition-transform">
+                        <div class="nm-inset w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
+                            <iconify-icon icon="lucide:zap" class="text-2xl text-[#3b82f6]"></iconify-icon>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Auto-Capture</h3>
+                        <p class="text-slate-500 font-medium leading-relaxed">Our lightweight agent watches output folders and uploads files instantly. Zero friction.</p>
+                    </div>
+
+                    <div class="nm-outset p-12 rounded-[40px] hover:scale-[1.02] transition-transform">
+                        <div class="nm-inset w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
+                            <iconify-icon icon="lucide:search" class="text-2xl text-[#3b82f6]"></iconify-icon>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Instant Search</h3>
+                        <p class="text-slate-500 font-medium leading-relaxed">Find any experiment in 2 seconds. Search by project, date, instrument, or operator.</p>
+                    </div>
+
+                    <div class="nm-outset p-12 rounded-[40px] hover:scale-[1.02] transition-transform">
+                        <div class="nm-inset w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
+                            <iconify-icon icon="lucide:share-2" class="text-2xl text-[#3b82f6]"></iconify-icon>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">Universal Export</h3>
+                        <p class="text-slate-500 font-medium leading-relaxed">One-click exports to CSV, JSON, or Excel. Formatted exactly how you need it for analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-28">
+                    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-8">Operational in 5 Mins</h2>
+                    <p class="text-xl text-slate-500 font-medium leading-relaxed">Zero IT department required. Designed for immediate scientist self-service.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-20 relative">
+                    <!-- Connective Line (Dashed) -->
+                    <div class="hidden md:block absolute top-[40px] left-[15%] right-[15%] h-px border-t-2 border-dashed border-slate-200"></div>
+
+                    <div class="flex flex-col items-center text-center group">
+                        <div class="nm-circle-pressed mb-10">
+                            <span class="text-3xl font-extrabold text-slate-400">1</span>
+                        </div>
+                        <iconify-icon icon="lucide:binary" class="text-3xl text-slate-300 mb-6 group-hover:text-[#3b82f6] transition-colors"></iconify-icon>
+                        <h4 class="text-xl font-bold mb-4 text-slate-900">Install Agent</h4>
+                        <p class="text-slate-500 font-medium px-4">Download the single-binary agent to your instrument PC.</p>
+                    </div>
+
+                    <div class="flex flex-col items-center text-center group">
+                        <div class="nm-circle-pressed mb-10">
+                            <span class="text-3xl font-extrabold text-slate-400">2</span>
+                        </div>
+                        <iconify-icon icon="lucide:folder-heart" class="text-3xl text-slate-300 mb-6 group-hover:text-[#3b82f6] transition-colors"></iconify-icon>
+                        <h4 class="text-xl font-bold mb-4 text-slate-900">Watch Folders</h4>
+                        <p class="text-slate-500 font-medium px-4">Point the agent at your instrument output directories.</p>
+                    </div>
+
+                    <div class="flex flex-col items-center text-center group">
+                        <div class="nm-circle-pressed mb-10">
+                            <span class="text-3xl font-extrabold text-slate-400">3</span>
+                        </div>
+                        <iconify-icon icon="lucide:bar-chart-big" class="text-3xl text-slate-300 mb-6 group-hover:text-[#3b82f6] transition-colors"></iconify-icon>
+                        <h4 class="text-xl font-bold mb-4 text-slate-900">Visualize</h4>
+                        <p class="text-slate-500 font-medium px-4">Data appears searchable and parsed in your dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Future Labs Section -->
+        <section id="future-labs" class="py-32 bg-[#f5f7fa]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-3xl mx-auto mb-20">
+                    <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-8">Built for the Future of Labs</h2>
+                    <p class="text-xl text-slate-500 font-medium leading-relaxed">The autonomous lab market is moving from proof-of-concept to commercial product. LabLink's foundational data layer enables this next generation.</p>
+                </div>
+
+                <!-- DMTA Cycle Visualization -->
+                <div class="relative max-w-2xl mx-auto h-[450px] md:h-[500px] mb-32">
+                    <!-- SVG Connections -->
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 500 500">
+                        <path d="M120,80 Q250,30 380,80" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 4" />
+                        <path d="M420,120 Q470,250 420,380" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 4" />
+                        <path d="M380,420 Q250,470 120,420" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" />
+                        <path d="M80,380 Q30,250 80,120" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 4" />
+                    </svg>
+
+                    <!-- Design Node -->
+                    <div class="absolute top-[5%] left-[5%] md:left-[10%] flex flex-col items-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 nm-outset bg-indigo-50/50 rounded-3xl flex items-center justify-center mb-4">
+                            <iconify-icon icon="lucide:brain-circuit" class="text-3xl text-indigo-500"></iconify-icon>
+                        </div>
+                        <span class="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Design</span>
+                    </div>
+
+                    <!-- Make Node -->
+                    <div class="absolute top-[5%] right-[5%] md:right-[10%] flex flex-col items-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 nm-outset rounded-3xl flex items-center justify-center mb-4">
+                            <iconify-icon icon="lucide:bot" class="text-3xl text-slate-400"></iconify-icon>
+                        </div>
+                        <span class="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Make</span>
+                    </div>
+
+                    <!-- Test Node -->
+                    <div class="absolute bottom-[5%] right-[5%] md:right-[10%] flex flex-col items-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 nm-outset rounded-3xl flex items-center justify-center mb-4">
+                            <iconify-icon icon="lucide:flask-conical" class="text-3xl text-slate-400"></iconify-icon>
+                        </div>
+                        <span class="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Test</span>
+                    </div>
+
+                    <!-- Analyze Node -->
+                    <div class="absolute bottom-[5%] left-[5%] md:left-[10%] flex flex-col items-center">
+                        <div class="w-20 h-20 md:w-24 md:h-24 nm-outset bg-blue-50/50 rounded-3xl flex items-center justify-center mb-4">
+                            <iconify-icon icon="lucide:line-chart" class="text-3xl text-blue-500"></iconify-icon>
+                        </div>
+                        <span class="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Analyze</span>
+                    </div>
+
+                    <!-- LabLink Junction Highlight -->
+                    <div class="absolute bottom-[0%] left-1/2 -translate-x-1/2 flex flex-col items-center z-10">
+                        <div class="nm-btn bg-white nm-glow-blue border-2 border-[#3b82f6]/20 px-6 py-2 rounded-full mb-3">
+                             <span class="text-[#3b82f6] font-extrabold text-sm tracking-tight">LabLink Data Layer</span>
+                        </div>
+                        <div class="w-4 h-4 bg-[#3b82f6] rounded-full animate-ping opacity-75"></div>
+                    </div>
+                </div>
+
+                <!-- Sub-sections Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="nm-outset p-10 rounded-[40px] space-y-6 hover:translate-y-[-4px] transition-transform">
+                        <div class="w-14 h-14 nm-inset rounded-2xl flex items-center justify-center text-[#3b82f6]">
+                            <iconify-icon icon="lucide:bot" class="text-2xl"></iconify-icon>
+                        </div>
+                        <h4 class="text-2xl font-bold text-slate-900">Agent-Native Architecture</h4>
+                        <p class="text-slate-500 font-medium leading-relaxed">Every action you take in LabLink's dashboard—upload files, parse data, query results—is available to AI agents via REST APIs, Python SDK, and MCP servers.</p>
+                    </div>
+
+                    <div class="nm-outset p-10 rounded-[40px] space-y-6 hover:translate-y-[-4px] transition-transform">
+                        <div class="w-14 h-14 nm-inset rounded-2xl flex items-center justify-center text-[#3b82f6]">
+                            <iconify-icon icon="lucide:refresh-cw" class="text-2xl"></iconify-icon>
+                        </div>
+                        <h4 class="text-2xl font-bold text-slate-900">Closed-Loop Ready</h4>
+                        <p class="text-slate-500 font-medium leading-relaxed">LabLink captures analysis results in machine-readable JSON. Analysis outputs can trigger new experiment suggestions, enabling continuous autonomous design cycles.</p>
+                    </div>
+
+                    <div class="nm-outset p-10 rounded-[40px] space-y-6 hover:translate-y-[-4px] transition-transform">
+                        <div class="w-14 h-14 nm-inset rounded-2xl flex items-center justify-center text-[#3b82f6]">
+                            <iconify-icon icon="lucide:box" class="text-2xl"></iconify-icon>
+                        </div>
+                        <h4 class="text-2xl font-bold text-slate-900">Digital Twin Compatible</h4>
+                        <p class="text-slate-500 font-medium leading-relaxed">LabLink stores instrument parameters and calibration metadata. This rich context enables digital twins to simulate protocols in silico before physical execution.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section id="waitlist" class="py-32 pb-48">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="nm-outset rounded-[60px] p-20 text-center space-y-12 relative overflow-hidden">
+                    <div class="absolute -top-40 -left-40 w-80 h-80 bg-[#3b82f6]/5 blur-[120px] rounded-full"></div>
+                    <div class="absolute -bottom-40 -right-40 w-80 h-80 bg-slate-900/5 blur-[120px] rounded-full"></div>
+
+                    <div class="space-y-6">
+                        <h2 class="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900">Unify Your Lab Data</h2>
+                        <p class="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Join our early access group and secure lifetime discounted pricing before our 2026 public rollout.</p>
+                    </div>
+
+                    <div class="flex flex-col items-center gap-8">
+                        <a href="#" class="nm-btn bg-[#3b82f6] text-white nm-glow-blue px-12 py-6 rounded-3xl font-extrabold text-2xl hover:scale-105 transition-all" id="final-cta-waitlist-btn">
+                            Join Early Access List
+                        </a>
+                        <a href="#" class="text-slate-400 font-bold hover:text-slate-600 transition-colors uppercase tracking-widest text-xs" id="final-cta-demo-link">Or schedule a team briefing</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-slate-900 pt-32 pb-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 lg:grid-cols-5 gap-16 mb-24">
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-3 mb-8">
+                            <div class="w-10 h-10 bg-[#3b82f6] rounded-xl flex items-center justify-center text-white nm-btn border-none shadow-none">
+                                <iconify-icon icon="lucide:link-2" class="text-2xl"></iconify-icon>
+                            </div>
+                            <span class="text-2xl font-bold tracking-tight text-white">LabLink</span>
+                        </div>
+                        <p class="text-slate-500 font-medium leading-relaxed max-w-sm mb-10">
+                            The modern integration layer for the world's leading research organizations.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors" id="footer-social-linkedin"><iconify-icon icon="mdi:linkedin" class="text-2xl"></iconify-icon></a>
+                            <a href="#" class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors" id="footer-social-twitter"><iconify-icon icon="mdi:twitter" class="text-2xl"></iconify-icon></a>
+                            <a href="#" class="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition-colors" id="footer-social-github"><iconify-icon icon="mdi:github" class="text-2xl"></iconify-icon></a>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="text-slate-400 uppercase tracking-widest font-bold text-[10px] mb-8">Product</h6>
+                        <ul class="space-y-4 font-bold">
+                            <li><a href="#" id="footer-link-features" class="text-slate-300 hover:text-white transition-colors">Features</a></li>
+                            <li><a href="#" id="footer-link-pricing" class="text-slate-300 hover:text-white transition-colors">Pricing</a></li>
+                            <li><a href="#" id="footer-link-docs" class="text-slate-300 hover:text-white transition-colors">Docs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h6 class="text-slate-400 uppercase tracking-widest font-bold text-[10px] mb-8">Company</h6>
+                        <ul class="space-y-4 font-bold">
+                            <li><a href="#" id="footer-link-about" class="text-slate-300 hover:text-white transition-colors">About</a></li>
+                            <li><a href="#" id="footer-link-contact" class="text-slate-300 hover:text-white transition-colors">Contact</a></li>
+                            <li><a href="#" id="footer-link-careers" class="text-slate-300 hover:text-white transition-colors">Careers</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h6 class="text-slate-400 uppercase tracking-widest font-bold text-[10px] mb-8">Legal</h6>
+                        <ul class="space-y-4 font-bold">
+                            <li><a href="#" id="footer-link-privacy" class="text-slate-300 hover:text-white transition-colors">Privacy</a></li>
+                            <li><a href="#" id="footer-link-terms" class="text-slate-300 hover:text-white transition-colors">Terms</a></li>
+                            <li><a href="#" id="footer-link-gdpr" class="text-slate-300 hover:text-white transition-colors">GDPR</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="pt-12 border-t border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <p class="text-slate-600 text-sm font-medium">© 2026 LabLink, Inc. Built for scientific precision.</p>
+                    <p class="text-slate-600 text-sm font-bold uppercase tracking-widest">Status: <span class="text-emerald-500">v1.2.0-Alpha</span></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
+```
+
+Please reference this design and implement it into our codebase; Try to understand the structure, which part of our codebase is relevant and implement
