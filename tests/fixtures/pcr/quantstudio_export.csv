@@ -1,0 +1,28 @@
+* Experiment Name: Gene Expression Panel v3
+* Instrument Type: QuantStudio 5
+* Instrument Name: QS5-Lab-Main
+* Serial Number: 278450312
+* Software Version: QuantStudio Design & Analysis 2.7.0
+* Block Type: 96-Well 0.2-mL Block
+* Chemistry: SYBR Green
+* Passive Reference: ROX
+* Experiment Run End Time: 2026-03-01 16:45:23 UTC
+
+[Results]
+Well,Well Position,Sample Name,Target Name,Task,Reporter,CT,Ct Mean,Ct SD
+1,A1,Control_WT,GAPDH,UNKNOWN,SYBR,18.45,18.52,0.10
+2,A2,Control_WT,GAPDH,UNKNOWN,SYBR,18.59,18.52,0.10
+3,A3,Control_WT,BRCA1,UNKNOWN,SYBR,25.12,25.20,0.11
+4,A4,Control_WT,BRCA1,UNKNOWN,SYBR,25.28,25.20,0.11
+5,B1,Sample_KO_1,GAPDH,UNKNOWN,SYBR,18.78,18.85,0.10
+6,B2,Sample_KO_1,GAPDH,UNKNOWN,SYBR,18.92,18.85,0.10
+7,B3,Sample_KO_1,BRCA1,UNKNOWN,SYBR,32.45,32.50,0.07
+8,B4,Sample_KO_1,BRCA1,UNKNOWN,SYBR,32.55,32.50,0.07
+9,C1,Sample_KO_2,GAPDH,UNKNOWN,SYBR,19.12,19.08,0.06
+10,C2,Sample_KO_2,GAPDH,UNKNOWN,SYBR,19.04,19.08,0.06
+11,C3,Sample_KO_2,BRCA1,UNKNOWN,SYBR,Undetermined,,
+12,C4,Sample_KO_2,BRCA1,UNKNOWN,SYBR,Undetermined,,
+13,D1,NTC,GAPDH,NTC,SYBR,Undetermined,,
+14,D2,NTC,BRCA1,NTC,SYBR,Undetermined,,
+15,E1,Positive_Ctrl,GAPDH,STANDARD,SYBR,15.23,15.23,0.00
+16,E2,Positive_Ctrl,BRCA1,STANDARD,SYBR,22.89,22.89,0.00

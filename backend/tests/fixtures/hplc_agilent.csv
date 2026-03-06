@@ -1,0 +1,19 @@
+Instrument: Agilent 1260 Infinity II
+Serial Number: DE64250812
+Software Version: ChemStation C.01.10
+Method: CAFFEINE_ANALYSIS.M
+Method Name: Caffeine Quantification - Reverse Phase
+Column: Agilent ZORBAX Eclipse Plus C18, 4.6 x 150 mm, 5 um
+Detector: DAD 254 nm
+Flow Rate: 1.0 mL/min
+Injection Volume: 10 uL
+Sample Name: Coffee Extract A
+Date: 2026-03-01 14:23:05
+Operator: Dr. Smith
+
+Retention Time,Area,Height,Area %
+1.234,15234.5,1245.3,3.21
+2.891,45123.8,3892.1,9.52
+5.672,312456.7,28934.5,65.93
+8.145,78234.1,6234.8,16.51
+11.923,22890.3,1834.2,4.83

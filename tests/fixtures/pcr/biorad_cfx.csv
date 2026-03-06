@@ -1,0 +1,13 @@
+Well,Fluor,Target,Content,Sample,Cq
+A01,SYBR,IL6,Unkn,Patient_001,24.56
+A02,SYBR,IL6,Unkn,Patient_002,22.13
+A03,SYBR,IL6,Unkn,Patient_003,28.91
+A04,SYBR,IL6,Std,Standard_1,15.23
+A05,SYBR,IL6,Std,Standard_2,18.45
+A06,SYBR,IL6,Std,Standard_3,21.67
+A07,SYBR,IL6,NTC,NTC,N/A
+A08,SYBR,TNF,Unkn,Patient_001,26.78
+A09,SYBR,TNF,Unkn,Patient_002,23.45
+A10,SYBR,TNF,Unkn,Patient_003,31.23
+A11,SYBR,TNF,NTC,NTC,N/A
+A12,SYBR,TNF,Unkn,Patient_004,42.50

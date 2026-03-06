@@ -1,0 +1,14 @@
+Method: Reversed Phase C18
+Instrument: Agilent 1260 Infinity II
+Serial Number: DE12345678
+Software Version: OpenLAB CDS 2.7
+Column: Agilent ZORBAX Eclipse Plus C18 4.6x150mm
+Sample Name: Caffeine_Standard_Mix
+Detector: UV 254nm
+
+Peak#,Retention Time (min),Area (mAU*s),Height (mAU),Area %
+1,2.145,15234.5,1523.4,5.12
+2,4.567,89123.4,8912.3,29.96
+3,7.891,125678.9,12567.9,42.25
+4,11.234,45678.1,4567.8,15.35
+5,14.567,21789.3,2178.9,7.32

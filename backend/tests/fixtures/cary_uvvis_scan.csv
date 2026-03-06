@@ -1,0 +1,13 @@
+Instrument: Cary 60 UV-Vis
+Method: Full Spectrum Scan
+Sample ID,Wavelength (nm),Absorbance
+Sample_A,200,0.856
+Sample_A,220,1.234
+Sample_A,260,2.456
+Sample_A,280,1.128
+Sample_A,300,0.345
+Sample_B,200,0.423
+Sample_B,220,0.678
+Sample_B,260,1.234
+Sample_B,280,0.567
+Sample_B,300,0.123

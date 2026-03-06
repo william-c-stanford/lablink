@@ -1,0 +1,22 @@
+* Block Type = 96-Well 0.2-mL Block
+* Chemistry = TaqMan Reagents
+* Experiment Name = COVID_Screening_Plate_42
+* Instrument Type = QuantStudio 5
+* Passive Reference = ROX
+
+[Results]
+Well Position,Sample Name,Target Name,Task,Reporter,Ct,Ct Mean,Ct SD,Quantity
+A1,Patient_001,N gene,Unknown,FAM,24.56,24.61,0.07,
+A2,Patient_001,N gene,Unknown,FAM,24.67,24.61,0.07,
+A3,Patient_001,ORF1ab,Unknown,VIC,25.89,25.92,0.04,
+A4,Patient_001,ORF1ab,Unknown,VIC,25.95,25.92,0.04,
+B1,Patient_002,N gene,Unknown,FAM,31.23,31.45,0.31,
+B2,Patient_002,N gene,Unknown,FAM,31.67,31.45,0.31,
+B3,Patient_002,ORF1ab,Unknown,VIC,32.45,32.56,0.16,
+B4,Patient_002,ORF1ab,Unknown,VIC,32.67,32.56,0.16,
+C1,Patient_003,N gene,Unknown,FAM,Undetermined,,,
+C2,Patient_003,ORF1ab,Unknown,VIC,Undetermined,,,
+D1,Positive_Ctrl,N gene,Positive Control,FAM,20.12,20.15,0.04,500.0
+D2,Positive_Ctrl,ORF1ab,Positive Control,VIC,21.34,21.34,0.00,250.0
+E1,NTC,N gene,Negative Control,FAM,Undetermined,,,
+E2,NTC,ORF1ab,Negative Control,VIC,Undetermined,,,

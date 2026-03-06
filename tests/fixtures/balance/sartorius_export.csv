@@ -1,0 +1,15 @@
+Balance: Sartorius Quintix 224-1S
+S/N: WQS-2024-00789
+Software Version: Q-App 3.2.1
+Unit: g
+Readability: 0.1 mg
+
+Sample ID,Net Weight,Tare Weight,Unit,Status
+Reagent_NaCl,58.4400,15.2310,g,Stable
+Reagent_KCl,74.5510,15.2280,g,Stable
+Reagent_CaCl2,110.9800,15.2350,g,Stable
+Buffer_Tris,12.1140,15.2300,g,Stable
+Buffer_HEPES,23.8300,15.2290,g,Stable
+Catalyst_PdC,0.1065,15.2340,g,Unstable
+Reference_Std,100.0002,15.2320,g,Stable
+Empty_Vessel,0.0008,15.2330,g,Stable

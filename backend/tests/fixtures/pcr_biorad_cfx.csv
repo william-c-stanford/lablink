@@ -1,0 +1,25 @@
+Instrument Name: Bio-Rad CFX96 Touch
+Serial Number: BR041256
+Software Version: CFX Manager 3.1
+Experiment Name: GAPDH_Expression_Study
+Run Date: 2026-02-28
+Chemistry: SYBR Green
+Block Type: 96-Well 0.2 mL
+
+Well,Sample Name,Target Name,Ct,Ct Mean,Reporter
+A1,Control_1,GAPDH,18.45,18.52,SYBR
+A2,Control_1,GAPDH,18.59,18.52,SYBR
+A3,Control_1,GAPDH,18.51,18.52,SYBR
+B1,Control_1,ACTB,16.23,16.31,SYBR
+B2,Control_1,ACTB,16.39,16.31,SYBR
+B3,Control_1,ACTB,16.32,16.31,SYBR
+C1,Treatment_1,GAPDH,19.12,19.18,SYBR
+C2,Treatment_1,GAPDH,19.24,19.18,SYBR
+C3,Treatment_1,GAPDH,19.17,19.18,SYBR
+D1,Treatment_1,ACTB,16.78,16.82,SYBR
+D2,Treatment_1,ACTB,16.85,16.82,SYBR
+D3,Treatment_1,ACTB,16.84,16.82,SYBR
+E1,NTC,GAPDH,Undetermined,,SYBR
+E2,NTC,ACTB,Undetermined,,SYBR
+F1,Treatment_2,GAPDH,22.34,22.41,SYBR
+F2,Treatment_2,GAPDH,22.48,22.41,SYBR

@@ -1,0 +1,18 @@
+Experiment Name: Gene Expression Study
+Instrument Type: CFX96 Touch
+Chemistry: SYBR
+Well,Sample Name,Target,Ct
+A1,Control_1,GAPDH,18.45
+A2,Control_1,GAPDH,18.52
+A3,Control_1,GAPDH,18.39
+B1,Control_1,TP53,24.67
+B2,Control_1,TP53,24.78
+B3,Control_1,TP53,24.55
+C1,Treatment_1,GAPDH,18.89
+C2,Treatment_1,GAPDH,18.92
+C3,Treatment_1,GAPDH,18.85
+D1,Treatment_1,TP53,28.34
+D2,Treatment_1,TP53,28.56
+D3,Treatment_1,TP53,28.12
+E1,NTC,GAPDH,Undetermined
+E2,NTC,TP53,Undetermined

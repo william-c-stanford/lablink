@@ -1,0 +1,12 @@
+Instrument: Shimadzu LC-2040C
+Software Version: LabSolutions 5.97
+Method Name: Amino Acid Analysis
+Sample Name: Serum_Panel_01
+
+Peak#,Ret. Time,Area,Height,Area %,Compound
+1,1.234,5678.9,567.9,3.45,Aspartate
+2,3.456,12345.6,1234.6,7.50,Glutamate
+3,5.678,34567.8,3456.8,20.98,Serine
+4,8.901,56789.0,5678.9,34.47,Glycine
+5,12.345,45678.1,4567.8,27.72,Alanine
+6,15.678,9876.5,987.7,5.99,Valine

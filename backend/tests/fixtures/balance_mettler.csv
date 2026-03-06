@@ -1,0 +1,10 @@
+Model: XPR205
+Serial Number: B123456789
+Readability: 0.01mg
+Unit: g
+Sample ID,Net Weight,Tare,Stability
+Compound_A,0.01523,12.3456,Stable
+Compound_B,0.02345,12.3460,Stable
+Compound_C,0.00876,12.3452,Stable
+Compound_D,0.05012,12.3448,Unstable
+Compound_E,0.03456,12.3455,Stable

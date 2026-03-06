@@ -1,0 +1,18 @@
+Instrument: Agilent 1260 Infinity II
+Serial Number: DE64257891
+Software Version: OpenLAB CDS ChemStation C.01.10
+Method: PURITY_SCREEN_REV_PHASE.M
+Column: Agilent ZORBAX Eclipse Plus C18 4.6x150mm 5um
+Detector: DAD 254 nm
+Sample Name: API-Batch-2026-003
+Injection Volume: 10 uL
+Flow Rate: 1.0 mL/min
+Run Date: 2026-02-28 14:32:15
+Peak#,Retention Time (min),Area (mAU*s),Height (mAU),Area %,Width (min)
+1,1.23,15234.5,1823.4,2.45,0.12
+2,3.67,456789.2,45678.1,73.42,0.34
+3,5.12,89012.3,12345.6,14.31,0.28
+4,7.89,34567.8,5678.9,5.56,0.22
+5,9.45,12345.6,2345.7,1.98,0.18
+6,11.23,8901.2,1234.5,1.43,0.15
+7,13.56,5234.1,890.2,0.84,0.11

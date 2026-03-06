@@ -1,0 +1,14 @@
+Instrument: Shimadzu LC-2040C Nexera-i
+Serial Number: L20401234567
+Software Version: LabSolutions 5.97
+Method Name: Aspirin_Assay_USP
+Column: Shimadzu Shim-pack GIST C18 4.6x150mm 5um
+Detector: PDA 220 nm
+Sample Name: Aspirin-Tablet-Lot-42
+Injection Volume: 20 uL
+Peak#,Ret. Time,Area,Height,Area %
+1,2.15,23456.7,3456.8,5.12
+2,4.82,345678.9,42567.3,75.43
+3,6.34,56789.0,8901.2,12.40
+4,8.91,23456.7,3456.8,5.12
+5,10.67,9012.3,1234.5,1.97

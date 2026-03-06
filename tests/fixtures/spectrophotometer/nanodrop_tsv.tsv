@@ -1,0 +1,7 @@
+Sample	Concentration	A260	A280	260/280
+gDNA_Mouse_Liver	520.4	10.408	5.362	1.94
+gDNA_Mouse_Brain	312.7	6.254	3.245	1.93
+gDNA_Mouse_Heart	185.3	3.706	1.910	1.94
+Plasmid_pUC19	445.0	8.900	4.579	1.94
+mRNA_HeLa	890.2	22.255	10.616	2.10
+tRNA_Yeast	678.1	16.953	8.304	2.04

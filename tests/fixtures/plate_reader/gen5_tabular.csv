@@ -1,0 +1,42 @@
+Software: Gen5 Export
+Instrument: BioTek Synergy H1
+Date: 2026-02-15
+Read: Endpoint 450 nm
+Procedure: ELISA Quantitation
+Well,Reading (OD),Sample ID
+A1,0.052,Blank_1
+A2,0.048,Blank_2
+A3,0.125,Std_1
+A4,0.250,Std_2
+A5,0.500,Std_3
+A6,1.000,Std_4
+A7,2.000,Std_5
+A8,0.345,Unknown_1
+A9,0.678,Unknown_2
+A10,1.234,Unknown_3
+A11,0.089,Control_Low
+A12,1.890,Control_High
+B1,0.055,Blank_3
+B2,0.051,Blank_4
+B3,0.128,Std_1_rep
+B4,0.248,Std_2_rep
+B5,0.512,Std_3_rep
+B6,1.023,Std_4_rep
+B7,2.045,Std_5_rep
+B8,0.352,Unknown_1_rep
+B9,0.690,Unknown_2_rep
+B10,1.245,Unknown_3_rep
+B11,0.092,Control_Low_rep
+B12,1.912,Control_High_rep
+C1,0.048,Sample_A1
+C2,0.567,Sample_A2
+C3,0.890,Sample_A3
+C4,1.234,Sample_A4
+C5,0.345,Sample_B1
+C6,0.678,Sample_B2
+C7,1.012,Sample_B3
+C8,1.456,Sample_B4
+C9,0.234,Sample_C1
+C10,0.567,Sample_C2
+C11,0.890,Sample_C3
+C12,1.345,Sample_C4

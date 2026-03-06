@@ -1,0 +1,26 @@
+Instrument: Mettler Toledo XPE205
+Model: XPE205
+Serial Number: B415678901
+Firmware: V2.30
+Operator: Dr. Sarah Chen
+Method: Standard Weighing
+Readability: 0.01 mg
+Last Calibration: 2026-02-28
+Environment: Stable
+Temperature: 22.5 C
+Weighing Mode: Fine
+Stabilization: Auto
+
+Date,Time,Sample ID,Net Weight,Unit,Tare,Gross Weight,Stability,Mode
+2026-03-01,09:15:22,CAL-STD-100,100.0002,mg,15.2340,115.2342,Stable,Standard
+2026-03-01,09:16:45,CAL-STD-200,200.0015,mg,15.2340,215.2355,Stable,Standard
+2026-03-01,09:18:03,SAMPLE-001,45.3782,mg,15.2340,60.6122,Stable,Standard
+2026-03-01,09:19:28,SAMPLE-002,112.5601,mg,15.2340,127.7941,Stable,Standard
+2026-03-01,09:20:55,SAMPLE-003,78.9243,mg,15.2340,94.1583,Unstable,Standard
+2026-03-01,09:22:10,SAMPLE-004,203.1187,mg,15.2340,218.3527,Stable,Standard
+2026-03-01,09:23:40,SAMPLE-005,5.0034,mg,15.2340,20.2374,Stable,Fine
+2026-03-01,09:25:02,SAMPLE-006,0.5012,mg,15.2340,15.7352,Stable,Fine
+2026-03-01,09:26:30,BLANK-001,0.0003,mg,15.2340,15.2343,Stable,Standard
+2026-03-01,09:27:55,SAMPLE-007,---,mg,15.2340,---,Error,Standard
+2026-03-01,09:29:18,SAMPLE-008,156.7890,mg,15.2340,172.0230,Stable,Standard
+2026-03-01,09:30:42,QC-CHECK-100,99.9987,mg,15.2340,115.2327,Stable,Standard

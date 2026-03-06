@@ -1,0 +1,20 @@
+* Instrument Type = QuantStudio 5
+* Block Type = 96-Well 0.2-mL Block
+* Chemistry = SYBR Green
+* Experiment Name = Gene Expression Panel
+* Passive Reference = ROX
+
+[Results]
+Well,Sample Name,Target Name,Task,Reporter,CT
+A1,Sample_01,GAPDH,UNKNOWN,SYBR,18.45
+A2,Sample_01,ACTB,UNKNOWN,SYBR,19.23
+A3,Sample_02,GAPDH,UNKNOWN,SYBR,17.89
+A4,Sample_02,ACTB,UNKNOWN,SYBR,18.67
+A5,Sample_03,GAPDH,UNKNOWN,SYBR,22.34
+A6,Sample_03,ACTB,UNKNOWN,SYBR,23.12
+B1,NTC,GAPDH,NTC,SYBR,Undetermined
+B2,NTC,ACTB,NTC,SYBR,Undetermined
+B3,Pos_Control,GAPDH,STANDARD,SYBR,15.67
+B4,Pos_Control,ACTB,STANDARD,SYBR,16.45
+B5,Sample_04,GAPDH,UNKNOWN,SYBR,25.78
+B6,Sample_04,ACTB,UNKNOWN,SYBR,26.56

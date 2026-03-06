@@ -1,0 +1,192 @@
+## Ouroboros Seed Specification
+## Project: LabLink Backend
+## Generated: 2026-03-06
+## Ambiguity Score: 0.1 (low — detailed roadmap + interview answers)
+
+goal: >
+  Build the complete Python backend for LabLink — an agent-native lab data integration
+  platform for mid-market research labs. Includes FastAPI application, SQLAlchemy models,
+  Pydantic schemas, service layer, 5 instrument parsers, Celery tasks (with sync fallback),
+  MCP server (FastMCP with 25 curated tools), and comprehensive test suite with realistic
+  instrument file fixtures.
+
+constraints:
+  - Python 3.12+ with FastAPI 0.115+, SQLAlchemy 2.0+ async, Pydantic 2.12+
+  - SQLite + mocks for dev (no Docker dependency required to run/test)
+  - Own instrument parsers (no allotropy dependency for MVP)
+  - Sync task fallback (Celery config present but tasks run inline in dev mode)
+  - Mock S3 (local filesystem), mock Elasticsearch (in-memory), mock Redis
+  - Response envelope on ALL endpoints — { data, meta, errors } via Envelope[T]
+  - Agent-native from day one — every UI action has an API, structured JSON alongside charts
+  - PostgreSQL is source of truth (SQLite for dev), ES eventually consistent, S3 immutable
+  - Immutable audit trail with hash chain — never delete audit events
+  - Routers are thin (validate + call service + return envelope)
+  - Services contain business logic with zero HTTP awareness
+  - Parsers follow BaseParser ABC — input (bytes + metadata), output ParsedResult
+  - MCP server capped at 25 tools across 4 toolsets + 2 discovery tools
+  - Tool names use verb_noun snake_case pattern
+  - Error responses include suggestion field for agent recovery
+
+acceptance_criteria:
+  # Core Infrastructure
+  - FastAPI app factory with CORS, exception handlers, envelope middleware runs successfully
+  - Settings load from environment variables via pydantic-settings
+  - SQLAlchemy async engine with session factory works with SQLite for dev
+  - All 16 database tables defined as SQLAlchemy ORM models
+  - Alembic migration creates initial schema
+  - JWT auth with bcrypt password hashing works end-to-end
+  - API token creation with scoped access (read, write, admin) enforced
+
+  # Upload Pipeline
+  - File upload via multipart/form-data returns upload_id in envelope
+  - SHA-256 content hash deduplication rejects duplicate uploads within org
+  - Parser auto-detection selects correct parser based on instrument_type hint, file extension, and header analysis
+  - Parse task runs synchronously in dev mode, stores ParsedResult
+
+  # 5 Instrument Parsers
+  - Spectrophotometer parser handles NanoDrop/Cary UV-Vis CSV → canonical MeasurementValue output
+  - Plate reader parser handles template-based CSV (SoftMax Pro, Gen5) with 96-well plate layout
+  - HPLC parser handles Agilent/Shimadzu CSV export with retention time, peak area
+  - PCR parser handles Bio-Rad/Thermo CSV with Ct values, amplification curves
+  - Balance parser handles Mettler Toledo CSV with mass readings
+  - All parsers output ParsedResult with measurements, units, instrument_settings, warnings
+  - All parsers handle corrupted input gracefully (raise ParseError, not crash)
+
+  # Search & Data
+  - Mock Elasticsearch service provides full-text search interface
+  - get_instrument_data returns structured JSON with measurements
+  - get_chart_data returns Plotly.js config + raw JSON
+  - create_export generates CSV/JSON export
+
+  # Experiments
+  - Experiment CRUD with state machine enforcement (planned→running→completed/failed, planned→cancelled)
+  - Campaign CRUD with progress tracking (experiment count, best result)
+  - Experiment-upload linking (many-to-many)
+  - record_outcome stores success/failure + measured results
+
+  # Webhooks
+  - Webhook subscription CRUD with HMAC-SHA256 secret
+  - Webhook delivery with retry (sync in dev mode)
+  - 7 event types: upload.created, upload.parsed, upload.parse_failed, experiment.created, experiment.status_changed, experiment.outcome_recorded, agent.offline
+
+  # Audit Trail
+  - Append-only audit events with hash chain integrity
+  - Every mutation logged with actor_type, action, resource_type, resource_id, details
+  - List/filter audit events by resource, actor, date
+
+  # MCP Server
+  - FastMCP server with 25 tools across 4 toolsets (explorer, planner, ingestor, admin)
+  - 2 discovery tools: list_toolsets(), get_toolset(name)
+  - All tool descriptions are agent-oriented with return type info
+  - Total tool count under 30
+
+  # Tests
+  - pytest with asyncio_mode=auto
+  - Realistic instrument file fixtures for all 5 parsers
+  - Auth tests (register, login, token, scope enforcement)
+  - Upload pipeline tests (upload, dedup, status tracking)
+  - Parser tests (happy path + corrupted input per parser)
+  - Experiment tests (CRUD, state machine, linking, outcomes)
+  - Audit tests (immutability, hash chain integrity)
+  - MCP tool tests (verb_noun names, return type descriptions, tool count limit)
+
+  # Config Files
+  - pyproject.toml with all dependencies
+  - docker-compose.yml for production services
+  - Makefile with dev, test, lint, migrate, seed targets
+  - CLAUDE.md with project conventions
+  - .gitignore
+
+ontology_schema:
+  name: LabDataIntegration
+  description: >
+    Domain model for a lab data integration platform covering organizations,
+    instruments, uploads, parsed data, experiments, campaigns, and audit trails.
+  fields:
+    - name: organization
+      type: object
+      description: Multi-tenant lab organization with tier-based limits (free/starter/pro/enterprise)
+    - name: user
+      type: object
+      description: User account with email auth, belongs to organizations via memberships
+    - name: membership
+      type: object
+      description: User-organization relationship with role (admin, scientist, viewer)
+    - name: project
+      type: object
+      description: Sub-organization grouping for related work
+    - name: instrument
+      type: object
+      description: Registered lab instrument (hplc, pcr, plate_reader, spectrophotometer, balance)
+    - name: agent
+      type: object
+      description: Desktop agent instance with API key, heartbeat status, watched folder config
+    - name: upload
+      type: object
+      description: Raw instrument file with lifecycle (uploaded→parsing→parsed→indexed), SHA-256 dedup
+    - name: parsed_data
+      type: object
+      description: Canonical ASM-compatible parsed output with measurements, units, instrument settings
+    - name: measurement_value
+      type: object
+      description: Single measurement — value, unit, QUDT URI, sample info, quality flag
+    - name: experiment
+      type: object
+      description: Experiment with intent, hypothesis, parameters, state machine (planned→running→completed/failed)
+    - name: campaign
+      type: object
+      description: Series of related experiments with optimization objective and progress tracking
+    - name: api_token
+      type: object
+      description: Scoped API token (read/write/admin) for user, agent, or integration identity
+    - name: audit_event
+      type: object
+      description: Immutable audit entry with hash chain — actor, action, resource, details
+    - name: webhook
+      type: object
+      description: Event subscription with HMAC-SHA256 signing and delivery tracking
+    - name: envelope
+      type: object
+      description: Standard response wrapper — { data: T, meta: ResponseMeta, errors: ErrorDetail[] }
+
+evaluation_principles:
+  - name: agent_nativeness
+    description: Every endpoint returns structured JSON in envelope format. Errors include suggestions. MCP tools are composable primitives.
+    weight: 0.25
+  - name: correctness
+    description: Parsers produce accurate canonical output. State machines enforce valid transitions. Auth scopes are checked. Hash chain maintains integrity.
+    weight: 0.25
+  - name: test_coverage
+    description: All parsers, services, and critical paths have tests. Realistic fixtures. Both happy path and error cases.
+    weight: 0.20
+  - name: code_organization
+    description: Thin routers, fat services, clean separation. Models/schemas/services in correct layers. No HTTP awareness in services.
+    weight: 0.15
+  - name: developer_experience
+    description: Works with SQLite + mocks out of the box. make test runs without Docker. Clear error messages.
+    weight: 0.15
+
+exit_conditions:
+  - name: all_tests_pass
+    description: Full test suite passes with pytest
+    criteria: pytest returns exit code 0 with no failures
+  - name: all_parsers_functional
+    description: All 5 instrument parsers produce valid ParsedResult from realistic fixtures
+    criteria: Parser tests pass for spectrophotometer, plate_reader, hplc, pcr, balance
+  - name: api_endpoints_working
+    description: All core REST endpoints return valid envelope responses
+    criteria: Auth, uploads, experiments, campaigns, audit, webhooks, data endpoints respond correctly
+  - name: mcp_server_valid
+    description: MCP server exposes curated toolsets within the 25-tool limit
+    criteria: Tool count <= 30, all tools have verb_noun names and return type descriptions
+
+metadata:
+  version: "1.0.0"
+  source: interview + plans/lablink-product-roadmap.md
+  ambiguity_score: 0.1
+  interview_date: "2026-03-06"
+  key_references:
+    - plans/lablink-product-roadmap.md
+    - RESEARCH/lablink-data-integration/executive_summary.md
+    - RESEARCH/agent-native-api-docs/executive_summary.md
+    - RESEARCH/closed-loop-autonomous-lab/executive_summary.md

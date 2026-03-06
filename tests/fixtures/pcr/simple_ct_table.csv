@@ -1,0 +1,9 @@
+Well,Sample Name,Target Name,Ct
+A1,Sample_1,GeneA,21.34
+A2,Sample_1,GeneA,21.56
+A3,Sample_1,GeneB,28.90
+B1,Sample_2,GeneA,19.87
+B2,Sample_2,GeneA,19.97
+B3,Sample_2,GeneB,26.45
+C1,NTC,GeneA,Undetermined
+C2,NTC,GeneB,Undetermined

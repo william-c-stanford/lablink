@@ -1,0 +1,14 @@
+Instrument: Shimadzu LC-2040C 3D
+Serial Number: L20401234567
+Software Version: LabSolutions 5.97
+Method: VITAMIN_ANALYSIS
+Column: Shimadzu Shim-pack GIST C18, 4.6 x 250 mm, 5 um
+Detector: UV-Vis 280 nm
+Sample Name: Vitamin Mix Standard
+
+Peak#,Ret. Time,Area,Height,Area %
+1,2.145,8923.4,723.1,5.12
+2,4.567,34521.8,2891.4,19.81
+3,7.234,89234.1,7234.5,51.21
+4,10.891,32145.7,2567.3,18.45
+5,14.123,9423.6,812.4,5.41

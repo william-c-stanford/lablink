@@ -1,0 +1,183 @@
+# ============================================================
+# LabLink .gitignore — Python / Node / Go
+# ============================================================
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+.Python
+develop-eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+nosetests.xml
+
+# mypy / pyright / type checkers
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.pyre/
+pyrightconfig.json
+
+# Ruff
+.ruff_cache/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ---------- Node / Frontend ----------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# Build output
+dist/
+.next/
+out/
+.nuxt/
+.output/
+.cache/
+
+# Env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vite
+*.local
+
+# ---------- Go ----------
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.dylib
+
+# Test binary
+*.test
+
+# Go build output
+/bin/
+vendor/
+
+# Go workspace
+go.work
+go.work.sum
+
+# ---------- IDEs & Editors ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.spyderproject
+.spyproject
+.ropeproject
+
+# ---------- OS ----------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- Terraform ----------
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# ---------- Project-specific ----------
+# Local SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded / ingested files (local mock S3)
+storage/
+uploads/
+data/
+
+# Logs
+logs/
+*.log
+
+# Secrets
+*.pem
+*.key
+*.crt
+*.p12
+
+# UV
+.uv/
+
+# Alembic auto-generated (keep migrations/, ignore tmp)
+alembic/tmp/
