@@ -661,7 +661,7 @@ list_audit_events(resource_type?, resource_id?, created_after?, page?)
 ```
 lablink/
 ├── CLAUDE.md                           # Agent coding instructions
-├── AGENTS.md                           # AI agent integration instructions
+├── CLAUDE.md                           # AI agent integration instructions
 ├── README.md
 ├── plans/
 │   └── lablink-product-roadmap.md      # This file
@@ -856,7 +856,7 @@ lablink/
 │   ├── docs.json                       # Mintlify config
 │   ├── quickstart/
 │   │   ├── for-developers.mdx
-│   │   ├── for-agents.mdx
+│   │   ├── for-CLAUDE.mdx
 │   │   └── for-sdk-users.mdx
 │   ├── api-reference/                  # Auto-generated from OpenAPI
 │   └── mcp/
@@ -922,7 +922,7 @@ Files to create:
 - `tests/conftest.py` — Test database, test client, authenticated user fixture, test org fixture
 - `tests/test_auth.py` — Registration, login, token creation, scope enforcement
 - `CLAUDE.md` — Project conventions for agentic coding tools
-- `AGENTS.md` — Instructions for AI agents working with the codebase
+- `CLAUDE.md` — Instructions for AI agents working with the codebase
 - `.gitignore`
 
 **Week 2: Upload Pipeline + First Parser**
@@ -1002,7 +1002,7 @@ Files to create:
 Files to create:
 - `docs/docs.json` — Mintlify config pointing at OpenAPI spec
 - `docs/quickstart/for-developers.mdx` — REST API quickstart
-- `docs/quickstart/for-agents.mdx` — MCP server setup for Claude Desktop
+- `docs/quickstart/for-CLAUDE.mdx` — MCP server setup for Claude Desktop
 - `docs/quickstart/for-sdk-users.mdx` — Python SDK quickstart
 - `docs/mcp/overview.mdx` — MCP architecture explanation
 - `docs/mcp/toolsets.mdx` — Toolset descriptions with examples

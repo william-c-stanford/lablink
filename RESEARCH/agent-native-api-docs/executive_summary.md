@@ -59,7 +59,7 @@ Don't load all tools at startup. Use a discovery pattern:
 | **API spec** | OpenAPI 3.1 (auto-generated from FastAPI) | Single source of truth |
 | **MCP server** | FastMCP (Python) | Agent integration layer, auto-generated from FastAPI then curated |
 | **SDK** | Fern or manual | `pip install lablink` with type hints |
-| **Agent config** | AGENTS.md | Project-level agent instructions |
+| **Agent config** | CLAUDE.md | Project-level agent instructions |
 | **Discovery** | llms.txt + llms-full.txt | Progressive disclosure for LLM consumption |
 
 ## What "Top-Tier" Looks Like

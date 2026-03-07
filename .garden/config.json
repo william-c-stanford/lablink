@@ -1,0 +1,12 @@
+{
+  "version": "1",
+  "claude_md_max_lines": 150,
+  "module_md_max_lines": 150,
+  "module_md_required_above_file_count": 10,
+  "freshness_warn_days": 30,
+  "freshness_error_days": 90,
+  "doc_coverage_mode": "warn",
+  "source_dirs": ["src/lablink", "frontend/src", "agent"],
+  "generated_docs": ["docs/generated/db-schema.md"],
+  "ignore_paths": ["node_modules", ".git", "dist", "build", "__pycache__", ".pytest_cache", ".venv"]
+}

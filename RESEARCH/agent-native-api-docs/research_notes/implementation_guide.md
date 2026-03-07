@@ -363,7 +363,7 @@ def test_agent_chains_tools_correctly():
 - [ ] `summary` on all endpoints (1 sentence, agent-friendly)
 - [ ] `description` with format hints on all parameters
 - [ ] `{ data, meta, errors }` response envelope with `suggestion` in errors
-- [ ] AGENTS.md at repo root
+- [ ] CLAUDE.md at repo root
 
 ### P1 (Ship with docs site)
 - [ ] Mintlify configured with OpenAPI auto-import

@@ -517,15 +517,15 @@ If you also want auto-generated SDKs (Python, TypeScript), Fern generates both d
 
 # 7. Agent Configuration Standards
 
-## 7.1 AGENTS.md
+## 7.1 CLAUDE.md
 
 A simple markdown file at your project root that tells AI coding agents how to work with your codebase. Now stewarded by the Linux Foundation under the Agentic AI Foundation.
 
-**Spec:** https://agents.md/ | **GitHub:** github.com/agentsmd/agents.md
+**Spec:** https://CLAUDE.md/ | **GitHub:** github.com/agentsmd/CLAUDE.md
 
 **Key sections for LabLink's repo:**
 ```markdown
-# AGENTS.md
+# CLAUDE.md
 
 ## Project Overview
 LabLink is a lab data integration platform. FastAPI backend, React frontend, Go desktop agent.
@@ -551,12 +551,12 @@ LabLink is a lab data integration platform. FastAPI backend, React frontend, Go 
 - Tool descriptions tested for clarity: `pytest tests/test_tool_descriptions.py`
 ```
 
-## 7.2 llms.txt vs. AGENTS.md vs. MCP
+## 7.2 llms.txt vs. CLAUDE.md vs. MCP
 
 | Standard | Audience | Purpose | Location |
 |----------|----------|---------|----------|
 | **llms.txt** | AI agents consuming your API | "What can this API do?" | `/llms.txt` on docs site |
-| **AGENTS.md** | AI coding agents working on your code | "How do I develop this codebase?" | Repo root |
+| **CLAUDE.md** | AI coding agents working on your code | "How do I develop this codebase?" | Repo root |
 | **MCP server** | AI agents using your API at runtime | "How do I call this tool right now?" | Running server |
 | **OpenAPI spec** | All audiences | Full technical reference | `/openapi.json` |
 
@@ -591,7 +591,7 @@ OpenAPI 3.1 Spec (openapi.json)
     │       ├── Async support
     │       └── Generated from OpenAPI (Fern or manual)
     │
-    └──▶ AGENTS.md (repo root)
+    └──▶ CLAUDE.md (repo root)
             └── Developer/agent coding instructions
 ```
 
@@ -657,8 +657,8 @@ The refined version gives the agent everything it needs without fetching additio
 - [ ] Error responses include `code`, `message`, `suggestion`
 - [ ] Pagination via `meta.total_count`, `meta.page`, `meta.has_more`
 
-### AGENTS.md
-- [ ] Create AGENTS.md at repo root with development instructions
+### CLAUDE.md
+- [ ] Create CLAUDE.md at repo root with development instructions
 
 ## 9.2 Phase 2: Documentation Site (Week 3)
 
@@ -677,7 +677,7 @@ The refined version gives the agent everything it needs without fetching additio
 docs/
 ├── quickstart/
 │   ├── for-developers.md
-│   ├── for-agents.md          # "How to integrate LabLink with your AI agent"
+│   ├── for-CLAUDE.md          # "How to integrate LabLink with your AI agent"
 │   └── for-sdk-users.md
 ├── api-reference/              # Auto-generated from OpenAPI
 ├── guides/
@@ -829,11 +829,11 @@ new_exp = client.create_experiment(
 - [Context7 MCP Integration](https://ef-map.com/blog/context7-mcp-documentation-automation) - EF-Map
 - [Context7](https://context7.com/) - Context7
 
-## AGENTS.md
-- [AGENTS.md specification](https://agents.md/) - AGENTS.md
-- [AGENTS.md GitHub](https://github.com/agentsmd/agents.md) - GitHub
-- [How to write a great agents.md](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/) - GitHub Blog
-- [A Complete Guide To AGENTS.md](https://www.aihero.dev/a-complete-guide-to-agents-md) - AI Hero
+## CLAUDE.md
+- [CLAUDE.md specification](https://CLAUDE.md/) - CLAUDE.md
+- [CLAUDE.md GitHub](https://github.com/agentsmd/CLAUDE.md) - GitHub
+- [How to write a great CLAUDE.md](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/) - GitHub Blog
+- [A Complete Guide To CLAUDE.md](https://www.aihero.dev/a-complete-guide-to-agents-md) - AI Hero
 
 ## API Design Patterns
 - [Stripe & Twilio: Achieving growth through cutting-edge documentation](https://devdocs.work/post/stripe-twilio-achieving-growth-through-cutting-edge-documentation) - DevDocs

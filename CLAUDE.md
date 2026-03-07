@@ -16,53 +16,6 @@
 6. **PostgreSQL is source of truth**: ES is eventually consistent. S3 is immutable.
 7. **Immutable audit trail**: Append-only with hash chain. Never delete audit events.
 
-## Project Structure
-```
-src/lablink/
-  config.py              # Settings via pydantic-settings (env vars, LABLINK_ prefix)
-  database.py            # Async SQLAlchemy engine, session factory, Base
-  main.py                # FastAPI app factory, CORS, exception handlers, router registration
-  dependencies.py        # get_db, get_current_user, get_current_org, require_role
-  exceptions.py          # LabLinkError hierarchy (NotFound, Validation, StateTransition, etc.)
-  schemas/               # Pydantic v2 request/response schemas
-    envelope.py          # Envelope[T], ErrorDetail, success_response(), error_response()
-    canonical.py         # ParsedResult, MeasurementValue, InstrumentSettings (ASM-compatible)
-    auth.py, organizations.py, projects.py, instruments.py, agents.py,
-    uploads.py, experiments.py, campaigns.py, webhooks.py, audit.py
-  models/                # SQLAlchemy 2.0 ORM models (Mapped/mapped_column, String(36) UUID PKs)
-    base.py              # TimestampMixin, UpdatedAtMixin, SoftDeleteMixin
-    16 model files       # organization, user, membership, project, instrument, agent,
-                         # upload, parsed_data, experiment, experiment_upload, campaign,
-                         # api_token, audit_event, webhook, webhook_delivery
-  routers/               # Thin FastAPI routers (validate -> call service -> return envelope)
-    13 router files      # auth, organizations, projects, instruments, agents, uploads,
-                         # data, experiments, campaigns, webhooks, audit, admin
-  services/              # Business logic (zero HTTP awareness, testable independently)
-    10 service files     # auth, organization, upload, parser, search, experiment,
-                         # campaign, webhook, audit, export
-  parsers/               # Instrument file parsers (BaseParser ABC)
-    base.py              # BaseParser ABC, ParseError
-    registry.py          # ParserRegistry with @register decorator and auto-detect
-    detector.py          # detect_instrument_type(file_bytes, filename, hint)
-    spectrophotometer.py # NanoDrop/Cary UV-Vis CSV
-    plate_reader.py      # SoftMax Pro/Gen5 template-based CSV (96/384-well)
-    hplc.py              # Agilent ChemStation/Shimadzu LabSolutions CSV
-    pcr.py               # Bio-Rad CFX/Thermo QuantStudio CSV (Ct values)
-    balance.py           # Mettler Toledo/Sartorius CSV
-  tasks/                 # Celery tasks with sync fallback
-    dispatch.py          # dispatch_task() - inline when TASK_BACKEND="sync"
-    celery_app.py        # Celery config with parsing/webhooks/indexing queues
-    parse_task.py        # Parse upload file, store result, fire webhook, queue index
-    webhook_task.py      # Deliver webhook with HMAC-SHA256, retry with backoff
-    index_task.py        # Index parsed data to search service
-  mcp/                   # FastMCP server (25 tools, 4 toolsets + 2 discovery)
-    server.py            # Standalone: python -m lablink.mcp.server
-backend/                 # Alternative app structure (from initial scaffold)
-tests/                   # pytest with asyncio_mode=auto
-  fixtures/              # 24 realistic instrument data files (CSV/TSV)
-migrations/              # Alembic migrations
-```
-
 ## Code Organization
 - **Routers are thin**: validate input, call service, return envelope. No business logic.
 - **Services contain business logic**: zero HTTP awareness, testable independently.
@@ -76,34 +29,6 @@ migrations/              # Alembic migrations
 - Python files: singular snake_case (`experiment.py`, `upload_service.py`)
 - Pydantic schemas: PascalCase (`ExperimentCreate`, `UploadResponse`)
 - MCP tools: verb_noun snake_case (`search_catalog`, `get_instrument_data`)
-
-## Envelope Pattern
-Every endpoint returns:
-```python
-{
-  "data": T | null,           # The response payload
-  "meta": {
-    "request_id": "uuid",
-    "timestamp": "iso8601",
-    "pagination": { "total_count", "page", "page_size", "has_more" } | null
-  },
-  "errors": [{
-    "code": "MACHINE_READABLE",
-    "message": "Human readable",
-    "field": "optional_field",
-    "suggestion": "Agent-actionable recovery hint",
-    "retry": false,
-    "retry_after": null
-  }]
-}
-```
-
-## MCP Server (25 tools)
-- **Discovery**: list_toolsets, get_toolset
-- **Explorer (8)**: list_experiments, get_experiment, get_instrument_data, search_catalog, list_instruments, list_uploads, get_chart_data, create_export
-- **Planner (7)**: create_experiment, update_experiment, record_outcome, link_upload_to_experiment, create_campaign, get_campaign_progress, list_campaigns
-- **Ingestor (4)**: create_upload, list_parsers, get_upload, reparse_upload
-- **Admin (4)**: get_usage_stats, list_agents, create_webhook, list_audit_events
 
 ## Testing
 - pytest with asyncio_mode="auto"
@@ -123,6 +48,31 @@ Every endpoint returns:
 ## Key References
 - `plans/lablink-product-roadmap.md` — Full 2-year roadmap + MVP spec
 - `RESEARCH/` — Market analysis, competitive landscape, agent-native API design, SDL trends
+
+## Documentation Index
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — Domain map, package layout, data flow
+- [docs/DESIGN.md](./docs/DESIGN.md) — Design philosophy and architectural principles
+- [docs/SECURITY.md](./docs/SECURITY.md) — Auth, data protection, threat model
+- [docs/FRONTEND.md](./docs/FRONTEND.md) — React/TypeScript/Vite conventions
+- [docs/RELIABILITY.md](./docs/RELIABILITY.md) — SLOs, error handling, runbooks
+- [docs/QUALITY_SCORE.md](./docs/QUALITY_SCORE.md) — Domain quality grades and gaps
+- [docs/PRODUCT_SENSE.md](./docs/PRODUCT_SENSE.md) — Who this is for and why
+
+## Module Guides
+| Module | Guide |
+|---|---|
+| src/lablink/models/ | [models/CLAUDE.md](./src/lablink/models/CLAUDE.md) |
+| src/lablink/schemas/ | [schemas/CLAUDE.md](./src/lablink/schemas/CLAUDE.md) |
+| src/lablink/routers/ | [routers/CLAUDE.md](./src/lablink/routers/CLAUDE.md) |
+| src/lablink/services/ | [services/CLAUDE.md](./src/lablink/services/CLAUDE.md) |
+| src/lablink/parsers/ | [parsers/CLAUDE.md](./src/lablink/parsers/CLAUDE.md) |
+| src/lablink/tasks/ | [tasks/CLAUDE.md](./src/lablink/tasks/CLAUDE.md) |
+| src/lablink/mcp/ | [mcp/CLAUDE.md](./src/lablink/mcp/CLAUDE.md) |
+
+## Gardening
+- `/context-gardening:status` — knowledge base health dashboard
+- `/context-gardening:tend` — update docs that drifted from code
+- `/context-gardening:weed` — find and prune stale docs
 
 <!-- ooo:START -->
 <!-- ooo:VERSION:0.14.0 -->

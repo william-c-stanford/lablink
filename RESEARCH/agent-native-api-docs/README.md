@@ -17,4 +17,4 @@
 2. **MCP server:** FastMCP auto-generated from FastAPI, then curated into toolsets
 3. **Tool organization:** 4 curated toolsets (explorer/planner/ingestor/admin), max 25 tools each
 4. **Discovery pattern:** `list_toolsets()` -> `get_toolset(name)` -> execute tool
-5. **Standards:** llms.txt + AGENTS.md + MCP + OpenAPI 3.1
+5. **Standards:** llms.txt + CLAUDE.md + MCP + OpenAPI 3.1
