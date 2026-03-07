@@ -22,6 +22,15 @@ from lablink.schemas.canonical import (
     ParsedResult,
 )
 
+# Allotropy integration (optional — graceful fallback on failure)
+try:
+    from allotropy.parser_factory import Vendor as _Vendor
+    from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
+    from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+    _ALLOTROPY_AVAILABLE = True
+except ImportError:
+    _ALLOTROPY_AVAILABLE = False
+
 
 @ParserRegistry.register
 class SpectrophotometerParser(BaseParser):
@@ -80,12 +89,42 @@ class SpectrophotometerParser(BaseParser):
         # Detect format
         header_lower = text[:2048].lower()
         if any(m in header_lower for m in ("260/280", "a260", "ng/ul", "nanodrop")):
-            return self._parse_nanodrop(text, delimiter, metadata)
+            # Try allotropy for NanoDrop formats first; fallback to custom on failure
+            allotropy_result = self._try_allotropy(
+                file_bytes, "THERMO_FISHER_NANODROP_ONE", "file.csv"
+            )
+            if allotropy_result is not None:
+                allotropy_result.run_metadata["allotropy_attempted"] = True
+                allotropy_result.run_metadata["allotropy_used"] = True
+                return allotropy_result
+            result = self._parse_nanodrop(text, delimiter, metadata)
+            result.run_metadata["allotropy_attempted"] = True
+            result.run_metadata["allotropy_used"] = False
+            return result
         elif any(m in header_lower for m in ("wavelength",)):
+            # Cary UV-Vis — no allotropy support, custom only
             return self._parse_cary(text, delimiter, metadata)
         else:
-            # Try generic CSV with numeric columns
             return self._parse_generic(text, delimiter, metadata)
+
+    def _try_allotropy(
+        self, file_bytes: bytes, vendor_name: str, filepath: str
+    ) -> ParsedResult | None:
+        """Attempt to parse via allotropy, returning None on any failure."""
+        if not _ALLOTROPY_AVAILABLE:
+            return None
+        try:
+            import io as _io
+            vendor = getattr(_Vendor, vendor_name)
+            asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
+            return _asm_to_parsed_result(
+                asm,
+                parser_name=self.name,
+                parser_version=self.version,
+                instrument_type=self.instrument_type,
+            )
+        except Exception:
+            return None
 
     def _detect_delimiter(self, text: str) -> str:
         """Detect CSV delimiter from first few lines."""

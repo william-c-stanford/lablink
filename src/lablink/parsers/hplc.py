@@ -23,6 +23,15 @@ from lablink.schemas.canonical import (
     ParsedResult,
 )
 
+# Allotropy integration (optional — graceful fallback on failure)
+try:
+    from allotropy.parser_factory import Vendor as _Vendor
+    from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
+    from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+    _ALLOTROPY_AVAILABLE = True
+except ImportError:
+    _ALLOTROPY_AVAILABLE = False
+
 
 @ParserRegistry.register
 class HPLCParser(BaseParser):
@@ -105,6 +114,14 @@ class HPLCParser(BaseParser):
         is_agilent = any(m in header_lower for m in self._AGILENT_MARKERS)
         is_shimadzu = any(m in header_lower for m in self._SHIMADZU_MARKERS)
 
+        # Try allotropy for Agilent (OpenLab CDS); Shimadzu has no allotropy support
+        if is_agilent:
+            allotropy_result = self._try_allotropy(file_bytes, "AGILENT_OPENLAB_CDS", "file.rslt")
+            if allotropy_result is not None:
+                allotropy_result.run_metadata["allotropy_attempted"] = True
+                allotropy_result.run_metadata["allotropy_used"] = True
+                return allotropy_result
+
         # Parse instrument metadata from header lines
         instrument_meta = self._parse_header_metadata(header_meta)
 
@@ -138,19 +155,40 @@ class HPLCParser(BaseParser):
             parser_name=self.name,
             parser_version=self.version,
             instrument_type=self.instrument_type,
-            measurement_type="chromatography",
+            measurement_type="retention_time",
             measurements=measurements,
             instrument_settings=settings,
             sample_count=len(sample_names) if sample_names else 1,
             run_metadata={
                 "format": fmt,
                 "peak_count": len([m for m in measurements if m.measurement_type == "retention_time"]),
+                "allotropy_attempted": is_agilent,
+                "allotropy_used": False,
                 **{k: v for k, v in instrument_meta.items()},
                 **{k: v for k, v in metadata.items() if k != "instrument_type"},
             },
             raw_headers=raw_headers,
             warnings=warnings,
         )
+
+    def _try_allotropy(
+        self, file_bytes: bytes, vendor_name: str, filepath: str
+    ) -> ParsedResult | None:
+        """Attempt to parse via allotropy, returning None on any failure."""
+        if not _ALLOTROPY_AVAILABLE:
+            return None
+        try:
+            import io as _io
+            vendor = getattr(_Vendor, vendor_name)
+            asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
+            return _asm_to_parsed_result(
+                asm,
+                parser_name=self.name,
+                parser_version=self.version,
+                instrument_type=self.instrument_type,
+            )
+        except Exception:
+            return None
 
     def _split_header_and_data(self, text: str) -> tuple[list[str], str, list[str] | None]:
         """Split file into header metadata lines and the data table portion.

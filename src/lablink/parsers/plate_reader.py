@@ -23,6 +23,15 @@ from lablink.schemas.canonical import (
     ParsedResult,
 )
 
+# Allotropy integration (optional — graceful fallback on failure)
+try:
+    from allotropy.parser_factory import Vendor as _Vendor
+    from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
+    from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+    _ALLOTROPY_AVAILABLE = True
+except ImportError:
+    _ALLOTROPY_AVAILABLE = False
+
 # Well row labels
 PLATE_ROWS_96 = list("ABCDEFGH")
 PLATE_ROWS_384 = list("ABCDEFGHIJKLMNOP")
@@ -101,12 +110,46 @@ class PlateReaderParser(BaseParser):
 
         # Detect format — check Gen5/BioTek first (more specific markers)
         if any(m in text_lower for m in ("gen5", "biotek", "synergy", "cytation", "epoch")):
-            return self._parse_gen5(text, metadata)
+            allotropy_result = self._try_allotropy(file_bytes, "AGILENT_GEN5", "file.txt")
+            if allotropy_result is not None:
+                allotropy_result.run_metadata["allotropy_attempted"] = True
+                allotropy_result.run_metadata["allotropy_used"] = True
+                return allotropy_result
+            result = self._parse_gen5(text, metadata)
+            result.run_metadata["allotropy_attempted"] = True
+            result.run_metadata["allotropy_used"] = False
+            return result
         elif any(m in text_lower for m in ("softmax", "spectramax", "plate#", "##blocks")):
-            return self._parse_softmax(text, metadata)
+            allotropy_result = self._try_allotropy(file_bytes, "MOLDEV_SOFTMAX_PRO", "file.txt")
+            if allotropy_result is not None:
+                allotropy_result.run_metadata["allotropy_attempted"] = True
+                allotropy_result.run_metadata["allotropy_used"] = True
+                return allotropy_result
+            result = self._parse_softmax(text, metadata)
+            result.run_metadata["allotropy_attempted"] = True
+            result.run_metadata["allotropy_used"] = False
+            return result
         else:
-            # Try grid layout detection
             return self._parse_grid(text, metadata)
+
+    def _try_allotropy(
+        self, file_bytes: bytes, vendor_name: str, filepath: str
+    ) -> ParsedResult | None:
+        """Attempt to parse via allotropy, returning None on any failure."""
+        if not _ALLOTROPY_AVAILABLE:
+            return None
+        try:
+            import io as _io
+            vendor = getattr(_Vendor, vendor_name)
+            asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
+            return _asm_to_parsed_result(
+                asm,
+                parser_name=self.name,
+                parser_version=self.version,
+                instrument_type=self.instrument_type,
+            )
+        except Exception:
+            return None
 
     def _parse_softmax(self, text: str, metadata: dict) -> ParsedResult:
         """Parse SoftMax Pro section-based CSV format.

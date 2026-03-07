@@ -21,6 +21,7 @@ dependencies = [
     "celery[redis]>=5.4.0",
     "email-validator>=2.3.0",
     "fastmcp>=2.0.0",
+    "allotropy>=0.1.112,<0.2.0",
 ]
 
 [project.optional-dependencies]

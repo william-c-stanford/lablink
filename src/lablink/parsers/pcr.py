@@ -24,6 +24,15 @@ from lablink.schemas.canonical import (
     ParsedResult,
 )
 
+# Allotropy integration (optional — graceful fallback on failure)
+try:
+    from allotropy.parser_factory import Vendor as _Vendor
+    from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
+    from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+    _ALLOTROPY_AVAILABLE = True
+except ImportError:
+    _ALLOTROPY_AVAILABLE = False
+
 # Values treated as undetermined / no amplification
 _UNDETERMINED = {"undetermined", "n/a", "na", "nan", "", "-", "---", "no ct", "no cq"}
 
@@ -91,16 +100,30 @@ class PCRParser(BaseParser):
                 suggestion="Upload a non-empty PCR results CSV file.",
             )
 
-        # Detect format
+        # Detect format, then try allotropy before falling back to custom parsers
         header_area = text[:4096].lower()
         if "* instrument type" in header_area or "[results]" in header_area:
-            return self._parse_quantstudio(text, metadata)
+            allotropy_result = self._try_allotropy(file_bytes, "APPBIO_QUANTSTUDIO", "file.txt")
+            if allotropy_result is not None:
+                allotropy_result.run_metadata["allotropy_attempted"] = True
+                allotropy_result.run_metadata["allotropy_used"] = True
+                return allotropy_result
+            result = self._parse_quantstudio(text, metadata)
+            result.run_metadata["allotropy_attempted"] = True
+            result.run_metadata["allotropy_used"] = False
+            return result
         elif any(m in header_area for m in ("fluor", "content", "cq")):
-            # Check specifically for Bio-Rad style (has Fluor and Cq columns)
             first_data_line = text.split("\n", 1)[0].lower()
             if "cq" in first_data_line or "fluor" in first_data_line:
-                return self._parse_biorad(text, metadata)
-            # Might be QuantStudio without header metadata
+                allotropy_result = self._try_allotropy(file_bytes, "CFXMAESTRO", "file.csv")
+                if allotropy_result is not None:
+                    allotropy_result.run_metadata["allotropy_attempted"] = True
+                    allotropy_result.run_metadata["allotropy_used"] = True
+                    return allotropy_result
+                result = self._parse_biorad(text, metadata)
+                result.run_metadata["allotropy_attempted"] = True
+                result.run_metadata["allotropy_used"] = False
+                return result
             return self._parse_generic_ct(text, metadata)
         else:
             return self._parse_generic_ct(text, metadata)
@@ -502,6 +525,24 @@ class PCRParser(BaseParser):
         )
 
     # -- Helpers ---------------------------------------------------------------
+
+    def _try_allotropy(
+        self, file_bytes: bytes, vendor_name: str, filepath: str
+    ) -> ParsedResult | None:
+        """Attempt to parse file_bytes via allotropy, returning None on any failure."""
+        if not _ALLOTROPY_AVAILABLE:
+            return None
+        try:
+            vendor = getattr(_Vendor, vendor_name)
+            asm = _allotrope_from_io(io.BytesIO(file_bytes), filepath, vendor)
+            return _asm_to_parsed_result(
+                asm,
+                parser_name=self.name,
+                parser_version=self.version,
+                instrument_type=self.instrument_type,
+            )
+        except Exception:
+            return None
 
     @staticmethod
     def _parse_ct_value(raw: str) -> tuple[float | None, str | None]:

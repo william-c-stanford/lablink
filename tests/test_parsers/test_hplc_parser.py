@@ -47,10 +47,10 @@ class TestAgilentPeaksParsing:
         assert result.instrument_type == "hplc"
 
     def test_measurement_type_is_chromatography(self, parser: HPLCParser):
-        """Primary measurement type is chromatography."""
+        """Primary measurement type is retention_time (canonical value, replaces invalid 'chromatography')."""
         data = (FIXTURES / "agilent_peaks.csv").read_bytes()
         result = parser.parse(data)
-        assert result.measurement_type == "chromatography"
+        assert result.measurement_type == "retention_time"
 
     def test_peak_count(self, parser: HPLCParser):
         """Agilent fixture has 5 peaks, each with RT + area + height + area% = 20 measurements."""
