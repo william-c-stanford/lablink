@@ -20,8 +20,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
 from lablink.exceptions import NotFoundError
-from lablink.models.identity import Organization, User
-from lablink.models.lab import Agent
+from lablink.models.organization import Organization
+from lablink.models.user import User
+from lablink.models.agent import Agent
 from lablink.schemas.agents import AgentCreate, AgentResponse, HeartbeatRequest
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 
@@ -34,7 +35,7 @@ router = APIRouter(prefix="/agents", tags=["agents"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[dict],
     status_code=201,
     operation_id="register_agent",
@@ -75,7 +76,7 @@ async def register_agent(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[AgentResponse]],
     operation_id="list_agents",
     response_model_exclude_none=True,

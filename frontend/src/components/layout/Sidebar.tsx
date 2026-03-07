@@ -16,6 +16,7 @@
  *   - sidebarCollapsed from UIStore (persisted to localStorage)
  */
 
+import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/store";
 import {
@@ -58,14 +59,10 @@ const SECONDARY_NAV: NavItem[] = [
 // ---------------------------------------------------------------------------
 
 export function Sidebar() {
-  const { sidebarCollapsed, toggleSidebar } = useUIStore((s) => ({
-    sidebarCollapsed: s.sidebarCollapsed,
-    toggleSidebar: s.toggleSidebar,
-  }));
+  const sidebarCollapsed = useUIStore((s) => s.sidebarCollapsed);
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
-  // TODO: Replace with TanStack Router's useMatchRoute when routes exist
-  const currentPath =
-    typeof window !== "undefined" ? window.location.pathname : "/";
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <nav
@@ -180,8 +177,8 @@ function SidebarNavItem({ item, collapsed, active }: SidebarNavItemProps) {
   const { icon: Icon, label, href, badge } = item;
 
   return (
-    <a
-      href={href}
+    <Link
+      to={href as "/"}
       className={cn(
         // Base layout
         "flex items-center gap-3 h-11 rounded-xl px-3",
@@ -201,9 +198,7 @@ function SidebarNavItem({ item, collapsed, active }: SidebarNavItemProps) {
               backgroundColor: "var(--bg)",
               boxShadow: "var(--nm-inset-sm)",
             }
-          : {
-              // Subtle hover via CSS — add nm-btn-like shadow on hover via group
-            }
+          : {}
       }
       aria-current={active ? "page" : undefined}
       title={collapsed ? label : undefined}
@@ -233,6 +228,6 @@ function SidebarNavItem({ item, collapsed, active }: SidebarNavItemProps) {
           {badge}
         </span>
       )}
-    </a>
+    </Link>
   );
 }

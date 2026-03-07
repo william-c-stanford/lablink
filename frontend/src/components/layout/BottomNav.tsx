@@ -14,6 +14,7 @@
  * stay in sync.
  */
 
+import { Link, useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -46,9 +47,7 @@ const MOBILE_NAV_ITEMS: MobileNavItem[] = [
 // ---------------------------------------------------------------------------
 
 export function BottomNav() {
-  // TODO: Replace with TanStack Router's useMatchRoute when routes exist
-  const currentPath =
-    typeof window !== "undefined" ? window.location.pathname : "/";
+  const currentPath = useRouterState({ select: (s) => s.location.pathname });
 
   return (
     <nav
@@ -67,9 +66,9 @@ export function BottomNav() {
       {MOBILE_NAV_ITEMS.map(({ icon: Icon, label, href }) => {
         const isActive = currentPath === href;
         return (
-          <a
+          <Link
             key={href}
-            href={href}
+            to={href as "/"}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl",
               "text-[11px] font-semibold transition-all duration-200",
@@ -93,7 +92,7 @@ export function BottomNav() {
               aria-hidden="true"
             />
             <span>{label}</span>
-          </a>
+          </Link>
         );
       })}
     </nav>

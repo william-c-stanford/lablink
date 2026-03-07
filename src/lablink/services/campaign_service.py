@@ -22,13 +22,12 @@ from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.exceptions import NotFoundError, StateTransitionError, ValidationError
-from lablink.models.experiment import (
+from lablink.models.campaign import (
     CAMPAIGN_TRANSITIONS,
     Campaign,
     CampaignStatus,
-    Experiment,
-    ExperimentStatus,
 )
+from lablink.models.experiment import Experiment, ExperimentStatus
 
 # Fields that can be updated via ``update_campaign``
 _UPDATABLE_FIELDS: set[str] = {

@@ -32,7 +32,7 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[ProjectResponse],
     status_code=201,
     operation_id="create_project",
@@ -62,7 +62,7 @@ async def create_project(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[ProjectResponse]],
     operation_id="list_projects",
     response_model_exclude_none=True,

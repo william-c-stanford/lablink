@@ -35,7 +35,7 @@ router = APIRouter(prefix="/instruments", tags=["instruments"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[InstrumentResponse],
     status_code=201,
     operation_id="create_instrument",
@@ -68,7 +68,7 @@ async def create_instrument(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[InstrumentResponse]],
     operation_id="list_instruments",
     response_model_exclude_none=True,

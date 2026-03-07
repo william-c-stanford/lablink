@@ -52,6 +52,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.environment.value,
         settings.debug,
     )
+    from lablink.database import init_db
+    await init_db()
     yield
     logger.info("LabLink shutting down")
 
@@ -256,6 +258,7 @@ def create_app(settings=None) -> FastAPI:
         redoc_url="/redoc" if settings.is_dev else None,
         openapi_url="/openapi.json" if settings.is_dev else "/api/openapi.json",
         lifespan=lifespan,
+        redirect_slashes=False,
     )
 
     # -- CORS --

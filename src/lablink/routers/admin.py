@@ -16,10 +16,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.config import get_settings
 from lablink.dependencies import get_current_org, get_current_user, get_db, require_role
-from lablink.models.data_pipeline import Upload
+from lablink.models.upload import Upload
 from lablink.models.experiment import Experiment
-from lablink.models.identity import Membership, Organization, User
-from lablink.models.lab import Agent, Instrument
+from lablink.models.membership import Membership
+from lablink.models.organization import Organization
+from lablink.models.user import User
+from lablink.models.agent import Agent
+from lablink.models.instrument import Instrument
 from lablink.schemas.envelope import Envelope, success_response
 
 router = APIRouter(prefix="/admin", tags=["admin"])

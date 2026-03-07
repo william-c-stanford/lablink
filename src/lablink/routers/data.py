@@ -20,8 +20,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
 from lablink.exceptions import NotFoundError
-from lablink.models.data_pipeline import ParsedData, Upload
-from lablink.models.identity import Organization, User
+from lablink.models.parsed_data import ParsedData
+from lablink.models.upload import Upload
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.services.export_service import ExportRequest, ExportService
 from lablink.services.search_service import get_search_service

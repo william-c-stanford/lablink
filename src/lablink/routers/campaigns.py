@@ -15,7 +15,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
-from lablink.models.identity import Organization, User
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.campaigns import (
     CampaignCreate,
     CampaignProgressResponse,
@@ -38,7 +39,7 @@ router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[CampaignResponse],
     status_code=201,
     operation_id="create_campaign",
@@ -68,7 +69,7 @@ async def create_camp(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[CampaignResponse]],
     operation_id="list_campaigns",
     response_model_exclude_none=True,

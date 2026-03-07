@@ -116,14 +116,12 @@ def get_session_factory(
     return _session_factory
 
 
-async def get_db(
-    settings: Settings | None = None,
-) -> AsyncIterator[AsyncSession]:
+async def get_db() -> AsyncIterator[AsyncSession]:
     """FastAPI dependency that yields an ``AsyncSession``.
 
     The session is committed on success and rolled back on exception.
     """
-    factory = get_session_factory(settings)
+    factory = get_session_factory()
     async with factory() as session:
         try:
             yield session

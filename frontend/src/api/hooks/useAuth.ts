@@ -69,6 +69,7 @@ export function useLogin() {
         body: { email, password },
       })
       if (error) throw error
+      if (!data) throw new Error('No response from server')
       return data
     },
     onSuccess: (envelope) => {
@@ -110,6 +111,7 @@ export function useRegister() {
         },
       })
       if (error) throw error
+      if (!data) throw new Error('No response from server')
       return data
     },
     onSuccess: (envelope) => {

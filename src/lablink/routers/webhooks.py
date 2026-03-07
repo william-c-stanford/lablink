@@ -17,7 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
 from lablink.exceptions import NotFoundError, ValidationError
-from lablink.models.identity import Organization, User
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.schemas.webhooks import (
     WebhookCreate,
@@ -38,7 +39,7 @@ _webhook_svc = WebhookService()
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[WebhookResponse],
     status_code=201,
     operation_id="create_webhook",
@@ -74,7 +75,7 @@ async def create_webhook(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[WebhookResponse]],
     operation_id="list_webhooks",
     response_model_exclude_none=True,

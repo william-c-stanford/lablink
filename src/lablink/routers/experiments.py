@@ -18,7 +18,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
-from lablink.models.identity import Organization, User
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.schemas.experiments import (
     ExperimentCreate,
@@ -46,7 +47,7 @@ router = APIRouter(prefix="/experiments", tags=["experiments"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[ExperimentResponse],
     status_code=201,
     operation_id="create_experiment",
@@ -77,7 +78,7 @@ async def create_exp(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[ExperimentResponse]],
     operation_id="list_experiments",
     response_model_exclude_none=True,

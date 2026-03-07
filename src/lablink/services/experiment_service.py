@@ -31,12 +31,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from lablink.exceptions import NotFoundError, StateTransitionError, ValidationError
 from lablink.models.experiment import (
     EXPERIMENT_TRANSITIONS,
-    Campaign,
     Experiment,
-    ExperimentPredecessor,
     ExperimentStatus,
-    ExperimentUpload,
 )
+from lablink.models.experiment_upload import ExperimentUpload
+from lablink.models.campaign import Campaign
 
 # Fields that can be updated via ``update_experiment``
 _UPDATABLE_FIELDS: set[str] = {

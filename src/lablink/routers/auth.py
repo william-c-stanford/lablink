@@ -64,7 +64,7 @@ async def register(
         email=body.email,
         password=body.password,
         full_name=body.full_name,
-        org_name=body.full_name,
+        org_name=body.org_name,
     )
     return success_response(
         data={

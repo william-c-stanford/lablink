@@ -204,14 +204,16 @@ async def get_current_user(
             )
 
         try:
-            user_uuid = uuid.UUID(user_id)
+            # Validate the UUID format but query with the canonical
+            # hyphenated string so it matches the String(36) column.
+            user_id = str(uuid.UUID(user_id))
         except (ValueError, TypeError):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid 'sub' claim in token",
             )
 
-        stmt = select(User).where(User.id == user_uuid)
+        stmt = select(User).where(User.id == user_id)
         result = await db.execute(stmt)
         user = result.scalar_one_or_none()
 
@@ -227,11 +229,11 @@ async def get_current_user(
                 detail="User account is inactive",
             )
 
-        # Store org_id from JWT payload if present
+        # Store org_id from JWT payload if present (as hyphenated string)
         org_id_str = payload.get("org_id")
         if org_id_str:
             try:
-                request.state.auth_org_id = uuid.UUID(org_id_str)
+                request.state.auth_org_id = str(uuid.UUID(org_id_str))
             except (ValueError, TypeError):
                 request.state.auth_org_id = None
         else:
@@ -269,12 +271,12 @@ async def get_current_org(
         HTTPException 403: User is not a member of the requested organization.
         HTTPException 404: Organization not found.
     """
-    org_id: uuid.UUID | None = None
+    org_id: str | None = None
 
     # Priority 1: X-Org-ID header
     if x_org_id:
         try:
-            org_id = uuid.UUID(x_org_id)
+            org_id = str(uuid.UUID(x_org_id))
         except (ValueError, TypeError):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -283,7 +285,9 @@ async def get_current_org(
 
     # Priority 2: From auth context (JWT org_id or API token org)
     if org_id is None:
-        org_id = getattr(request.state, "auth_org_id", None)
+        raw = getattr(request.state, "auth_org_id", None)
+        if raw is not None:
+            org_id = str(raw) if isinstance(raw, uuid.UUID) else raw
 
     # Priority 3: User's sole organization
     if org_id is None:

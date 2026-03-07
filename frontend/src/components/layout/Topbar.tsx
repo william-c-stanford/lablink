@@ -15,6 +15,7 @@
  */
 
 import { useState, type KeyboardEvent } from 'react'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { Search, Bell, Menu, X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useUIStore, useAuthStore, selectUser } from '@/store'
@@ -31,9 +32,11 @@ export function Topbar() {
   const [searchFocused, setSearchFocused] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
 
+  const navigate = useNavigate()
+
   function handleSearchKey(e: KeyboardEvent<HTMLInputElement>) {
     if (e.key === 'Enter' && searchQuery.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`
+      navigate({ to: '/search' })
     }
     if (e.key === 'Escape') {
       setSearchQuery('')
@@ -153,7 +156,7 @@ const PAGE_TITLES: Record<string, string> = {
 }
 
 function PageTitle() {
-  const path = typeof window !== 'undefined' ? window.location.pathname : '/'
+  const path = useRouterState({ select: (s) => s.location.pathname })
   const title = PAGE_TITLES[path] ?? 'LabLink'
 
   return (
@@ -224,14 +227,14 @@ function NotificationPanel({ onClose }: NotificationPanelProps) {
         className="px-4 py-3 text-center"
         style={{ borderTop: '1px solid rgba(174,185,201,0.25)' }}
       >
-        <a
-          href="/uploads"
+        <Link
+          to="/uploads"
           className="text-xs font-bold hover:underline"
           style={{ color: 'var(--blue)' }}
           onClick={onClose}
         >
           View all activity
-        </a>
+        </Link>
       </div>
     </div>
   )

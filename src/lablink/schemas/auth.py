@@ -35,6 +35,12 @@ class RegisterRequest(BaseModel):
         max_length=255,
         description="Human-readable display name",
     )
+    org_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255,
+        description="Name of the organization to create",
+    )
 
 
 class LoginRequest(BaseModel):

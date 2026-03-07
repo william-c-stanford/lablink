@@ -47,7 +47,7 @@ router = APIRouter(prefix="/organizations", tags=["organizations"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[OrganizationRead],
     status_code=201,
     operation_id="create_organization",

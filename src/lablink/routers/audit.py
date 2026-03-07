@@ -13,7 +13,8 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
-from lablink.models.identity import Organization, User
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.audit import AuditEventRead
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.services.audit_service import list_audit_events
@@ -27,7 +28,7 @@ router = APIRouter(prefix="/audit", tags=["audit"])
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[AuditEventRead]],
     operation_id="list_audit_events",
     response_model_exclude_none=True,

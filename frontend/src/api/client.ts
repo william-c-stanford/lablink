@@ -79,9 +79,9 @@ const authMiddleware: Middleware = {
 // ---------------------------------------------------------------------------
 
 export const apiClient = createClient<paths>({
-  // In dev, Vite proxies /api to http://localhost:8000.
-  // In production, requests go directly to the same origin.
-  baseUrl: '/',
+  // Backend routes are mounted under /api/v1.
+  // In dev, Vite proxies /api/* to http://localhost:8000.
+  baseUrl: '/api/v1',
 })
 
 apiClient.use(authMiddleware)

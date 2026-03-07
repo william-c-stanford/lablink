@@ -18,7 +18,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.dependencies import get_current_org, get_current_user, get_db
 from lablink.exceptions import NotFoundError, ValidationError
-from lablink.models.identity import Organization, User
+from lablink.models.organization import Organization
+from lablink.models.user import User
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.schemas.uploads import UploadResponse
 from lablink.services.upload_service import DuplicateUploadError, UploadError, UploadService
@@ -32,7 +33,7 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
 
 
 @router.post(
-    "/",
+    "",
     response_model=Envelope[UploadResponse],
     status_code=201,
     operation_id="upload_file",
@@ -83,7 +84,7 @@ async def upload_file(
 
 
 @router.get(
-    "/",
+    "",
     response_model=Envelope[list[UploadResponse]],
     operation_id="list_uploads",
     response_model_exclude_none=True,
@@ -98,7 +99,7 @@ async def list_uploads(
     org: Organization = Depends(get_current_org),
 ) -> Envelope:
     """List uploads for the current organization with optional filters."""
-    from lablink.models.data_pipeline import UploadStatus
+    from lablink.models.upload import UploadStatus
 
     status_enum = None
     if status:
