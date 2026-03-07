@@ -14,11 +14,12 @@ build:
 test:
 	go test ./...
 
-## build-all: cross-compile for linux/amd64, darwin/arm64, windows/amd64
+## build-all: cross-compile for linux/amd64, darwin/arm64, darwin/amd64, windows/amd64
 build-all:
 	@mkdir -p $(BUILD_DIR)
 	GOOS=linux   GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY)-linux-amd64 .
 	GOOS=darwin  GOARCH=arm64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY)-darwin-arm64 .
+	GOOS=darwin  GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY)-darwin-amd64 .
 	GOOS=windows GOARCH=amd64 go build $(LDFLAGS) -o $(BUILD_DIR)/$(BINARY)-windows-amd64.exe .
 
 ## clean: remove build artifacts
