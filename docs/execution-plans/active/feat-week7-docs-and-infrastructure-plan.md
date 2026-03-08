@@ -8,6 +8,39 @@ deepened: 2026-03-08
 
 # Week 7: Documentation + Infrastructure
 
+## Progress
+
+All 20 files created and committed on 2026-03-08. Tests: 1,423 passing (no regressions). Pre-commit hooks: all green.
+
+| Task | Status | Notes |
+|---|---|---|
+| .dockerignore + llms.txt + llms-full.txt | ✅ Complete | llms.txt ~500 tokens, includes parameter signatures |
+| Dockerfile + Dockerfile.worker | ✅ Complete | Virtual env pattern, tini, non-root uid 999 |
+| docs.json + 5 MDX files | ✅ Complete | Mintlify v3 nested tabs format |
+| infra/ (7 Terraform files incl. vpc.tf) | ✅ Complete | OpenSearch, Redis replication group, RDS managed password |
+| ci.yml + deploy.yml + dependabot.yml | ✅ Complete | SHA-pinned, parallel jobs, ARN verification |
+
+## Decision Log
+
+| Decision | Rationale |
+|---|---|
+| Added infra/vpc.tf (not in original plan) | Security review found missing VPC — all data services must be in private subnets |
+| aws_elasticache_replication_group instead of cluster | Cluster resource doesn't support AUTH tokens or TLS encryption |
+| manage_master_user_password on RDS | Avoids storing plaintext password in Terraform state |
+| SHA-pinned GitHub Actions | March 2025 tj-actions supply chain attack; GitHub enforced org-level SHA pinning Aug 2025 |
+| Task def registration + ARN verification in deploy.yml | --force-new-deployment only re-pulls same task def; waiter returns success even on rollback |
+| Mintlify v3 nested navigation | v2 mint.json top-level tabs array no longer works in v3 (renamed Feb 2025) |
+
+## Outcomes & Retrospective
+
+_To be completed after Week 8 design partner onboarding._
+
+Metrics to capture:
+- Time for first design partner to complete for-developers.mdx quickstart
+- `mintlify dev` build time
+- Docker build time (cold vs warm cache)
+- `terraform validate` pass/fail on first attempt
+
 ## Enhancement Summary
 
 **Deepened on:** 2026-03-08
