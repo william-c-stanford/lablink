@@ -1,0 +1,23 @@
+name: Garden CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  garden-lint:
+    name: Doc Structure Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for cross-link checks
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run garden linters
+        run: node .garden/linters/run-all.js --ci
+        env:
+          GARDEN_BASE_BRANCH: origin/${{ github.base_ref }}
