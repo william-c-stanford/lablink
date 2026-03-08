@@ -82,7 +82,7 @@ The existing endpoint catalog has `POST /api/v1/agents` (register_agent). The pa
 The roadmap contains a verbatim copy of CLAUDE.md starting around line 1505. Rather than updating it in sync (which will drift again), replace the embedded block with a pointer:
 
 ```markdown
-> **Developer reference:** See [`/CLAUDE.md`](../../CLAUDE.md) for the canonical coding conventions.
+> **Developer reference:** See [`/CLAUDE.md`](../../../CLAUDE.md) for the canonical coding conventions.
 > The embedded copy below is **deprecated** — do not update it here.
 ```
 
