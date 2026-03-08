@@ -124,6 +124,36 @@ Every endpoint returns:
 - `plans/lablink-product-roadmap.md` — Full 2-year roadmap + MVP spec
 - `RESEARCH/` — Market analysis, competitive landscape, agent-native API design, SDL trends
 
+## Module Guides
+
+Each source module has a `CLAUDE.md` with local coding conventions (lazy-loaded by Claude Code).
+
+| Module | Guide |
+|---|---|
+| src/lablink/models/ | [models/CLAUDE.md](./src/lablink/models/CLAUDE.md) |
+| src/lablink/parsers/ | [parsers/CLAUDE.md](./src/lablink/parsers/CLAUDE.md) |
+| src/lablink/routers/ | [routers/CLAUDE.md](./src/lablink/routers/CLAUDE.md) |
+| src/lablink/schemas/ | [schemas/CLAUDE.md](./src/lablink/schemas/CLAUDE.md) |
+| src/lablink/services/ | [services/CLAUDE.md](./src/lablink/services/CLAUDE.md) |
+| src/lablink/tasks/ | [tasks/CLAUDE.md](./src/lablink/tasks/CLAUDE.md) |
+| frontend/src/api/ | [api/CLAUDE.md](./frontend/src/api/CLAUDE.md) |
+| frontend/src/components/ | [components/CLAUDE.md](./frontend/src/components/CLAUDE.md) |
+| frontend/src/pages/ | [pages/CLAUDE.md](./frontend/src/pages/CLAUDE.md) |
+| frontend/src/store/ | [store/CLAUDE.md](./frontend/src/store/CLAUDE.md) |
+
+## Documentation
+
+| Document | Purpose |
+|---|---|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | Stack, domain map, data flow, deployment |
+| [docs/DESIGN.md](./docs/DESIGN.md) | Design philosophy, principles, patterns |
+| [docs/SECURITY.md](./docs/SECURITY.md) | Auth patterns, threat model |
+| [docs/FRONTEND.md](./docs/FRONTEND.md) | Frontend conventions and component patterns |
+| [docs/RELIABILITY.md](./docs/RELIABILITY.md) | SLOs, error handling, runbooks |
+| [docs/QUALITY_SCORE.md](./docs/QUALITY_SCORE.md) | Domain quality grades and gaps |
+| [docs/PRODUCT_SENSE.md](./docs/PRODUCT_SENSE.md) | Product principles and target users |
+| [docs/PLANS.md](./docs/PLANS.md) | Plans catalogue |
+
 <!-- ooo:START -->
 <!-- ooo:VERSION:0.14.0 -->
 ## Ouroboros Commands
