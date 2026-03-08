@@ -1,0 +1,516 @@
+# LabLink API Reference
+
+LabLink is a lab data integration platform. It ingests instrument files from HPLC, PCR, spectrophotometer, plate reader, and balance instruments, parses them into a canonical ASM-compatible schema, and exposes all functionality through a REST API and a 25-tool MCP server designed for AI agent consumption.
+
+---
+
+## Authentication
+
+All REST API requests require a Bearer token in the Authorization header:
+
+```
+Authorization: Bearer <api_token>
+```
+
+To create an API token:
+
+1. Register: `POST /api/v1/auth/register` with `{ email, password, full_name }`
+2. Login: `POST /api/v1/auth/login` with `{ username, password }` (OAuth2 form data) → returns `access_token`
+3. Create API token: `POST /api/v1/auth/tokens` with `{ name, scopes? }` → returns `{ token }` (shown once)
+
+For MCP server access, the server uses a hardcoded org_id (`00000000-0000-0000-0000-000000000000`) in MVP. Set `LABLINK_MCP_ORG_ID` in future releases to scope to a specific organization.
+
+---
+
+## Response Envelope
+
+Every endpoint returns the same `Envelope[T]` wrapper:
+
+```json
+{
+  "data": <T> | null,
+  "meta": {
+    "request_id": "uuid-v4",
+    "timestamp": "2026-03-08T12:00:00Z",
+    "pagination": {
+      "total_count": 42,
+      "page": 1,
+      "page_size": 20,
+      "has_more": true
+    } | null
+  },
+  "errors": [
+    {
+      "code": "EXPERIMENT_NOT_FOUND",
+      "message": "No experiment with ID 'abc-123'",
+      "field": "experiment_id",
+      "suggestion": "Use list_experiments to find valid IDs",
+      "retry": false,
+      "retry_after": null
+    }
+  ]
+}
+```
+
+### ErrorDetail fields
+
+| Field | Type | Description |
+|---|---|---|
+| `code` | string | Machine-readable error code (e.g. `EXPERIMENT_NOT_FOUND`, `VALIDATION_ERROR`) |
+| `message` | string | Human-readable description of the error |
+| `field` | string \| null | Request field that caused the error, if field-specific |
+| `suggestion` | string \| null | Agent-actionable recovery hint |
+| `retry` | boolean | Whether to retry the exact same request |
+| `retry_after` | integer \| null | Seconds to wait before retrying (only when `retry` is true) |
+
+On success, `errors` is an empty list `[]`. On failure, `data` is null.
+
+---
+
+## Error Recovery
+
+Agents should handle errors using the structured fields in each `ErrorDetail`:
+
+1. **Check `suggestion`** — always present on recoverable errors. Follow the hint (e.g. call `list_experiments` to find a valid ID before retrying).
+2. **Check `retry`** — if `true`, the exact same request can be retried. Common for transient failures (DB timeout, queue full).
+3. **Check `retry_after`** — if set, wait that many seconds before retrying. Respect this to avoid rate limiting.
+4. **Check `field`** — if set, only that request field is invalid. Fix that field value, not the entire request.
+5. **Check `code`** — use for programmatic branching (e.g. `NOT_FOUND` vs `STATE_TRANSITION_ERROR` require different handling).
+
+Common recovery patterns:
+
+- `NOT_FOUND` + `suggestion: "Use list_X"` → call the list tool to discover valid IDs
+- `STATE_TRANSITION_ERROR` → check current status with `get_experiment`, then attempt a valid transition
+- `retry: true` + `retry_after: 5` → sleep 5 seconds, then retry the same call
+- `VALIDATION_ERROR` + `field: "format"` + `suggestion: "Use one of: csv, json"` → fix that field value
+
+---
+
+## MCP Server
+
+Run the MCP server standalone:
+
+```
+python -m lablink.mcp.server
+```
+
+The server exposes 27 tools: 2 discovery + 25 operational tools across 4 toolsets.
+
+### Discovery Tools
+
+**`list_toolsets()`**
+
+Returns all toolset names with descriptions and tool counts.
+
+```json
+{
+  "data": {
+    "explorer": { "tool_count": 8, "description": "Read-only data exploration, search, and export", "tools": [...] },
+    "planner":  { "tool_count": 7, "description": "Experiment and campaign lifecycle management", "tools": [...] },
+    "ingestor": { "tool_count": 4, "description": "File upload, parsing, and reparse operations", "tools": [...] },
+    "admin":    { "tool_count": 4, "description": "Usage stats, agent management, webhooks, and audit trail", "tools": [...] }
+  }
+}
+```
+
+**`get_toolset(name)`**
+
+Returns tool names and descriptions for one toolset. `name` is one of: `explorer`, `planner`, `ingestor`, `admin`.
+
+---
+
+### Explorer Toolset (8 tools)
+
+Read-only. No side effects.
+
+**`list_experiments(status?, campaign_id?, created_after?, instrument_type?, page?, page_size?)`**
+
+List experiment summaries with optional filters. Results ordered newest first.
+
+- `status`: planned | running | completed | failed | cancelled
+- `campaign_id`: UUID string
+- `created_after`: ISO-8601 datetime string
+- `instrument_type`: hplc | pcr | spectrophotometer | plate_reader | balance
+- `page`: default 1
+- `page_size`: 1-100, default 20
+
+Returns: `{ data: ExperimentSummary[], meta: { total, page, page_size } }`
+
+Each ExperimentSummary: `{ id, intent, status, campaign_id, created_at }`
+
+---
+
+**`get_experiment(experiment_id)`**
+
+Retrieve full details for a single experiment.
+
+Returns: `{ id, intent, hypothesis, parameters, constraints, status, outcome, design_method, campaign_id, created_at, completed_at }`
+
+---
+
+**`get_instrument_data(upload_id)`**
+
+Retrieve parsed measurement data for an upload. Requires the upload to have `status == "parsed"`.
+
+Returns: `ParsedData[]` where each item has `{ id, upload_id, instrument_type, measurement_type, parser_version, sample_count, measurements[], instrument_settings, data_summary, metadata }`
+
+Each measurement in `measurements[]`: `{ sample_id, sample_name, value, unit, ... }`
+
+---
+
+**`search_catalog(query, max_results?)`**
+
+Full-text search across all indexed data. `max_results` is 1-100, default 20.
+
+Returns: `{ data: { hits[], facets: { by_instrument_type, by_measurement_type } }, meta: { total, query_time_ms } }`
+
+---
+
+**`list_instruments()`**
+
+List all registered instruments.
+
+Returns: `Instrument[]` — each with `{ id, name, instrument_type, manufacturer, model, serial_number, location, agent_id }`
+
+---
+
+**`list_uploads(status?, instrument_id?, created_after?, page?, page_size?)`**
+
+List uploaded files. `status` is one of: uploaded | parsing | parsed | parse_failed | indexed.
+
+Returns: `Upload[]` — each with `{ id, filename, status, file_size_bytes, mime_type, instrument_type_detected, parser_used, created_at, parsed_at, indexed_at }`
+
+---
+
+**`get_chart_data(upload_id)`**
+
+Retrieve Plotly-compatible visualization data for an upload.
+
+Returns: `{ plotly_config: { data: [trace], layout }, raw_values[], labels[], units[], measurement_count }`
+
+The `plotly_config` can be passed directly to `Plotly.newPlot()`.
+
+---
+
+**`create_export(format, filters?)`**
+
+Create a data export. `format` is one of: csv | json | xlsx | pdf.
+
+`filters` (optional): `{ instrument_type?, upload_ids?: [], date_from?, date_to? }`
+
+Returns: `{ export_id, format, status, download_url, record_count, file_size_bytes }`
+
+---
+
+### Planner Toolset (7 tools)
+
+Writes experiments and campaigns. All state transitions are validated.
+
+**`create_experiment(intent, parameters?, campaign_id?, predecessor_ids?)`**
+
+Create a new experiment in `planned` status.
+
+- `intent`: Required. What this experiment aims to achieve.
+- `parameters`: JSON dict of experimental conditions (e.g. `{ "temperature_c": 37.0, "ph": 7.4 }`)
+- `campaign_id`: UUID string to associate with a campaign
+- `predecessor_ids`: List of UUID strings to form an experiment DAG
+
+Returns: `{ id, intent, status: "planned", parameters, campaign_id, created_at }`
+
+---
+
+**`update_experiment(experiment_id, status?, outcome?)`**
+
+Update status or outcome of an experiment.
+
+Valid transitions: `planned → running → completed | failed`, `planned → cancelled`
+
+- `status`: New status value
+- `outcome`: Dict with results (only when completing or failing)
+
+Returns: `{ id, intent, status, outcome, completed_at }`
+
+---
+
+**`record_outcome(experiment_id, results, success)`**
+
+Record the outcome and transition status in one call.
+
+- `results`: Dict with measured values, observations, etc.
+- `success`: `true` → completed, `false` → failed
+
+Returns: `{ id, status, outcome, completed_at }`
+
+---
+
+**`link_upload_to_experiment(experiment_id, upload_id)`**
+
+Associate an instrument data upload with an experiment.
+
+Returns: `{ experiment_id, upload_id, linked_at }`
+
+---
+
+**`create_campaign(name, objective, optimization_method?)`**
+
+Create an optimization campaign grouping related experiments.
+
+- `optimization_method`: manual | bayesian | grid_search | random (optional)
+
+Returns: `{ id, name, objective, status: "active", optimization_method, created_at }`
+
+---
+
+**`get_campaign_progress(campaign_id)`**
+
+Retrieve progress metrics for a campaign.
+
+Returns: `{ total, planned, running, completed, failed, cancelled, completion_rate }` where `completion_rate` is 0.0-1.0.
+
+---
+
+**`list_campaigns(status?)`**
+
+List campaigns. `status`: active | paused | completed.
+
+Returns: `Campaign[]` — each with `{ id, name, objective, status, optimization_method, created_at }`
+
+---
+
+### Ingestor Toolset (4 tools)
+
+File ingestion is asynchronous. After `create_upload`, poll `get_upload` until `status == "parsed"`.
+
+**`list_parsers()`**
+
+List all available parsers with supported formats and instrument types.
+
+Returns: `Parser[]` — each with `{ name, version, instrument_type, supported_extensions[] }`
+
+Supported instrument types (MVP): spectrophotometer | plate_reader | hplc | pcr | balance
+
+---
+
+**`create_upload(file_path, instrument_type?, project_id?)`**
+
+Upload a file by specifying its absolute path on the local filesystem.
+
+- `file_path`: Absolute path to the file (required)
+- `instrument_type`: Parser hint — hplc | pcr | spectrophotometer | plate_reader | balance
+- `project_id`: UUID string to associate with a project
+
+Returns immediately with: `{ id, filename, status: "uploaded", file_size_bytes, content_hash }`
+
+The parse pipeline runs asynchronously. Poll `get_upload` to track progress.
+
+---
+
+**`get_upload(upload_id)`**
+
+Retrieve upload details including parse status and any error.
+
+Returns: `{ id, filename, status, file_size_bytes, mime_type, content_hash, instrument_type_detected, parser_used, error_message, created_at, parsed_at, indexed_at }`
+
+Status lifecycle: `uploaded → parsing → parsed → indexed` (or `parse_failed` on error)
+
+---
+
+**`reparse_upload(upload_id)`**
+
+Reset and re-dispatch the parse task for an existing upload. Useful after parser updates or `parse_failed`.
+
+Returns: `{ upload_id, status: "reparse_queued", message }`
+
+---
+
+### Admin Toolset (4 tools)
+
+**`get_usage_stats()`**
+
+Retrieve current usage metrics.
+
+Returns: `{ total_uploads, total_storage_bytes, total_storage_mb, instrument_count, agent_count, user_count }`
+
+---
+
+**`list_agents()`**
+
+List all desktop agents (Go file-watching agents) with status.
+
+Returns: `Agent[]` — each with `{ id, name, platform, version, status, last_heartbeat_at, instrument_count }`
+
+`status`: active | inactive | offline
+
+---
+
+**`create_webhook(url, events, secret?)`**
+
+Register a webhook subscription. HMAC-SHA256 signed delivery.
+
+- `url`: HTTPS callback URL
+- `events`: List of event types — e.g. `["upload.parsed", "upload.parse_failed", "experiment.completed"]`
+- `secret`: Optional. Auto-generated if omitted (shown once in response).
+
+Returns: `{ id, url, events[], is_active, secret, created_at }`
+
+---
+
+**`list_audit_events(resource_type?, resource_id?, created_after?, page?)`**
+
+Query the immutable audit trail. Append-only, hash-chained. Never deleted.
+
+- `resource_type`: experiment | upload | campaign | webhook | agent
+- `resource_id`: UUID string to filter to a specific resource
+- `created_after`: ISO-8601 datetime string
+
+Returns: `AuditEvent[]` — each with `{ id, event_type, resource_type, resource_id, actor_id, payload, created_at, hash }`
+
+---
+
+## REST API Quick Reference
+
+All endpoints are prefixed with `/api/v1/`.
+
+### Auth
+| Method | Path | Description |
+|---|---|---|
+| POST | `/auth/register` | Create user account |
+| POST | `/auth/login` | OAuth2 password flow → access_token |
+| POST | `/auth/tokens` | Create API token |
+| GET | `/auth/me` | Get current user |
+
+### Organizations
+| Method | Path | Description |
+|---|---|---|
+| POST | `/organizations` | Create organization |
+| GET | `/organizations/{org_id}` | Get organization |
+| PATCH | `/organizations/{org_id}` | Update organization |
+
+### Projects
+| Method | Path | Description |
+|---|---|---|
+| POST | `/projects` | Create project |
+| GET | `/projects` | List projects |
+| GET | `/projects/{project_id}` | Get project |
+
+### Instruments
+| Method | Path | Description |
+|---|---|---|
+| POST | `/instruments` | Register instrument |
+| GET | `/instruments` | List instruments |
+| GET | `/instruments/{instrument_id}` | Get instrument |
+
+### Uploads
+| Method | Path | Description |
+|---|---|---|
+| POST | `/uploads` | Create upload (multipart/form-data) |
+| GET | `/uploads` | List uploads |
+| GET | `/uploads/{upload_id}` | Get upload |
+| POST | `/uploads/{upload_id}/reparse` | Re-trigger parse |
+
+### Data
+| Method | Path | Description |
+|---|---|---|
+| GET | `/data/{upload_id}` | Get parsed instrument data |
+| GET | `/data/{upload_id}/chart` | Get Plotly chart config |
+| GET | `/data/search` | Full-text catalog search |
+| POST | `/data/export` | Create data export |
+
+### Experiments
+| Method | Path | Description |
+|---|---|---|
+| POST | `/experiments` | Create experiment |
+| GET | `/experiments` | List experiments |
+| GET | `/experiments/{experiment_id}` | Get experiment |
+| PATCH | `/experiments/{experiment_id}` | Update/transition experiment |
+| POST | `/experiments/{experiment_id}/uploads` | Link upload to experiment |
+
+### Campaigns
+| Method | Path | Description |
+|---|---|---|
+| POST | `/campaigns` | Create campaign |
+| GET | `/campaigns` | List campaigns |
+| GET | `/campaigns/{campaign_id}` | Get campaign |
+| GET | `/campaigns/{campaign_id}/progress` | Get progress metrics |
+
+### Webhooks
+| Method | Path | Description |
+|---|---|---|
+| POST | `/webhooks` | Create webhook |
+| GET | `/webhooks` | List webhooks |
+| DELETE | `/webhooks/{webhook_id}` | Delete webhook |
+
+### Audit
+| Method | Path | Description |
+|---|---|---|
+| GET | `/audit` | List audit events |
+
+### Admin
+| Method | Path | Description |
+|---|---|---|
+| GET | `/admin/stats` | Usage stats |
+| GET | `/agents` | List agents |
+
+---
+
+## Async Patterns
+
+### Upload and parse flow
+
+```
+1. create_upload(file_path="/abs/path/data.csv", instrument_type="hplc")
+   → { id: "upload-uuid", status: "uploaded" }
+
+2. Poll get_upload("upload-uuid") until status == "parsed"
+   → check every 1-2 seconds
+   → status sequence: uploaded → parsing → parsed (or parse_failed)
+   → on parse_failed: check error_message, then call reparse_upload or fix the file
+
+3. get_instrument_data("upload-uuid")
+   → { measurements[], instrument_settings, sample_count, ... }
+
+4. Optional: get_chart_data("upload-uuid")
+   → { plotly_config, raw_values[], labels[] }
+
+5. Optional: link_upload_to_experiment(experiment_id, upload_id)
+```
+
+### Experiment lifecycle flow
+
+```
+1. create_campaign(name="Solubility Sweep", objective="Maximize yield at pH 6-8")
+   → { id: "campaign-uuid", status: "active" }
+
+2. create_experiment(intent="Test pH 6.5", parameters={"ph": 6.5}, campaign_id="campaign-uuid")
+   → { id: "exp-uuid", status: "planned" }
+
+3. update_experiment("exp-uuid", status="running")
+
+4. create_upload + poll + get_instrument_data (see above)
+
+5. link_upload_to_experiment("exp-uuid", "upload-uuid")
+
+6. record_outcome("exp-uuid", results={"yield_pct": 78.4}, success=True)
+   → { status: "completed", outcome: {...} }
+
+7. get_campaign_progress("campaign-uuid")
+   → { completion_rate: 0.33, completed: 1, planned: 2, ... }
+```
+
+---
+
+## MVP Limitations
+
+- **Multi-tenancy stub**: The MCP server uses a hardcoded `org_id` of `00000000-0000-0000-0000-000000000000` for all write operations (`create_experiment`, `create_campaign`, `create_upload`, `create_webhook`, `create_export`). This means all MCP-created resources belong to the default org.
+  - REST API endpoints are properly scoped to the authenticated user's organization.
+  - Future: `LABLINK_MCP_ORG_ID` environment variable to configure org scoping for the MCP server.
+
+- **Search**: In dev mode (SQLite), search uses an in-memory implementation. Elasticsearch 9 is required for production full-text search with facets.
+
+- **File storage**: In dev mode, files are stored on the local filesystem. S3 is required for production.
+
+- **Task execution**: In dev mode (`TASK_BACKEND=sync`), parse tasks run inline (synchronous). Celery + Redis is required for production async processing.
+
+- **Desktop agent**: The Go file-watching agent is planned but not yet included in the MVP. Agents can be registered via the API; the daemon binary is in the roadmap.
+
+- **Parsers**: 5 instrument types supported in MVP: spectrophotometer (NanoDrop/Cary), plate reader (SoftMax Pro/Gen5), HPLC (Agilent ChemStation/Shimadzu LabSolutions), PCR (Bio-Rad CFX/Thermo QuantStudio), balance (Mettler Toledo/Sartorius).

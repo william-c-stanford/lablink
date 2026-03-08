@@ -1,0 +1,102 @@
+---
+title: "MCP Server for Agents"
+sidebarTitle: "For Agents"
+description: "Connect Claude Desktop to LabLink using the MCP protocol."
+---
+
+## Prerequisites
+
+- [uv](https://docs.astral.sh/uv/) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- LabLink repository cloned locally
+- Claude Desktop installed
+
+## Configure Claude Desktop
+
+Add the following block to your Claude Desktop configuration file.
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "lablink": {
+      "command": "uv",
+      "args": [
+        "--directory", "/absolute/path/to/lablink",
+        "run", "python", "-m", "lablink.mcp.server"
+      ],
+      "env": {
+        "LABLINK_DATABASE_URL": "sqlite+aiosqlite:///./lablink.db",
+        "LABLINK_ENVIRONMENT": "development"
+      }
+    }
+  }
+}
+```
+
+Replace `/absolute/path/to/lablink` with the actual path to your cloned repository. Restart Claude Desktop after saving.
+
+<Warning>
+**Security**: The MCP server has no authentication layer. Do not expose it over a network without an authentication wrapper. Use it only over local STDIO as configured above.
+</Warning>
+
+## Tool Discovery
+
+Always start by calling the discovery tools to orient yourself:
+
+```
+1. list_toolsets()           → see all 4 toolsets and tool counts
+2. get_toolset("explorer")   → see tool names and descriptions in the explorer toolset
+3. list_experiments()        → make your first data query
+```
+
+This discovery pattern is intentional — it keeps the initial tool surface small and lets you load only the tools you need for a given task.
+
+## Uploading and Reading Instrument Data
+
+<Warning>
+**Async upload flow**: `create_upload` returns immediately with `status: "pending"`. You **must** poll `get_upload(upload_id)` until `status == "parsed"` before calling `get_instrument_data`. Parse time is typically 2–30 seconds.
+</Warning>
+
+Example agent workflow:
+
+```
+1. create_upload(file_path="/data/nanodrop_20260308.csv", instrument_type="spectrophotometer")
+   → { "id": "abc-123", "status": "uploaded" }
+
+2. get_upload("abc-123")         # poll until status == "parsed"
+   → { "status": "parsing" }     # not ready yet, wait 2s and retry
+
+3. get_upload("abc-123")
+   → { "status": "parsed", "parser_used": "spectrophotometer_v1" }
+
+4. get_instrument_data("abc-123")
+   → { measurements: [...], instrument_settings: {...}, ... }
+```
+
+Do not call `get_instrument_data` on an upload with status `"uploaded"` or `"parsing"` — it will return a `not_found` error because the parsed data record does not exist yet.
+
+## Error Recovery
+
+Every error response includes a `suggestion` field with an actionable recovery hint. Always check `errors[0].suggestion` before giving up:
+
+```json
+{
+  "data": null,
+  "errors": [
+    {
+      "code": "not_found",
+      "message": "No parsed data found for upload abc-123.",
+      "suggestion": "Check upload status with get_upload. The file may not be parsed yet."
+    }
+  ]
+}
+```
+
+## MVP Limitation: Multi-Tenancy
+
+<Note>
+Multi-tenancy is currently a stub. All MCP writes (create_experiment, create_upload, create_campaign, create_webhook) use a shared development organization. Data isolation by organization is planned for Q2. Do not use the MCP server in a shared or production environment with sensitive data until this feature ships.
+</Note>

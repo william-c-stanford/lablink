@@ -1,0 +1,138 @@
+---
+title: "MCP Architecture Overview"
+sidebarTitle: "Overview"
+description: "How LabLink exposes 25 tools across 4 toolsets via the Model Context Protocol."
+---
+
+## What is MCP?
+
+The [Model Context Protocol](https://modelcontextprotocol.io) (MCP) is an open standard for giving AI agents structured access to external tools and data. Instead of injecting raw API documentation into a context window and hoping the agent constructs correct HTTP calls, MCP exposes typed, callable tools that agents invoke directly.
+
+LabLink was designed agent-first from day one. Every write action available in the UI or REST API is also available as an MCP tool — there are no UI-only features.
+
+## Tool Structure
+
+LabLink exposes **27 tools total**: 2 discovery tools that are always available, plus 25 domain tools organized into 4 toolsets.
+
+### Discovery Tools (always call these first)
+
+| Tool | Purpose |
+|---|---|
+| `list_toolsets` | Returns all 4 toolsets with tool counts and descriptions |
+| `get_toolset` | Returns names and descriptions of every tool in a named toolset |
+
+Start every agent session by calling `list_toolsets()`, then `get_toolset("explorer")` (or whichever toolset fits your task). This progressive disclosure keeps the initial context overhead small.
+
+### Explorer Toolset (8 tools — read-only)
+
+Read-only data exploration, search, and export. Safe to call at any frequency. Use these tools to orient yourself before making writes.
+
+| Tool | Purpose |
+|---|---|
+| `list_experiments` | Paginated experiment listing with filters |
+| `get_experiment` | Full experiment details by UUID |
+| `get_instrument_data` | Parsed measurements for an upload |
+| `search_catalog` | Free-text search across all indexed data |
+| `list_instruments` | All registered instruments |
+| `list_uploads` | Paginated upload listing with status and instrument filters |
+| `get_chart_data` | Plotly-compatible config + raw arrays for an upload |
+| `create_export` | Export data to csv, json, xlsx, or pdf |
+
+### Planner Toolset (7 tools)
+
+Experiment and campaign lifecycle management. These tools create and mutate records — use them after exploring with the explorer toolset.
+
+| Tool | Purpose |
+|---|---|
+| `create_experiment` | Create an experiment in PLANNED status |
+| `update_experiment` | Transition status or update fields |
+| `record_outcome` | Mark an experiment completed or failed with results |
+| `link_upload_to_experiment` | Associate instrument data with an experiment |
+| `create_campaign` | Create an optimization campaign |
+| `get_campaign_progress` | Progress metrics (counts by status, completion rate) |
+| `list_campaigns` | Paginated campaign listing |
+
+### Ingestor Toolset (4 tools)
+
+File upload, parsing, and reparse operations.
+
+| Tool | Purpose |
+|---|---|
+| `create_upload` | Upload a file by local path and kick off parsing |
+| `list_parsers` | Available parsers, supported formats, instrument types |
+| `get_upload` | Full upload record including parse status and error |
+| `reparse_upload` | Reset and re-queue an upload for parsing |
+
+### Admin Toolset (4 tools)
+
+Usage metrics, agent management, webhook registration, and audit trail access.
+
+| Tool | Purpose |
+|---|---|
+| `get_usage_stats` | Storage, instrument, user, and agent counts |
+| `list_agents` | Desktop agent status and heartbeat timestamps |
+| `create_webhook` | Register webhook URL with event subscriptions |
+| `list_audit_events` | Query the immutable, hash-chained audit trail |
+
+## Naming Convention
+
+All tools follow the `verb_noun` snake_case convention:
+
+- `create_experiment` — not `experimentCreate` or `newExperiment`
+- `get_instrument_data` — not `instrumentData` or `fetchData`
+- `list_uploads` — not `getUploads` or `uploads`
+
+This makes tools predictable and easy to guess from context.
+
+## Envelope Mapping
+
+The REST API returns `{ data, meta, errors }`. MCP tools return the `data` dict directly — the envelope wrapper is stripped:
+
+```
+REST response:
+{
+  "data": { "id": "abc-123", "status": "parsed" },
+  "meta": { "request_id": "...", "timestamp": "..." },
+  "errors": []
+}
+
+MCP tool return value:
+{ "id": "abc-123", "status": "parsed" }
+```
+
+Error cases still surface via the `errors` key in the MCP return dict. Always check for `errors` before reading `data`:
+
+```python
+result = await get_upload("abc-123")
+if result.get("errors"):
+    suggestion = result["errors"][0].get("suggestion")
+    # handle error
+else:
+    upload = result["data"]
+```
+
+## When to Use MCP vs REST vs SDK
+
+| Scenario | Recommended interface |
+|---|---|
+| Interactive agent (Claude Desktop, Cursor) | MCP server |
+| Automated pipeline / CI | REST API |
+| Python data science workflow | httpx client (SDK in Q2) |
+| Bulk data export | REST API (`/api/v1/exports`) |
+| Real-time event processing | Webhooks |
+
+## STDIO Protocol
+
+The MCP server communicates over STDIO using JSON-RPC 2.0. This has one important constraint:
+
+**Never `print()` to stdout in MCP server code — it corrupts the JSON-RPC protocol.**
+
+All logging must go to stderr:
+
+```python
+import sys
+print("debug message", file=sys.stderr)  # safe
+print("debug message")                   # corrupts the protocol
+```
+
+This applies to all code paths reachable from MCP tool handlers, including imported services.

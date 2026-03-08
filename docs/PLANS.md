@@ -10,7 +10,7 @@ Master catalogue of all plans in this repository. Detailed execution plans live 
 
 | Plan | Status | Started | Summary |
 |---|---|---|---|
-| _No plans yet._ | | | |
+| [feat-week7-docs-and-infrastructure-plan](execution-plans/active/feat-week7-docs-and-infrastructure-plan.md) | Active | 2026-03-08 | Mintlify docs site, llms.txt, Terraform AWS infra, Dockerfiles, CI/CD pipelines |
 
 ## Completed
 

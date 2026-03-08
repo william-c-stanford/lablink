@@ -1,0 +1,161 @@
+---
+title: "REST API Quickstart"
+sidebarTitle: "For Developers"
+description: "Authenticate and make your first API call in 5 minutes."
+---
+
+## Get an API Token
+
+You can create an API token two ways:
+
+**Option 1 — Dashboard**: Navigate to Settings → API Tokens → Create Token.
+
+**Option 2 — API**:
+
+```bash
+curl -X POST https://api.lablink.io/api/v1/auth/tokens \
+  -H "Content-Type: application/json" \
+  -d '{"name": "my-token", "expires_in_days": 90}'
+```
+
+Save the returned `token` value — it is shown only once.
+
+## Verify Connectivity
+
+```bash
+curl https://api.lablink.io/health
+# {"status": "ok", "version": "0.1.0"}
+```
+
+## Authenticate
+
+All requests require a Bearer token in the `Authorization` header:
+
+```bash
+export LABLINK_TOKEN="ll_your_token_here"
+
+curl https://api.lablink.io/api/v1/uploads \
+  -H "Authorization: Bearer $LABLINK_TOKEN"
+```
+
+## Core Workflow
+
+The typical data ingestion and analysis workflow involves four steps.
+
+### Step 1 — Upload a File
+
+```bash
+curl -X POST https://api.lablink.io/api/v1/uploads \
+  -H "Authorization: Bearer $LABLINK_TOKEN" \
+  -F "file=@/path/to/nanodrop_results.csv" \
+  -F "instrument_type=spectrophotometer"
+```
+
+Response:
+
+```json
+{
+  "data": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "filename": "nanodrop_results.csv",
+    "status": "uploaded",
+    "file_size_bytes": 4096
+  },
+  "meta": { "request_id": "...", "timestamp": "..." },
+  "errors": []
+}
+```
+
+### Step 2 — Poll for Parse Completion
+
+Parsing is asynchronous. Poll until `status` is `"parsed"` or `"parse_failed"`:
+
+```bash
+UPLOAD_ID="550e8400-e29b-41d4-a716-446655440000"
+
+curl https://api.lablink.io/api/v1/uploads/$UPLOAD_ID \
+  -H "Authorization: Bearer $LABLINK_TOKEN"
+```
+
+Typical parse time is 2–30 seconds depending on file size.
+
+### Step 3 — Query the Data
+
+```bash
+curl "https://api.lablink.io/api/v1/data/search?q=absorbance&instrument_type=spectrophotometer" \
+  -H "Authorization: Bearer $LABLINK_TOKEN"
+```
+
+### Step 4 — Create an Experiment
+
+```bash
+curl -X POST https://api.lablink.io/api/v1/experiments \
+  -H "Authorization: Bearer $LABLINK_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "intent": "Measure protein concentration via UV-Vis at 280 nm",
+    "hypothesis": "Sample A concentration exceeds 2 mg/mL",
+    "parameters": {"wavelength_nm": 280, "blank": "TE buffer"}
+  }'
+```
+
+## Understanding the Response Envelope
+
+Every LabLink response is wrapped in a consistent envelope:
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "request_id": "uuid-v4",
+    "timestamp": "2026-03-08T12:00:00Z",
+    "pagination": null
+  },
+  "errors": []
+}
+```
+
+**Always access `.data` for the response payload.** On success, `errors` is an empty array. On failure, `data` is `null` and `errors` contains one or more error objects.
+
+List endpoints include pagination in `meta.pagination`:
+
+```json
+"pagination": {
+  "total_count": 142,
+  "page": 1,
+  "page_size": 20,
+  "has_more": true
+}
+```
+
+## Error Handling
+
+Error responses set a non-2xx HTTP status and populate the `errors` array:
+
+```json
+{
+  "data": null,
+  "meta": { "request_id": "...", "timestamp": "..." },
+  "errors": [
+    {
+      "code": "UPLOAD_NOT_FOUND",
+      "message": "No upload with ID '550e8400-...'",
+      "field": null,
+      "suggestion": "Use GET /api/v1/uploads to find valid upload IDs",
+      "retry": false,
+      "retry_after": null
+    }
+  ]
+}
+```
+
+Key fields:
+
+| Field | Description |
+|---|---|
+| `code` | Machine-readable error code — safe to `switch` on |
+| `message` | Human-readable description |
+| `field` | Which request field caused the error (validation errors only) |
+| `suggestion` | Actionable hint for recovery |
+| `retry` | `true` if retrying the same request may succeed (e.g. rate limit, transient) |
+| `retry_after` | Seconds to wait before retrying when `retry` is `true` |

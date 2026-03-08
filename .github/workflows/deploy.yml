@@ -1,0 +1,120 @@
+name: Deploy
+
+# Runs on every merge to main. Never runs on pull_request — OIDC role is scoped
+# to ref:refs/heads/main only. The trust policy must use StringEquals on the :sub
+# claim: repo:william-c-stanford/lablink:ref:refs/heads/main
+# Without this, any PR branch could assume the production deploy role.
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # Required for OIDC authentication with AWS
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502  # v4.0.2
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076  # v2.0.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349  # v3.7.1
+
+      - name: Build and push API image
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75  # v6.9.0
+        with:
+          push: true
+          tags: |
+            ${{ secrets.ECR_REGISTRY }}/lablink-api:${{ github.sha }}
+            ${{ secrets.ECR_REGISTRY }}/lablink-api:latest
+          # type=gha,mode=max caches ALL intermediate layers including the slow
+          # dep-install layer — 10 GB, 7-day LRU, zero cost. --cache-from image:latest
+          # alone has high miss rates on multi-stage builds.
+          cache-from: type=gha,mode=max
+          cache-to: type=gha,mode=max
+
+      - name: Build and push worker image
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75  # v6.9.0
+        with:
+          file: Dockerfile.worker
+          push: true
+          tags: |
+            ${{ secrets.ECR_REGISTRY }}/lablink-worker:${{ github.sha }}
+            ${{ secrets.ECR_REGISTRY }}/lablink-worker:latest
+          cache-from: type=gha,mode=max
+          cache-to: type=gha,mode=max
+
+      - name: Register new ECS task definition and deploy API
+        run: |
+          # --force-new-deployment alone only re-pulls the same task definition.
+          # Code changes require registering a new task definition revision and
+          # passing --task-definition <new-arn> to update-service.
+          API_TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition lablink-api-production \
+            --query 'taskDefinition' --output json | \
+            jq --arg IMAGE "${{ secrets.ECR_REGISTRY }}/lablink-api:${{ github.sha }}" \
+              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
+               .containerDefinitions[0].image = $IMAGE')
+
+          NEW_API_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$API_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+
+          aws ecs update-service \
+            --cluster lablink-production \
+            --service lablink-api \
+            --task-definition "$NEW_API_ARN"
+
+          # aws ecs wait services-stable returns success EVEN when the deployment
+          # rolled back. Always verify the active task definition ARN post-wait.
+          aws ecs wait services-stable --cluster lablink-production --services lablink-api
+          ACTIVE_ARN=$(aws ecs describe-services \
+            --cluster lablink-production --services lablink-api \
+            --query 'services[0].deployments[0].taskDefinition' --output text)
+          if [ "$ACTIVE_ARN" != "$NEW_API_ARN" ]; then
+            echo "Deployment rolled back! Active: $ACTIVE_ARN, Expected: $NEW_API_ARN"
+            exit 1
+          fi
+          echo "API deployment verified: $NEW_API_ARN"
+
+      - name: Register new ECS task definition and deploy worker
+        run: |
+          WORKER_TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition lablink-worker-production \
+            --query 'taskDefinition' --output json | \
+            jq --arg IMAGE "${{ secrets.ECR_REGISTRY }}/lablink-worker:${{ github.sha }}" \
+              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
+               .containerDefinitions[0].image = $IMAGE')
+
+          NEW_WORKER_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$WORKER_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+
+          aws ecs update-service \
+            --cluster lablink-production \
+            --service lablink-worker \
+            --task-definition "$NEW_WORKER_ARN"
+
+          aws ecs wait services-stable --cluster lablink-production --services lablink-worker
+          ACTIVE_WORKER_ARN=$(aws ecs describe-services \
+            --cluster lablink-production --services lablink-worker \
+            --query 'services[0].deployments[0].taskDefinition' --output text)
+          if [ "$ACTIVE_WORKER_ARN" != "$NEW_WORKER_ARN" ]; then
+            echo "Deployment rolled back! Active: $ACTIVE_WORKER_ARN, Expected: $NEW_WORKER_ARN"
+            exit 1
+          fi
+          echo "Worker deployment verified: $NEW_WORKER_ARN"

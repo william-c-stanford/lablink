@@ -1,0 +1,72 @@
+# LabLink
+
+> LabLink is a lab data integration platform for research labs. It ingests instrument files (HPLC, PCR, spectrophotometer, plate reader, balance), parses them into a canonical schema, and exposes every action via both a REST API and a 25-tool MCP server — making it natively composable for AI agents and self-driving lab workflows.
+
+## REST API
+
+- Base URL: `http://localhost:8000` (dev) or your deployed host
+- Auth: `Authorization: Bearer <token>` on all endpoints
+- All responses: `{ data, meta, errors }` envelope (see llms-full.txt)
+- OpenAPI docs: `GET /docs` (Swagger UI), `GET /openapi.json`
+
+## MCP Server
+
+- 25 tools across 4 toolsets + 2 discovery tools
+- Run: `python -m lablink.mcp.server`
+- Discovery: `list_toolsets()` → toolset names/counts; `get_toolset(name)` → tool list
+- All IDs are UUIDs. Dates use ISO-8601.
+
+## Explorer Tools (8)
+
+Read-only data exploration, search, and export.
+
+- `list_experiments(status?, campaign_id?, created_after?, instrument_type?, page?, page_size?)` → ExperimentSummary[]
+- `get_experiment(experiment_id)` → Experiment (intent, hypothesis, parameters, constraints, status, outcome, linked upload IDs)
+- `get_instrument_data(upload_id)` → ParsedData[] (measurements, instrument_settings, sample_count, parser metadata)
+- `search_catalog(query, max_results?)` → hits[], facets (ranked full-text search across all indexed data)
+- `list_instruments()` → Instrument[] (name, instrument_type, manufacturer, model, location, agent_id)
+- `list_uploads(status?, instrument_id?, created_after?, page?, page_size?)` → Upload[]
+- `get_chart_data(upload_id)` → { plotly_config, raw_values[], labels[], units[] }
+- `create_export(format, filters?)` → { export_id, download_url, record_count } — formats: csv, json, xlsx, pdf
+
+## Planner Tools (7)
+
+Experiment and campaign lifecycle management.
+
+- `create_experiment(intent, parameters?, campaign_id?, predecessor_ids?)` → Experiment (status: planned)
+- `update_experiment(experiment_id, status?, outcome?)` → Experiment — transitions: planned→running→completed|failed, planned→cancelled
+- `record_outcome(experiment_id, results, success)` → Experiment — marks completed (success=true) or failed
+- `link_upload_to_experiment(experiment_id, upload_id)` → { experiment_id, upload_id, linked_at }
+- `create_campaign(name, objective, optimization_method?)` → Campaign — methods: manual, bayesian, grid_search
+- `get_campaign_progress(campaign_id)` → { counts_by_status, completion_rate }
+- `list_campaigns(status?)` → Campaign[] — statuses: active, paused, completed
+
+## Ingestor Tools (4)
+
+File upload, parsing, and reparse. Parsing is async.
+
+- `list_parsers()` → parser metadata (name, version, instrument_type, supported extensions)
+- `create_upload(file_path, instrument_type?, project_id?)` → Upload (status: uploaded) — triggers async parse
+- `get_upload(upload_id)` → Upload (status, parser_used, error_message, timestamps) — poll until status == "parsed"
+- `reparse_upload(upload_id)` → { status: "reparse_queued" } — resets and re-dispatches parse task
+
+**Async pattern**: call `create_upload` → poll `get_upload` until `status == "parsed"` → call `get_instrument_data`.
+
+## Admin Tools (4)
+
+Usage stats, agent management, webhooks, and audit trail.
+
+- `get_usage_stats()` → { total_uploads, total_storage_mb, instrument_count, agent_count, user_count }
+- `list_agents()` → Agent[] (name, platform, version, status, last_heartbeat_at)
+- `create_webhook(url, events, secret?)` → Webhook (with secret) — events: upload.parsed, experiment.completed, etc.
+- `list_audit_events(resource_type?, resource_id?, created_after?, page?)` → AuditEvent[]
+
+## Error Recovery
+
+Every error in `errors[]` includes:
+- `code` — machine-readable string (e.g. `EXPERIMENT_NOT_FOUND`)
+- `message` — human-readable description
+- `suggestion` — actionable recovery hint (e.g. "Use list_experiments to find valid IDs")
+- `retry` — boolean: whether to retry the same request
+- `retry_after` — seconds to wait before retrying (null if not applicable)
+- `field` — which request field caused the error (null if not field-specific)
