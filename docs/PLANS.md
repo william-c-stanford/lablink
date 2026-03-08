@@ -18,6 +18,7 @@ Master catalogue of all plans in this repository. Detailed execution plans live 
 |---|---|---|---|
 | [feat-complete-weeks-5-6-tests-and-ci](execution-plans/completed/feat-complete-weeks-5-6-tests-and-ci.md) | Completed | 2026-03-08 | Add missing Week 5 tests + GitHub Actions cross-compile CI |
 | [feat-replace-custom-parsers-with-allotropy](execution-plans/completed/feat-replace-custom-parsers-with-allotropy.md) | Completed | 2026-03-08 | Integrate allotropy library with graceful custom fallback |
+| [docs-align-roadmap-with-seed](execution-plans/completed/docs-align-roadmap-with-seed.md) | Completed | 2026-03-08 | Align product roadmap with seed-frontend-agent.yaml (11 drift items) |
 
 ## Technical Debt
 
