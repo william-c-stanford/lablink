@@ -13,3 +13,8 @@
 - **Skipped:** `docs/DESIGN.md` — no API surface or pattern changes
 - **Skipped:** `plans/*.md` — already forwarding stubs, no migration needed
 - **Generated:** `docs/gardening-log.md` — created this log
+
+## 2026-03-09 — Garden Run (2)
+
+- **Skipped:** `src/lablink/mcp/server.py` — removed `from __future__ import annotations`; implementation-only fix, no API/convention change
+- **Generated:** `docs/generated/db-schema.md` — first generation from SQLAlchemy models (17 tables)
