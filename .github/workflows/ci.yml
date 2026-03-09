@@ -49,9 +49,11 @@ jobs:
 
   e2e:
     name: E2E Tests
-    # Always run on main merges; on PRs only when triggered manually via [e2e] in title
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Always run on main merges; on PRs when 'run-e2e' label is applied
+    if: |
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-e2e'))
     permissions:
       contents: read
     steps:
@@ -70,7 +72,7 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Setup Chrome
-        uses: browser-actions/setup-chrome@latest
+        uses: browser-actions/setup-chrome@4f8e94349a351df0f048634f25fec36c3c91eded  # latest
 
       - name: Install Python dependencies
         run: pip install -e ".[dev]"
@@ -98,7 +100,7 @@ jobs:
 
       - name: Start API server (background)
         run: |
-          uvicorn lablink.main:app --host 0.0.0.0 --port 8000 &
+          uvicorn lablink.main:app --host 127.0.0.1 --port 8000 &
           echo $! > /tmp/api.pid
         env:
           LABLINK_DATABASE_URL: sqlite+aiosqlite:///./lablink.db

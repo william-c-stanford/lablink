@@ -26,9 +26,9 @@ def test_agents_empty_state_or_grid(auth_page: Page) -> None:
     """Either the empty state or the agent grid is visible."""
     ap = AgentsPage(auth_page)
     ap.navigate()
-    auth_page.wait_for_timeout(2_000)
     empty_state = auth_page.locator("text=No agents connected")
     grid = ap.agent_grid
+    empty_state.or_(grid).wait_for(state="visible", timeout=5_000)
     assert empty_state.count() > 0 or grid.count() > 0
 
 

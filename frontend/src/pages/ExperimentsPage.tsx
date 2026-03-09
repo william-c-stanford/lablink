@@ -61,14 +61,18 @@ interface ExperimentRecord {
 // ---------------------------------------------------------------------------
 
 const TRANSITIONS: Record<string, { label: string; target: string }[]> = {
-  draft: [{ label: 'Start', target: 'active' }],
-  active: [
+  planned: [
+    { label: 'Start', target: 'running' },
+    { label: 'Cancel', target: 'cancelled' },
+  ],
+  running: [
     { label: 'Complete', target: 'completed' },
+    { label: 'Fail', target: 'failed' },
     { label: 'Cancel', target: 'cancelled' },
   ],
   completed: [],
+  failed: [],
   cancelled: [],
-  archived: [],
 }
 
 // ---------------------------------------------------------------------------

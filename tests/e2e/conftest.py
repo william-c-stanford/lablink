@@ -33,9 +33,10 @@ from playwright.sync_api import BrowserContext, Page, sync_playwright  # noqa: E
 # ---------------------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
+FIXTURES_DIR = PROJECT_ROOT / "tests" / "fixtures"
 DB_PATH = PROJECT_ROOT / "lablink.db"
-API_BASE_URL = "http://localhost:8000"
-E2E_BASE_URL = "http://localhost:5173"
+API_BASE_URL = os.environ.get("E2E_API_URL", "http://localhost:8765")
+E2E_BASE_URL = os.environ.get("E2E_FE_URL", "http://localhost:5174")
 
 # Credentials inserted by seed.py
 E2E_EMAIL = "demo@example.com"
@@ -82,20 +83,40 @@ def _kill(proc: subprocess.Popen[bytes]) -> None:
 def e2e_services() -> Generator[None, None, None]:
     """Start API + frontend, seed DB. Teardown on exit."""
 
-    # Kill any stale processes on our ports before starting fresh
-    import subprocess as _sub
-    for port in (8000, 5173):
-        _sub.run(
-            f"lsof -ti:{port} | xargs kill -9 2>/dev/null || true",
-            shell=True,
-        )
+    # Verify E2E ports are free before starting
+    import socket as _socket
+    for port in (int(API_BASE_URL.split(":")[-1]), int(E2E_BASE_URL.split(":")[-1])):
+        try:
+            with _socket.create_connection(("localhost", port), timeout=0.5):
+                raise RuntimeError(
+                    f"Port {port} is already in use. Stop any running dev servers "
+                    f"(make dev-local) before running E2E tests, or set "
+                    f"E2E_API_URL / E2E_FE_URL to use different ports."
+                )
+        except (ConnectionRefusedError, OSError):
+            pass  # Port is free
 
     # Clean slate — remove WAL files or SQLite gets confused
     for suffix in ("", "-shm", "-wal"):
         p = DB_PATH.with_suffix(f".db{suffix}")
         p.unlink(missing_ok=True)
 
-    env = {**os.environ, "LABLINK_DATABASE_URL": f"sqlite+aiosqlite:///{DB_PATH}"}
+    env = {
+        # System paths — needed for subprocess to find executables and uv
+        "PATH": os.environ.get("PATH", "/usr/bin:/usr/local/bin"),
+        "HOME": os.environ.get("HOME", "/tmp"),
+        "USER": os.environ.get("USER", "testuser"),
+        # Python/uv virtualenv context
+        "VIRTUAL_ENV": os.environ.get("VIRTUAL_ENV", ""),
+        "UV_PROJECT_ENVIRONMENT": os.environ.get("UV_PROJECT_ENVIRONMENT", ""),
+        # LabLink config — safe defaults for E2E (no real cloud creds)
+        "LABLINK_DATABASE_URL": f"sqlite+aiosqlite:///{DB_PATH}",
+        "LABLINK_SECRET_KEY": "e2e-test-secret-not-for-production",
+        "LABLINK_CORS_ORIGINS": f'["{E2E_BASE_URL}"]',
+        "LABLINK_TASK_BACKEND": "sync",
+        "LABLINK_STORAGE_BACKEND": "local",
+        "LABLINK_ENVIRONMENT": "test",
+    }
 
     # Run migrations
     subprocess.run(
@@ -121,9 +142,9 @@ def e2e_services() -> Generator[None, None, None]:
             "uvicorn",
             "lablink.main:app",
             "--host",
-            "0.0.0.0",
+            "127.0.0.1",
             "--port",
-            "8000",
+            API_BASE_URL.split(":")[-1],
         ],
         cwd=PROJECT_ROOT,
         env=env,
@@ -135,7 +156,7 @@ def e2e_services() -> Generator[None, None, None]:
     # Start frontend dev server
     fe_env = {**os.environ, "VITE_API_BASE_URL": API_BASE_URL}
     fe_proc = subprocess.Popen(
-        ["npm", "run", "dev", "--", "--port", "5173"],
+        ["npm", "run", "dev", "--", "--port", E2E_BASE_URL.split(":")[-1]],
         cwd=PROJECT_ROOT / "frontend",
         env=fe_env,
         start_new_session=True,
@@ -194,7 +215,7 @@ def page(context: BrowserContext) -> Page:
 
 
 @pytest.fixture()
-def auth_page(page: Page) -> Page:
+def auth_page(page: Page, request: pytest.FixtureRequest) -> Page:
     """Return a Page that has already completed the login flow."""
     page.goto(f"{E2E_BASE_URL}/login")
     page.get_by_test_id("login-email").fill(E2E_EMAIL)
@@ -205,9 +226,10 @@ def auth_page(page: Page) -> Page:
     try:
         page.wait_for_selector('[data-testid="dashboard-page"]', timeout=30_000)
     except Exception:
-        # Capture screenshot and current URL for debugging
+        # Capture screenshot for CI artifact upload — name includes test for easy identification
         try:
-            page.screenshot(path="/tmp/e2e-auth-failure.png")
+            test_name = request.node.name.replace("/", "_").replace("::", "_")
+            page.screenshot(path=f"/tmp/e2e-failure-{test_name}.png")
         except Exception:
             pass
         raise

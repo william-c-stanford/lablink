@@ -1,17 +1,12 @@
 """E2E tests: Uploads page."""
 
-from pathlib import Path
-
 import pytest
 from playwright.sync_api import Page
 
+from tests.e2e.conftest import FIXTURES_DIR
 from tests.e2e.pages.uploads_page import UploadsPage
 
 pytestmark = pytest.mark.e2e
-
-FIXTURES_DIR = (
-    Path(__file__).parent.parent.parent / "tests" / "fixtures"
-)
 
 
 def test_uploads_page_renders(auth_page: Page) -> None:
@@ -33,8 +28,8 @@ def test_uploads_list_shows_seed_data(auth_page: Page) -> None:
     """Seed data is visible in the uploads list."""
     up = UploadsPage(auth_page)
     up.navigate()
-    # Wait for API response
-    auth_page.wait_for_timeout(2_000)
+    # Wait for seed data to appear in the list
+    auth_page.wait_for_selector("text=nanodrop_sample.csv", timeout=5_000)
     assert up.upload_list.is_visible()
     assert auth_page.locator("text=nanodrop_sample.csv").count() >= 1
 
