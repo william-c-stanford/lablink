@@ -8,15 +8,13 @@ Provides two context classes:
   - MCPContext: Dataclass-based context for in-memory tool handlers
 """
 
-from __future__ import annotations
-
 import contextvars
+from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, Callable
+from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
 
 # ---------------------------------------------------------------------------
 # ToolContext — used by explorer tools that need DB access
@@ -60,7 +58,7 @@ class ToolContext:
             yield session
 
     @classmethod
-    def get(cls) -> ToolContext:
+    def get(cls) -> "ToolContext":
         """Get the current ToolContext from context vars."""
         ctx = _current_context.get()
         if ctx is None:
@@ -70,7 +68,7 @@ class ToolContext:
         return ctx
 
     @classmethod
-    def set(cls, ctx: ToolContext) -> None:
+    def set(cls, ctx: "ToolContext") -> None:
         """Set the current ToolContext in context vars."""
         _current_context.set(ctx)
 

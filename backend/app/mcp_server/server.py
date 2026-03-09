@@ -13,10 +13,9 @@ All tool names follow verb_noun snake_case pattern.
 All responses include a 'suggestion' field for agent recovery.
 """
 
-from __future__ import annotations
-
 import inspect
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 from fastmcp import FastMCP
 

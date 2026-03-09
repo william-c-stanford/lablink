@@ -14,8 +14,6 @@ Tools:
   8. get_dataset_summary — Get summary statistics for a dataset
 """
 
-from __future__ import annotations
-
 from typing import Any
 
 from app.mcp_server.context import MCPContext
