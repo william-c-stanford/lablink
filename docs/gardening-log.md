@@ -1,5 +1,14 @@
 # Documentation Gardening Log
 
+## 2026-03-09 — Garden Run (7)
+
+- **Updated:** `ARCHITECTURE.md` — test count 1,296→1,423 unit + 29 E2E; added `tests/e2e/` to directory layout; updated CI/CD line to note E2E job on main/`run-e2e` label
+- **Updated:** `docs/RELIABILITY.md` — added Testing section: `make test` vs `make e2e`, 1,423 unit + 29 E2E tests, CI E2E trigger conditions
+- **Updated:** `docs/FRONTEND.md` — added E2E testing note; added Dev Server Configuration section documenting `VITE_API_BASE_URL` proxy override; updated last-reviewed date
+- **Updated:** `src/lablink/services/CLAUDE.md` — fixed state machine example to use lowercase enum members (`ExperimentStatus.planned`) matching the fixed `experiment_service.py`; updated last-reviewed date
+- **Skipped:** `frontend/src/pages/CLAUDE.md` — page list already current; no structural changes
+- **Skipped:** `docs/generated/db-schema.md` — no model/migration changes since last run
+
 ## 2026-03-09 — Garden Run
 
 - **Updated:** `src/lablink/models/CLAUDE.md` — entity count 16→17; added ExperimentPredecessor to purpose list and Key Types section

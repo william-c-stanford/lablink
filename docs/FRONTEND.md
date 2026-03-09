@@ -1,7 +1,7 @@
 # Frontend
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > Frontend conventions, component patterns, and styling approach.
 
@@ -50,6 +50,12 @@ Custom React Query hooks live in `frontend/src/api/hooks/` (or `hooks.ts`) — w
 ## Testing
 
 Component tests with Vitest + React Testing Library. Test files in `__tests__/` directories adjacent to the components they test. API client mocked at the `fetch` level.
+
+E2E tests in `tests/e2e/` use Playwright to drive the full stack (API + Vite dev server). Run via `make e2e`. E2E tests are excluded from `make test`.
+
+## Dev Server Configuration
+
+Vite proxies `/api/*` requests to the backend. The proxy target defaults to `http://localhost:8000` but can be overridden via the `VITE_API_BASE_URL` environment variable (used by `make e2e` to point at the E2E API port). Set in `vite.config.ts`: `target: process.env.VITE_API_BASE_URL ?? "http://localhost:8000"`.
 
 ## Performance Guidelines
 

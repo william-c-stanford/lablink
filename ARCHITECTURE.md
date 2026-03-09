@@ -55,7 +55,8 @@ lablink/
       store/              # Zustand stores (auth, ui, filter, events)
   agent/                  # Go desktop agent
     internal/             # File watcher, uploader, heartbeat, queue
-  tests/                  # 56 test files, 1,296 tests
+  tests/                  # 56 test files, 1,423 unit tests + 29 E2E tests
+    e2e/                  # Playwright E2E suite (run via `make e2e`, separate from unit tests)
   migrations/             # Alembic migrations
   infra/                  # Terraform modules (ECS, RDS, Redis, ES, S3, VPC)
   plans/                  # Forwarding stubs → docs/execution-plans/ and docs/product-specs/
@@ -90,6 +91,6 @@ File Upload Pipeline:
 ## Deployment
 
 **Dev**: `uvicorn lablink.main:create_app --factory --reload` (SQLite, no Docker)
-**CI/CD**: GitHub Actions — lint + type-check + test on every PR; deploy pipeline triggers on merge to main
+**CI/CD**: GitHub Actions — lint + type-check + unit tests on every PR; E2E tests on main push or `run-e2e` label; deploy pipeline triggers on merge to main
 **Production**: Docker (multi-stage `Dockerfile` for API, `Dockerfile.worker` for Celery); provisioned via Terraform (`infra/`) on AWS ECS + RDS + ElastiCache + OpenSearch + S3
 **Desktop Agent**: Go binary deployed alongside lab instruments, watches directories

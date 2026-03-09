@@ -34,6 +34,10 @@ Never log raw file bytes, passwords, or API tokens. Log content hashes (first 12
 
 In production: Celery task failures alert via Redis queue depth. Parse failure rate tracked via `upload.parse_failed` webhook events. Audit trail queryable via `GET /audit` for compliance monitoring.
 
+## Testing
+
+Unit tests: `make test` (pytest, no Docker, SQLite). 1,423 tests across 50 files. E2E tests: `make e2e` (Playwright + headless Chromium, starts API + Vite dev server, runs 29 browser tests). E2E tests are excluded from `make test` via `pytest.mark.e2e`. In CI, E2E runs on main push or on PRs with the `run-e2e` label.
+
 ## Runbooks
 
 **Deploy**: Merging to `main` triggers GitHub Actions deploy pipeline. Manually: `make migrate && docker-compose up -d api worker` (dev) or push to ECS via Terraform (prod)
