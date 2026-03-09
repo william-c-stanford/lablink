@@ -27,6 +27,12 @@
 
 - **Updated:** `CLAUDE.md` — added `docs/gardening-log.md` and `docs/generated/db-schema.md` to Documentation table (both existed but were unreachable from CLAUDE.md)
 
+## 2026-03-09 — Garden Run (6)
+
+- **Skipped:** `src/lablink/CLAUDE.md` — file does not exist; lint heuristic false positive (model docs live in `src/lablink/models/CLAUDE.md`, already updated in run 4)
+- **Skipped:** `docs/generated/db-schema.md` — commit `68fa954` added only blank lines and `if TYPE_CHECKING:` import blocks to model files; no schema columns or tables changed
+- **Skipped:** `docs/DESIGN.md` — no API surface or design pattern changes in reformatting commit
+
 ## 2026-03-09 — Garden Run (4)
 
 - **Updated:** `src/lablink/models/CLAUDE.md` — added TYPE_CHECKING cross-model import pattern (established across all 13 model files in the mypy fix commit)
