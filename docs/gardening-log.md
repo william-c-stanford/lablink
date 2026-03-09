@@ -18,3 +18,7 @@
 
 - **Skipped:** `src/lablink/mcp/server.py` — removed `from __future__ import annotations`; implementation-only fix, no API/convention change
 - **Generated:** `docs/generated/db-schema.md` — first generation from SQLAlchemy models (17 tables)
+
+## 2026-03-09 — Garden Run (3)
+
+- **Skipped:** all src/ and tests/ files — `1becf3d reformatted tests` was purely formatting (line-wrapping); no API, model, or pattern changes
