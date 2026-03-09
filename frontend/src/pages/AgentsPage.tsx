@@ -178,7 +178,7 @@ export function AgentsPage() {
   // ---------------------------------------------------------------------------
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in" data-testid="agents-page">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
@@ -302,7 +302,7 @@ export function AgentsPage() {
 
       {/* Agent cards grid */}
       {agents.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4" data-testid="agent-grid">
           {agents.map((agent) => (
             <AgentCard
               key={agent.id}

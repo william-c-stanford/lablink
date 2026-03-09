@@ -128,7 +128,7 @@ export default function UploadsPage() {
   )
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="uploads-page">
       {/* Page header */}
       <div>
         <h2
@@ -144,6 +144,7 @@ export default function UploadsPage() {
 
       {/* Drop zone */}
       <div
+        data-testid="upload-dropzone"
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -291,7 +292,7 @@ export default function UploadsPage() {
       )}
 
       {filteredUploads.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2" data-testid="upload-list">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-4 px-5 py-2 text-xs font-bold uppercase tracking-widest text-[#94a3b8]">
             <span className="col-span-4">Filename</span>

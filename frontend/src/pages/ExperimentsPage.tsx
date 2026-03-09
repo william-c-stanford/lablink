@@ -126,7 +126,7 @@ export default function ExperimentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="experiments-page">
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
@@ -146,6 +146,7 @@ export default function ExperimentsPage() {
           size="md"
           onClick={() => setIsCreateOpen(true)}
           leftIcon={<FlaskConical size={16} strokeWidth={2} />}
+          data-testid="create-experiment-btn"
         >
           Create Experiment
         </Button>
@@ -215,7 +216,7 @@ export default function ExperimentsPage() {
 
       {/* Experiment list */}
       {experiments.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="experiment-list">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-4 px-5 py-2 text-xs font-bold uppercase tracking-widest text-[#94a3b8]">
             <span className="col-span-4">Name</span>
@@ -420,6 +421,7 @@ export default function ExperimentsPage() {
               onClick={handleCreate}
               loading={createExperiment.isPending}
               disabled={!newIntent.trim()}
+              data-testid="create-experiment-submit"
             >
               Create
             </Button>

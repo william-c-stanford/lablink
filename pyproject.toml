@@ -31,6 +31,8 @@ dev = [
     "pytest-cov>=6.0.0",
     "ruff>=0.8.0",
     "mypy>=1.8.0",
+    "honcho>=2.0.0",
+    "playwright>=1.49.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -40,7 +42,17 @@ packages = ["src/lablink"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["src", "backend"]
+markers = [
+    "e2e: end-to-end browser tests (excluded from make test, run via make e2e)",
+]
+addopts = "-m 'not e2e'"
 
 [tool.ruff]
 target-version = "py312"
 line-length = 100
+
+[dependency-groups]
+dev = [
+    "honcho>=2.0.0",
+    "playwright>=1.58.0",
+]

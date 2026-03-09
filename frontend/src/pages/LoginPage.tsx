@@ -74,7 +74,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} data-testid="login-form">
           <CardContent className="space-y-5">
             {/* Error display */}
             {errorMessage && (
@@ -110,6 +110,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 error={Boolean(login.error)}
+                data-testid="login-email"
               />
             </InputGroup>
 
@@ -127,6 +128,7 @@ export default function LoginPage() {
                 required
                 autoComplete="current-password"
                 error={Boolean(login.error)}
+                data-testid="login-password"
               />
             </InputGroup>
           </CardContent>
@@ -138,6 +140,7 @@ export default function LoginPage() {
               size="lg"
               className="w-full"
               loading={login.isPending}
+              data-testid="login-submit"
             >
               Sign in
             </Button>

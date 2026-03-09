@@ -110,8 +110,7 @@ async def create_experiment(
         project_id=project_id,
         campaign_id=campaign_id,
         created_by=created_by,
-        created_by_agent_token=created_by_agent_token,
-        status=ExperimentStatus.PLANNED.value,
+        status=ExperimentStatus.planned.value,
     )
     session.add(experiment)
     await session.flush()

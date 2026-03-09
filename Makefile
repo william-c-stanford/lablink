@@ -1,4 +1,4 @@
-.PHONY: help dev test lint format migrate seed clean check install
+.PHONY: help dev dev-local check-prereqs check-ports test test-cov e2e lint format migrate seed clean check install
 
 PYTHON   ?= python
 UV       ?= uv
@@ -24,15 +24,32 @@ install: ## Install project and dev dependencies via uv
 dev: ## Run FastAPI dev server with auto-reload
 	$(UV) run uvicorn $(APP_MOD) --reload --host $(HOST) --port $(PORT)
 
+dev-local: check-prereqs ## Start API + frontend together via honcho (no Docker)
+	$(UV) run honcho start
+
+check-prereqs: ## Verify local dev prerequisites are installed
+	@which node >/dev/null 2>&1 || (echo "ERROR: node not found. Install Node.js >= 18." && exit 1)
+	@which npm >/dev/null 2>&1 || (echo "ERROR: npm not found." && exit 1)
+	@test -d frontend/node_modules || (echo "Installing frontend deps..." && cd frontend && npm install)
+	@echo "Prerequisites OK."
+
+check-ports: ## Check that ports 8000 and 5173 are free
+	@lsof -ti:8000 >/dev/null 2>&1 && echo "WARNING: port 8000 in use" || echo "Port 8000 free"
+	@lsof -ti:5173 >/dev/null 2>&1 && echo "WARNING: port 5173 in use" || echo "Port 5173 free"
+
 # ---------------------------------------------------------------------------
 # Testing
 # ---------------------------------------------------------------------------
 
-test: ## Run test suite with pytest
+test: ## Run unit + integration test suite with pytest (excludes e2e)
 	$(UV) run pytest tests/ -v --tb=short
 
 test-cov: ## Run tests with coverage report
 	$(UV) run pytest tests/ -v --tb=short --cov=lablink --cov-report=term-missing --cov-report=html
+
+e2e: ## Run end-to-end browser tests (requires Node.js + Playwright)
+	@test -d frontend/node_modules || (echo "Installing frontend deps..." && cd frontend && npm install)
+	$(UV) run pytest tests/e2e/ -v --tb=short -m e2e
 
 # ---------------------------------------------------------------------------
 # Code quality
