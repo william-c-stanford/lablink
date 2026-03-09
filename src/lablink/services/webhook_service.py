@@ -181,7 +181,7 @@ class WebhookService:
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def list(
+    async def list_webhooks(
         self,
         db: AsyncSession,
         *,

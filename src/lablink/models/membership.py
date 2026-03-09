@@ -6,11 +6,17 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.user import User
+    from lablink.models.organization import Organization
 
 class MemberRole(str, PyEnum):
     """Membership roles within an organization."""

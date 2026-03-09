@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -13,6 +13,9 @@ from lablink.database import Base
 
 from datetime import datetime, timezone
 
+
+if TYPE_CHECKING:
+    from lablink.models.agent import Agent
 
 class Instrument(Base):
     """A registered lab instrument within an organization.

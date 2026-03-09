@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,6 +12,9 @@ from sqlalchemy.types import JSON
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.instrument import Instrument
 
 class Agent(Base):
     """A desktop agent instance that watches folders and uploads files.

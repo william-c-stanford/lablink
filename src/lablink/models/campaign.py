@@ -5,13 +5,16 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.experiment import Experiment
 
 class CampaignStatus(str, PyEnum):
     """Valid campaign lifecycle states."""

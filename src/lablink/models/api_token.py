@@ -7,7 +7,7 @@ import secrets
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,6 +15,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from lablink.database import Base
 from lablink.models.base import SoftDeleteMixin
 
+
+if TYPE_CHECKING:
+    from lablink.models.organization import Organization
+    from lablink.models.user import User
 
 class TokenScope(str, PyEnum):
     """API token permission scopes."""

@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -13,6 +13,10 @@ from sqlalchemy.types import JSON
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.campaign import Campaign
+    from lablink.models.experiment_upload import ExperimentUpload
 
 class ExperimentStatus(str, PyEnum):
     """Valid experiment lifecycle states."""

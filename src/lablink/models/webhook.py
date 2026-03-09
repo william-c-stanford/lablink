@@ -5,12 +5,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.webhook_delivery import WebhookDelivery
 
 class Webhook(Base):
     """Outbound webhook subscription for an organization.

@@ -276,8 +276,8 @@ def create_app(settings=None) -> FastAPI:
     application.middleware("http")(request_id_middleware)
 
     # -- Exception handlers --
-    application.add_exception_handler(StarletteHTTPException, http_exception_handler)
-    application.add_exception_handler(RequestValidationError, validation_exception_handler)
+    application.add_exception_handler(StarletteHTTPException, http_exception_handler)  # type: ignore[arg-type]
+    application.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
     application.add_exception_handler(LabLinkError, lablink_exception_handler)
     application.add_exception_handler(Exception, generic_exception_handler)
 

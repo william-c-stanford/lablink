@@ -5,12 +5,17 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 from lablink.models.base import SoftDeleteMixin
 
+
+if TYPE_CHECKING:
+    from lablink.models.membership import Membership
 
 class User(Base, SoftDeleteMixin):
     """A human user of the platform.

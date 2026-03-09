@@ -5,7 +5,7 @@ from __future__ import annotations
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import (
     BigInteger,
@@ -21,6 +21,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.parsed_data import ParsedData
 
 class UploadStatus(str, enum.Enum):
     """Upload lifecycle states."""

@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 
+
+if TYPE_CHECKING:
+    from lablink.models.experiment import Experiment
 
 class ExperimentUpload(Base):
     """Many-to-many link between experiments and uploads.

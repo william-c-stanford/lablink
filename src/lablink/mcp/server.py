@@ -23,7 +23,7 @@ from fastmcp import FastMCP
 # Server instance
 # ---------------------------------------------------------------------------
 
-mcp = FastMCP(
+mcp: FastMCP = FastMCP(
     "LabLink",
     instructions=(
         "LabLink is a lab data integration platform. Use the discovery tools "
