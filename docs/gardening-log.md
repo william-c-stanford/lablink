@@ -1,5 +1,9 @@
 # Documentation Gardening Log
 
+## 2026-03-09 — Garden Run (8)
+
+- **Skipped:** all candidates — only formatting/style reformats since run 7; no behavioral changes
+
 ## 2026-03-09 — Garden Run (7)
 
 - **Updated:** `ARCHITECTURE.md` — test count 1,296→1,423 unit + 29 E2E; added `tests/e2e/` to directory layout; updated CI/CD line to note E2E job on main/`run-e2e` label
