@@ -153,6 +153,8 @@ Each source module has a `CLAUDE.md` with local coding conventions (lazy-loaded 
 | [docs/QUALITY_SCORE.md](./docs/QUALITY_SCORE.md) | Domain quality grades and gaps |
 | [docs/PRODUCT_SENSE.md](./docs/PRODUCT_SENSE.md) | Product principles and target users |
 | [docs/PLANS.md](./docs/PLANS.md) | Plans catalogue |
+| [docs/gardening-log.md](./docs/gardening-log.md) | Context-gardening run history |
+| [docs/generated/db-schema.md](./docs/generated/db-schema.md) | Auto-generated database schema reference (17 tables) |
 
 <!-- ooo:START -->
 <!-- ooo:VERSION:0.14.0 -->

@@ -23,6 +23,10 @@
 
 - **Skipped:** all src/ and tests/ files — `1becf3d reformatted tests` was purely formatting (line-wrapping); no API, model, or pattern changes
 
+## 2026-03-09 — Garden Run (5)
+
+- **Updated:** `CLAUDE.md` — added `docs/gardening-log.md` and `docs/generated/db-schema.md` to Documentation table (both existed but were unreachable from CLAUDE.md)
+
 ## 2026-03-09 — Garden Run (4)
 
 - **Updated:** `src/lablink/models/CLAUDE.md` — added TYPE_CHECKING cross-model import pattern (established across all 13 model files in the mypy fix commit)
