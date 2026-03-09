@@ -14,10 +14,7 @@ Run standalone::
     python -m lablink.mcp.server
 """
 
-from __future__ import annotations
-
 import uuid
-
 from typing import Any, Optional
 
 from fastmcp import FastMCP
