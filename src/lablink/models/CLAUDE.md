@@ -1,14 +1,14 @@
 # models Module Guide
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > Local style guide for the `models` module.
 > Claude Code automatically loads this file when it reads files in this directory.
 
 ## Purpose
 
-SQLAlchemy 2.0 ORM models for LabLink. Defines 16 database entities: organization, user, membership, project, instrument, agent, upload, parsed_data, experiment, experiment_upload, campaign, api_token, audit_event, webhook, webhook_delivery, and instrument_data.
+SQLAlchemy 2.0 ORM models for LabLink. Defines 17 database entities: organization, user, membership, project, instrument, agent, upload, parsed_data, experiment, experiment_upload, experiment_predecessor, campaign, api_token, audit_event, webhook, webhook_delivery, and instrument_data.
 
 This module is the schema of record. Services read from and write to these models. Routers never touch models directly.
 
@@ -64,6 +64,7 @@ organization_id: Mapped[str] = mapped_column(String(36), ForeignKey("organizatio
 - `Experiment` (`experiment.py`) — Tracks experiment lifecycle (PLANNED → RUNNING → COMPLETED/FAILED)
 - `AuditEvent` (`audit_event.py`) — Immutable append-only record with SHA-256 hash chain
 - `ExperimentUpload` (`experiment_upload.py`) — Association table linking experiments to uploads (M2M)
+- `ExperimentPredecessor` (`experiment_predecessor.py`) — Association table linking experiments in a predecessor DAG (composite PK)
 
 ## What Belongs Here
 

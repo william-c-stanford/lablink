@@ -1,7 +1,7 @@
 # Reliability
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > SLOs, error handling patterns, and operational runbooks.
 
@@ -36,7 +36,7 @@ In production: Celery task failures alert via Redis queue depth. Parse failure r
 
 ## Runbooks
 
-**Deploy**: `make migrate && docker-compose up -d api worker`
+**Deploy**: Merging to `main` triggers GitHub Actions deploy pipeline. Manually: `make migrate && docker-compose up -d api worker` (dev) or push to ECS via Terraform (prod)
 **Re-parse failed uploads**: `POST /uploads/{id}/reparse` or MCP `reparse_upload` tool
 **Database migration**: `alembic upgrade head` (runs in new event loop, swaps async→sync driver in `env.py`)
 **Reset dev DB**: Delete `lablink.db`, run `alembic upgrade head`
