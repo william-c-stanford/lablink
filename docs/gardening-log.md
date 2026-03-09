@@ -1,5 +1,9 @@
 # Documentation Gardening Log
 
+## 2026-03-09 — Garden Run (9)
+
+- **Skipped:** all candidates — only doc-only commits since run 8 (PLANS.md catalogue entry, gardening log); no source changes
+
 ## 2026-03-09 — Garden Run (8)
 
 - **Skipped:** all candidates — only formatting/style reformats since run 7; no behavioral changes
