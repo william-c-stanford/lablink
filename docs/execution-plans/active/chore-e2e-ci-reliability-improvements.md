@@ -235,6 +235,24 @@ CI E2E job downloads ~130MB of Chrome + dependencies on every run (`playwright i
 
 ---
 
+## Progress
+
+- [ ] 001 — Replace fixed sleep waits with event-driven Playwright waits
+- [ ] 002 — Minimal env dict for API subprocess in conftest
+- [ ] 003 — Switch E2E ports to 8765/5174, remove kill -9 loop
+- [ ] 004 — Enable E2E on PRs (non-blocking or label-gated)
+- [ ] 005 — Export FIXTURES_DIR from conftest, remove duplicate
+- [ ] 006 — Use request.node.name for failure screenshot paths
+- [ ] 008 — Add Playwright browser cache step to CI
+
+## Decision Log
+
+_(Record decisions made during implementation here.)_
+
+## Outcomes & Retrospective
+
+_(Complete after all items are resolved.)_
+
 ## Implementation Order
 
 1. **001** — Fixed sleep waits (highest reliability impact, pure code change)

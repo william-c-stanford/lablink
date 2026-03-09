@@ -59,6 +59,24 @@ Use the existing `db` fixture from `tests/conftest.py` for database setup.
 | `tests/test_mcp/test_planner.py` | Delete or rename to `test_legacy_planner.py` |
 | `tests/test_mcp/test_lablink_planner.py` | Create — tests for `lablink.mcp.server` planner tools |
 
+## Progress
+
+- [ ] Delete or rename `tests/test_mcp/test_planner.py` (legacy wrong-module tests)
+- [ ] Create `tests/test_mcp/test_lablink_planner.py` with functional tool tests
+- [ ] `create_experiment` — happy path + missing org error
+- [ ] `update_experiment` — status transition + invalid transition error
+- [ ] `record_outcome` — links outcome to experiment
+- [ ] `link_upload_to_experiment` — links upload, verifies relationship
+- [ ] All tests pass with `make test`
+
+## Decision Log
+
+_(Record decisions made during implementation here.)_
+
+## Outcomes & Retrospective
+
+_(Complete after all items are resolved.)_
+
 ### Minimum Coverage Required
 
 - [ ] `create_experiment` — happy path, missing org returns error with suggestion
