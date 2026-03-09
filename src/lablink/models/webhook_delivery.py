@@ -17,6 +17,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.webhook import Webhook
 
+
 class DeliveryStatus(str, enum.Enum):
     """Webhook delivery lifecycle states."""
 

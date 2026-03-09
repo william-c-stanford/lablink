@@ -17,6 +17,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.webhook_delivery import WebhookDelivery
 
+
 class Webhook(Base):
     """Outbound webhook subscription for an organization.
 

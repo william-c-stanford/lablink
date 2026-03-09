@@ -16,6 +16,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.instrument import Instrument
 
+
 class Agent(Base):
     """A desktop agent instance that watches folders and uploads files.
 

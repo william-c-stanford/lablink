@@ -14,6 +14,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.experiment import Experiment
 
+
 class ExperimentUpload(Base):
     """Many-to-many link between experiments and uploads.
 

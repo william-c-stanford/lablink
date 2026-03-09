@@ -16,6 +16,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.upload import Upload
 
+
 class ParsedData(Base):
     """Canonical parsed output from an instrument file (ASM-compatible).
 

@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from lablink.models.campaign import Campaign
     from lablink.models.experiment_upload import ExperimentUpload
 
+
 class ExperimentStatus(str, PyEnum):
     """Valid experiment lifecycle states."""
 

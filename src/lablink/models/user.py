@@ -17,6 +17,7 @@ from lablink.models.base import SoftDeleteMixin
 if TYPE_CHECKING:
     from lablink.models.membership import Membership
 
+
 class User(Base, SoftDeleteMixin):
     """A human user of the platform.
 

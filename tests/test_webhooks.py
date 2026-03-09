@@ -387,10 +387,14 @@ class TestWebhookRegistration:
         # Deactivate it
         await svc.update(session, wh.id, is_active=False)
 
-        active, active_count = await svc.list_webhooks(session, organization_id=org.id, is_active=True)
+        active, active_count = await svc.list_webhooks(
+            session, organization_id=org.id, is_active=True
+        )
         assert active_count == 0
 
-        inactive, inactive_count = await svc.list_webhooks(session, organization_id=org.id, is_active=False)
+        inactive, inactive_count = await svc.list_webhooks(
+            session, organization_id=org.id, is_active=False
+        )
         assert inactive_count == 1
 
     async def test_update_url(

@@ -16,6 +16,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.experiment import Experiment
 
+
 class CampaignStatus(str, PyEnum):
     """Valid campaign lifecycle states."""
 

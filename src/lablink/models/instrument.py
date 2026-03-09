@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 if TYPE_CHECKING:
     from lablink.models.agent import Agent
 
+
 class Instrument(Base):
     """A registered lab instrument within an organization.
 

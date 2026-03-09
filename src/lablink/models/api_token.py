@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from lablink.models.organization import Organization
     from lablink.models.user import User
 
+
 class TokenScope(str, PyEnum):
     """API token permission scopes."""
 

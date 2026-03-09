@@ -17,6 +17,7 @@ if TYPE_CHECKING:
     from lablink.models.membership import Membership
     from lablink.models.api_token import ApiToken
 
+
 class Tier(str, PyEnum):
     """Organization pricing tiers."""
 

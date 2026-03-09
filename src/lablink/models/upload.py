@@ -25,6 +25,7 @@ from lablink.database import Base
 if TYPE_CHECKING:
     from lablink.models.parsed_data import ParsedData
 
+
 class UploadStatus(str, enum.Enum):
     """Upload lifecycle states."""
 

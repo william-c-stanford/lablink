@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from lablink.models.user import User
     from lablink.models.organization import Organization
 
+
 class MemberRole(str, PyEnum):
     """Membership roles within an organization."""
 
