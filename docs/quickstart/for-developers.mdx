@@ -13,8 +13,9 @@ You can create an API token two ways:
 **Option 2 — API**:
 
 ```bash
-curl -X POST https://api.lablink.io/api/v1/auth/tokens \
+curl -X POST https://api.lablink.io/api/v1/auth/api-tokens \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $LABLINK_JWT" \
   -d '{"name": "my-token", "expires_in_days": 90}'
 ```
 
@@ -82,8 +83,10 @@ Typical parse time is 2–30 seconds depending on file size.
 ### Step 3 — Query the Data
 
 ```bash
-curl "https://api.lablink.io/api/v1/data/search?q=absorbance&instrument_type=spectrophotometer" \
-  -H "Authorization: Bearer $LABLINK_TOKEN"
+curl -X POST https://api.lablink.io/api/v1/data/search \
+  -H "Authorization: Bearer $LABLINK_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "absorbance", "instrument_type": "spectrophotometer"}'
 ```
 
 ### Step 4 — Create an Experiment
