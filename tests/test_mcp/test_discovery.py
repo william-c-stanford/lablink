@@ -1,9 +1,7 @@
 """Tests for Discovery tools: list_toolsets, get_tool_help."""
 
-import pytest
 
-from app.mcp_server.context import MCPContext
-from app.mcp_server.server import create_mcp_server, list_toolsets, get_tool_help
+from app.mcp_server.server import list_toolsets, get_tool_help
 
 
 class TestListToolsets:

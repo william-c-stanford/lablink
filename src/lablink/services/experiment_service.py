@@ -35,7 +35,7 @@ from lablink.models.experiment import (
     ExperimentStatus,
 )
 from lablink.models.experiment_upload import ExperimentUpload
-from lablink.models.campaign import Campaign
+from lablink.models.experiment_predecessor import ExperimentPredecessor
 
 # Fields that can be updated via ``update_experiment``
 _UPDATABLE_FIELDS: set[str] = {

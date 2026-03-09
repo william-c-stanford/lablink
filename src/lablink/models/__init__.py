@@ -45,6 +45,7 @@ from lablink.models.experiment import (
     EXPERIMENT_TRANSITIONS,
 )
 from lablink.models.experiment_upload import ExperimentUpload
+from lablink.models.experiment_predecessor import ExperimentPredecessor
 from lablink.models.api_token import ApiToken, IdentityType, TokenScope
 from lablink.models.audit_event import AuditEvent
 from lablink.models.webhook import Webhook
@@ -78,6 +79,7 @@ __all__ = [
     "ExperimentStatus",
     "EXPERIMENT_TRANSITIONS",
     "ExperimentUpload",
+    "ExperimentPredecessor",
     "Campaign",
     "CampaignStatus",
     "CAMPAIGN_TRANSITIONS",

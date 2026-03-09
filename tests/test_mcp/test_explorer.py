@@ -8,7 +8,6 @@ Tests verify:
   - Not-found error paths
 """
 
-import pytest
 
 from app.mcp_server.context import MCPContext
 from app.mcp_server.tools.explorer import (

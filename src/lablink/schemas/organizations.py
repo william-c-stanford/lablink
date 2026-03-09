@@ -12,7 +12,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-from lablink.models import MemberRole, Tier
+from lablink.models import MemberRole
 
 
 _SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")

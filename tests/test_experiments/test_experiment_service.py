@@ -17,7 +17,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import NotFoundError, StateTransitionError, ValidationError
-from app.models.experiment import Experiment, ExperimentStatus, EXPERIMENT_TRANSITIONS
+from app.models.experiment import ExperimentStatus, EXPERIMENT_TRANSITIONS
 from app.services.experiment import (
     create_experiment,
     get_experiment,

@@ -15,7 +15,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import time
 import uuid
 from typing import Any
 
@@ -35,7 +34,7 @@ async def _deliver_webhook_async(
 ) -> dict[str, Any]:
     """Async implementation of webhook delivery with retry logic."""
     from lablink.database import async_session_factory
-    from lablink.models import DeliveryStatus, Webhook, WebhookDelivery
+    from lablink.models import Webhook
     from lablink.services.webhook_service import sign_payload
 
     webhook_id = uuid.UUID(webhook_id_str)
@@ -69,7 +68,6 @@ async def _deliver_webhook_async(
             # 3. Attempt delivery with retries
             last_error: str | None = None
             response_status: int | None = None
-            response_body: str | None = None
 
             for attempt in range(1, MAX_ATTEMPTS + 1):
                 try:
@@ -86,7 +84,6 @@ async def _deliver_webhook_async(
                             },
                         )
                         response_status = resp.status_code
-                        response_body = resp.text[:2000]
 
                         if 200 <= resp.status_code < 300:
                             logger.info(

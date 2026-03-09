@@ -229,7 +229,7 @@ class TestListExperiments:
     @pytest.mark.asyncio
     async def test_list_filter_by_status(self, session, org_id):
         """Status filter narrows results."""
-        exp1 = await create_experiment(session, org_id=org_id, name="Planned")
+        await create_experiment(session, org_id=org_id, name="Planned")
         exp2 = await create_experiment(session, org_id=org_id, name="Running")
         await transition_experiment(
             session, exp2.id, ExperimentStatus.RUNNING
@@ -268,7 +268,7 @@ class TestListExperiments:
     @pytest.mark.asyncio
     async def test_list_excludes_deleted(self, session, org_id):
         """Deleted experiments are excluded from listing by default."""
-        exp1 = await create_experiment(session, org_id=org_id, name="Active")
+        await create_experiment(session, org_id=org_id, name="Active")
         exp2 = await create_experiment(session, org_id=org_id, name="Deleted")
         await soft_delete_experiment(session, exp2.id)
 

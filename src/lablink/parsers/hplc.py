@@ -291,9 +291,6 @@ class HPLCParser(BaseParser):
         compound_col = self._find_column(header_map, [
             "compound", "compound name", "name", "component",
         ])
-        width_col = self._find_column(header_map, [
-            "width (min)", "width", "peak width",
-        ])
         peak_col = self._find_column(header_map, [
             "peak#", "peak #", "peak", "no.", "#",
         ])

@@ -21,18 +21,17 @@ import csv
 import io
 import json
 import logging
-import os
 import uuid
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any
 
 from pydantic import BaseModel, Field
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lablink.models import ParsedData, Upload
+from lablink.models import ParsedData
 
 logger = logging.getLogger(__name__)
 
@@ -419,7 +418,7 @@ class ExportService:
         """
         try:
             from reportlab.lib.pagesizes import letter
-            from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+            from reportlab.platypus import SimpleDocTemplate, Table
 
             buf = io.BytesIO()
             doc = SimpleDocTemplate(buf, pagesize=letter)

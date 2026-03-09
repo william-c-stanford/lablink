@@ -17,9 +17,9 @@ import uuid
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from lablink.dependencies import get_current_org, get_current_user, get_db, require_role
+from lablink.dependencies import get_current_user, get_db, require_role
 from lablink.exceptions import NotFoundError
-from lablink.models import Organization, User
+from lablink.models import User
 from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.schemas.organization import (
     AddMemberRequest,

@@ -12,7 +12,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from lablink.schemas.agent import AgentPlatform, AgentStatus
+from lablink.schemas.agent import AgentPlatform
 
 
 # ---------------------------------------------------------------------------

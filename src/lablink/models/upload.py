@@ -10,7 +10,6 @@ from typing import Optional
 from sqlalchemy import (
     BigInteger,
     DateTime,
-    Enum,
     ForeignKey,
     Index,
     String,

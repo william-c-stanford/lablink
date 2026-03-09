@@ -16,7 +16,7 @@ from app.config import Environment, Settings
 from app.core.database import get_session
 from app.main import create_app
 from app.models.base import Base
-from app.models.system import AuditAction, AuditLog
+from app.models.system import AuditAction
 from app.schemas.audit import (
     AuditChainLink,
     AuditChainVerification,

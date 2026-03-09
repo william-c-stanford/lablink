@@ -3,15 +3,12 @@
 Planner tools are sync functions called directly (not via FastMCP dispatch).
 """
 
-import pytest
 
 from app.mcp_server.tools.planner import (
-    PipelineStatus,
     create_pipeline,
     delete_pipeline,
     estimate_duration,
     get_pipeline,
-    get_pipeline_store,
     list_pipelines,
     update_pipeline,
     validate_pipeline,

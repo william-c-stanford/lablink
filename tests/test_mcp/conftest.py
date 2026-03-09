@@ -13,7 +13,6 @@ from app.mcp_server.context import MCPContext
 from app.mcp_server.server import (
     _TOOL_HANDLERS,
     _TOOL_TOOLSET_MAP,
-    TOOLSET_DESCRIPTIONS,
     create_mcp_server,
 )
 

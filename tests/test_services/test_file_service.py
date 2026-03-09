@@ -6,10 +6,8 @@ Uses in-memory SQLite via the session fixture from conftest.py.
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
-import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings, Environment

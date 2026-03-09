@@ -22,14 +22,12 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.schemas.audit import (
-    AuditChainLink,
     AuditChainVerification,
     AuditEventCreate,
     AuditEventRead,
 )
 from app.schemas.experiment import (
     ExperimentCreate,
-    ExperimentFileLink,
     ExperimentListResponse,
     ExperimentRead,
     ExperimentStateTransition,

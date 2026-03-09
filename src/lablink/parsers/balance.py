@@ -12,7 +12,6 @@ stability quality flags, and negative-mass warnings.
 from __future__ import annotations
 
 import csv
-import io
 import re
 from typing import Any, ClassVar
 

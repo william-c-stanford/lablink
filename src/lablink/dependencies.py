@@ -33,9 +33,8 @@ from __future__ import annotations
 import hashlib
 import logging
 import uuid
-from collections.abc import AsyncIterator, Callable
+from collections.abc import Callable
 from datetime import datetime, timezone
-from typing import Annotated
 
 from jose import JWTError, jwt
 from fastapi import Depends, Header, HTTPException, Request, status

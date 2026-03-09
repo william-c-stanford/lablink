@@ -6,14 +6,12 @@ Uses in-memory SQLite via the session fixture from conftest.py.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
 
 import pytest
-import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import NotFoundError, StateTransitionError, ValidationError
-from app.models.experiment import Experiment, ExperimentStatus
+from app.models.experiment import ExperimentStatus
 from app.models.identity import Organization
 from app.services.experiment import (
     create_experiment,
@@ -150,7 +148,7 @@ class TestListExperiments:
 
     async def test_list_filter_by_status(self, session: AsyncSession) -> None:
         await _seed_org(session)
-        exp1 = await create_experiment(session, org_id="org-1", name="Draft")
+        await create_experiment(session, org_id="org-1", name="Draft")
         exp2 = await create_experiment(session, org_id="org-1", name="Running")
         await transition_experiment(session, exp2.id, ExperimentStatus.RUNNING)
 
@@ -179,7 +177,7 @@ class TestListExperiments:
 
     async def test_list_excludes_soft_deleted(self, session: AsyncSession) -> None:
         await _seed_org(session)
-        exp1 = await create_experiment(session, org_id="org-1", name="Active")
+        await create_experiment(session, org_id="org-1", name="Active")
         exp2 = await create_experiment(session, org_id="org-1", name="Deleted")
         await soft_delete_experiment(session, exp2.id)
 

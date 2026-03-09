@@ -35,7 +35,6 @@ from lablink.schemas.envelope import Envelope, PaginationMeta, success_response
 from lablink.services.auth_service import (
     authenticate_user,
     create_access_token,
-    decode_access_token,
     register_user,
 )
 

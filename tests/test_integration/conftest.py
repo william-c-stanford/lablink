@@ -18,7 +18,6 @@ from sqlalchemy.pool import StaticPool
 
 from app.config import Environment, Settings
 from app.core.database import get_session
-from app.core.security import hash_password
 from app.main import create_app
 from app.models.base import Base
 

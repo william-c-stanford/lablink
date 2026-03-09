@@ -22,9 +22,9 @@ import logging
 import secrets
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
-from sqlalchemy import select, func, update
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.models import (

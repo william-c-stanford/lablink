@@ -10,7 +10,6 @@ from jose import jwt
 
 from app.config import Settings
 from app.exceptions import AuthenticationError, ConflictError
-from app.models.identity import Organization, User
 from app.schemas.auth import TokenResponse, UserResponse
 from app.services.auth import (
     authenticate_user,

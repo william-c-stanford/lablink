@@ -22,6 +22,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from lablink.parsers.base import BaseParser
+    from lablink.schemas.canonical import ParsedResult
 
 
 # Minimum confidence to accept a detection without a hint
@@ -250,7 +251,6 @@ def detect_and_parse(
         ParsedResult is None if detection failed or parsing raised an error.
     """
     from lablink.parsers.base import ParseError
-    from lablink.schemas.canonical import ParsedResult
 
     detection = detect_instrument(file_bytes, filename, hint, metadata)
 

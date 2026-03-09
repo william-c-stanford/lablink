@@ -186,11 +186,8 @@ class PCRParser(BaseParser):
         # Find columns
         well_col = self._find_column(header_map, ["well", "well position"])
         sample_col = self._find_column(header_map, ["sample name", "sample", "sample id"])
-        target_col = self._find_column(header_map, ["target name", "target"])
         ct_col = self._find_column(header_map, ["ct", "cq", "ct value", "cq value"])
         reporter_col = self._find_column(header_map, ["reporter", "reporter dye", "fluor"])
-        task_col = self._find_column(header_map, ["task", "content"])
-
         if ct_col is None:
             raise ParseError(
                 "No Ct or Cq column found in QuantStudio CSV.",
@@ -213,20 +210,10 @@ class PCRParser(BaseParser):
                 if sample_col and row.get(sample_col):
                     sample_name = row[sample_col].strip()
 
-                # Target name
-                target_name = None
-                if target_col and row.get(target_col):
-                    target_name = row[target_col].strip()
-
                 # Reporter dye
                 reporter = None
                 if reporter_col and row.get(reporter_col):
                     reporter = row[reporter_col].strip()
-
-                # Task/content type
-                task = None
-                if task_col and row.get(task_col):
-                    task = row[task_col].strip()
 
                 # Ct value
                 ct_raw = row.get(ct_col, "").strip()
@@ -240,9 +227,6 @@ class PCRParser(BaseParser):
                             f"Well {well or row_idx + 1}: Ct {ct_value:.2f} > 40 "
                             f"suggests non-specific amplification."
                         )
-
-                # Build measurement name
-                meas_name = f"ct_{target_name or 'unknown'}_{well or row_idx + 1}"
 
                 measurements.append(
                     MeasurementValue(
@@ -274,7 +258,6 @@ class PCRParser(BaseParser):
         summary = self._compute_summary(ct_values, len(measurements))
 
         # Build instrument settings
-        chemistry = instrument_meta.get("Chemistry", instrument_meta.get("chemistry"))
         cycle_count_str = instrument_meta.get("Cycle Count", instrument_meta.get("cycle_count"))
         cycle_count = int(cycle_count_str) if cycle_count_str and cycle_count_str.isdigit() else None
 
@@ -329,10 +312,8 @@ class PCRParser(BaseParser):
         # Find columns
         well_col = self._find_column(header_map, ["well", "well position"])
         sample_col = self._find_column(header_map, ["sample", "sample name", "sample id"])
-        target_col = self._find_column(header_map, ["target", "target name"])
         ct_col = self._find_column(header_map, ["cq", "ct", "cq value", "ct value"])
         fluor_col = self._find_column(header_map, ["fluor", "reporter", "reporter dye"])
-        content_col = self._find_column(header_map, ["content", "task", "type"])
 
         if ct_col is None:
             raise ParseError(
@@ -354,10 +335,6 @@ class PCRParser(BaseParser):
                 if sample_col and row.get(sample_col):
                     sample_name = row[sample_col].strip()
 
-                target_name = None
-                if target_col and row.get(target_col):
-                    target_name = row[target_col].strip()
-
                 reporter = None
                 if fluor_col and row.get(fluor_col):
                     reporter = row[fluor_col].strip()
@@ -373,8 +350,6 @@ class PCRParser(BaseParser):
                             f"Well {well or row_idx + 1}: Ct {ct_value:.2f} > 40 "
                             f"suggests non-specific amplification."
                         )
-
-                meas_name = f"ct_{target_name or 'unknown'}_{well or row_idx + 1}"
 
                 measurements.append(
                     MeasurementValue(
@@ -440,7 +415,6 @@ class PCRParser(BaseParser):
 
         well_col = self._find_column(header_map, ["well", "well position"])
         sample_col = self._find_column(header_map, ["sample name", "sample", "sample id"])
-        target_col = self._find_column(header_map, ["target name", "target"])
         ct_col = self._find_column(header_map, ["ct", "cq", "ct value", "cq value"])
 
         if ct_col is None:
@@ -462,10 +436,6 @@ class PCRParser(BaseParser):
                 sample_name = None
                 if sample_col and row.get(sample_col):
                     sample_name = row[sample_col].strip()
-
-                target_name = None
-                if target_col and row.get(target_col):
-                    target_name = row[target_col].strip()
 
                 ct_raw = row.get(ct_col, "").strip()
                 ct_value, quality_flag = self._parse_ct_value(ct_raw)

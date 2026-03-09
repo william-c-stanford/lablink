@@ -11,18 +11,12 @@ They are applied at flush/insert time. So in-memory tests must either:
 
 from __future__ import annotations
 
-import json
-import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from app.models.base import (
-    AuditMixin,
     Base,
-    SoftDeleteMixin,
-    TimestampMixin,
-    UUIDPrimaryKeyMixin,
 )
 from app.models.identity import (
     ApiKey,

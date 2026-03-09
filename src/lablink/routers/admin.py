@@ -7,7 +7,6 @@ Endpoints:
 
 from __future__ import annotations
 
-import uuid
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
@@ -15,7 +14,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.config import get_settings
-from lablink.dependencies import get_current_org, get_current_user, get_db, require_role
+from lablink.dependencies import get_current_org, get_db, require_role
 from lablink.models.upload import Upload
 from lablink.models.experiment import Experiment
 from lablink.models.membership import Membership

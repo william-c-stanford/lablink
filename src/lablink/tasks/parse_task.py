@@ -39,9 +39,8 @@ def _get_or_create_event_loop() -> asyncio.AbstractEventLoop:
 async def _parse_upload_async(upload_id_str: str) -> dict[str, Any]:
     """Async implementation of the parse pipeline."""
     from lablink.database import async_session_factory
-    from lablink.models import Upload, UploadStatus
+    from lablink.models import Upload
     from lablink.services.parser_service import ParserService
-    from lablink.services.upload_service import UploadService
 
     upload_id = uuid.UUID(upload_id_str)
 

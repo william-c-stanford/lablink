@@ -1,6 +1,5 @@
 """Tests for MCP server structure, registration, and constraints."""
 
-import pytest
 
 from app.mcp_server.context import MCPContext
 from app.mcp_server.server import (

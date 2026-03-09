@@ -547,7 +547,7 @@ class PlateReaderParser(BaseParser):
         elif row_count <= 16 and col_count <= 24:
             return {"rows": 16, "cols": 24, "format": "384-well", "wells_with_data": len(wells)}
         else:
-            return {"rows": row_count, "cols": col_count, "format": f"custom", "wells_with_data": len(wells)}
+            return {"rows": row_count, "cols": col_count, "format": "custom", "wells_with_data": len(wells)}
 
     @staticmethod
     def _get_unit(measurement_type: str) -> str:
