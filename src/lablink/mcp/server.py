@@ -78,7 +78,6 @@ _TOOLSETS: dict[str, dict[str, str]] = {
 # ╚═════════════════════════════════════════════════════════════════════════╝
 
 
-@mcp.tool()
 def list_toolsets() -> dict[str, Any]:
     """List available toolset categories and their tool counts.
 
@@ -101,7 +100,9 @@ def list_toolsets() -> dict[str, Any]:
     return {"data": result, "meta": {"total_toolsets": len(result)}}
 
 
-@mcp.tool()
+mcp.tool()(list_toolsets)
+
+
 def get_toolset(name: str) -> dict[str, Any]:
     """Retrieve tool names and descriptions for a named toolset.
 
@@ -127,6 +128,9 @@ def get_toolset(name: str) -> dict[str, Any]:
         }
     tools = [{"name": k, "description": v} for k, v in toolset.items()]
     return {"data": {"toolset": name, "tools": tools}, "meta": {"tool_count": len(tools)}}
+
+
+mcp.tool()(get_toolset)
 
 
 # ╔═════════════════════════════════════════════════════════════════════════╗
