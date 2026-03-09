@@ -11,18 +11,12 @@ They are applied at flush/insert time. So in-memory tests must either:
 
 from __future__ import annotations
 
-import json
-import uuid
 from datetime import datetime, timedelta, timezone
 
 import pytest
 
 from app.models.base import (
-    AuditMixin,
     Base,
-    SoftDeleteMixin,
-    TimestampMixin,
-    UUIDPrimaryKeyMixin,
 )
 from app.models.identity import (
     ApiKey,
@@ -116,8 +110,12 @@ class TestAuditMixin:
 
     def test_compute_hash_changes_with_prev_hash(self) -> None:
         user = User(
-            id="u1", org_id="o1", email="a@b.com", display_name="A",
-            actor_id="a", action="create",
+            id="u1",
+            org_id="o1",
+            email="a@b.com",
+            display_name="A",
+            actor_id="a",
+            action="create",
         )
         user.prev_hash = None
         h1 = user.compute_hash()
@@ -133,9 +131,7 @@ class TestAuditMixin:
 
 class TestPlanTier:
     def test_values(self) -> None:
-        assert set(PlanTier) == {
-            PlanTier.free, PlanTier.starter, PlanTier.pro, PlanTier.enterprise
-        }
+        assert set(PlanTier) == {PlanTier.free, PlanTier.starter, PlanTier.pro, PlanTier.enterprise}
 
     def test_is_str(self) -> None:
         assert isinstance(PlanTier.free, str)
@@ -145,15 +141,20 @@ class TestPlanTier:
 class TestRoleName:
     def test_values(self) -> None:
         assert set(RoleName) == {
-            RoleName.owner, RoleName.admin, RoleName.member,
-            RoleName.viewer, RoleName.agent,
+            RoleName.owner,
+            RoleName.admin,
+            RoleName.member,
+            RoleName.viewer,
+            RoleName.agent,
         }
 
 
 class TestApiKeyStatus:
     def test_values(self) -> None:
         assert set(ApiKeyStatus) == {
-            ApiKeyStatus.active, ApiKeyStatus.revoked, ApiKeyStatus.expired,
+            ApiKeyStatus.active,
+            ApiKeyStatus.revoked,
+            ApiKeyStatus.expired,
         }
 
 
@@ -190,7 +191,9 @@ class TestOrganization:
 class TestUser:
     def test_construct(self) -> None:
         user = User(
-            id="u1", org_id="o1", email="test@lab.com",
+            id="u1",
+            org_id="o1",
+            email="test@lab.com",
             display_name="Test User",
         )
         assert user.email == "test@lab.com"
@@ -233,8 +236,11 @@ class TestRole:
 class TestApiKey:
     def test_construct(self) -> None:
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="My Key", key_hash="abc123",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="My Key",
+            key_hash="abc123",
         )
         assert key.name == "My Key"
 
@@ -244,16 +250,22 @@ class TestApiKey:
 
     def test_is_active_when_active(self) -> None:
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="K", key_hash="h1",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="K",
+            key_hash="h1",
             status=ApiKeyStatus.active.value,
         )
         assert key.is_active is True
 
     def test_is_not_active_when_revoked(self) -> None:
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="K", key_hash="h1",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="K",
+            key_hash="h1",
             status=ApiKeyStatus.revoked.value,
         )
         assert key.is_active is False
@@ -261,8 +273,11 @@ class TestApiKey:
     def test_is_not_active_when_expired(self) -> None:
         past = datetime.now(timezone.utc) - timedelta(days=1)
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="K", key_hash="h1",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="K",
+            key_hash="h1",
             status=ApiKeyStatus.active.value,
             expires_at=past,
         )
@@ -271,8 +286,11 @@ class TestApiKey:
     def test_is_active_when_future_expiry(self) -> None:
         future = datetime.now(timezone.utc) + timedelta(days=30)
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="K", key_hash="h1",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="K",
+            key_hash="h1",
             status=ApiKeyStatus.active.value,
             expires_at=future,
         )
@@ -280,8 +298,12 @@ class TestApiKey:
 
     def test_repr(self) -> None:
         key = ApiKey(
-            id="k1", org_id="o1", user_id="u1",
-            name="K", key_hash="h1", key_prefix="ll_abc",
+            id="k1",
+            org_id="o1",
+            user_id="u1",
+            name="K",
+            key_hash="h1",
+            key_prefix="ll_abc",
         )
         r = repr(key)
         assert "ApiKey" in r
@@ -299,7 +321,8 @@ class TestApiKey:
 class TestInstrumentDriver:
     def test_construct(self) -> None:
         driver = InstrumentDriver(
-            id="d1", name="Spec CSV",
+            id="d1",
+            name="Spec CSV",
             instrument_type="spectrophotometer",
             parser_module="app.parsers.spectrophotometer",
         )
@@ -312,7 +335,8 @@ class TestInstrumentDriver:
 
     def test_repr(self) -> None:
         driver = InstrumentDriver(
-            id="d1", name="HPLC CSV",
+            id="d1",
+            name="HPLC CSV",
             instrument_type="hplc",
             parser_module="app.parsers.hplc",
         )
@@ -326,8 +350,10 @@ class TestInstrumentDriver:
 class TestInstrument:
     def test_construct(self) -> None:
         inst = Instrument(
-            id="i1", name="UV-Vis Lab 3",
-            lab_id="lab-1", driver_id="d1",
+            id="i1",
+            name="UV-Vis Lab 3",
+            lab_id="lab-1",
+            driver_id="d1",
         )
         assert inst.serial_number is None
         assert inst.manufacturer is None
@@ -353,7 +379,8 @@ class TestInstrument:
 class TestWatchedFolder:
     def test_construct(self) -> None:
         wf = WatchedFolder(
-            id="wf1", instrument_id="i1",
+            id="wf1",
+            instrument_id="i1",
             folder_path="/data/instrument_output",
         )
         assert wf.agent_id is None
@@ -364,7 +391,9 @@ class TestWatchedFolder:
 
     def test_repr(self) -> None:
         wf = WatchedFolder(
-            id="wf1", instrument_id="i1", folder_path="/data/out",
+            id="wf1",
+            instrument_id="i1",
+            folder_path="/data/out",
         )
         assert "/data/out" in repr(wf)
 
@@ -390,9 +419,12 @@ class TestFileStatus:
 class TestFileRecord:
     def test_construct(self) -> None:
         rec = FileRecord(
-            id="fr1", file_name="data.csv",
-            file_hash="abc123", file_size_bytes=1024,
-            instrument_id="i1", lab_id="l1",
+            id="fr1",
+            file_name="data.csv",
+            file_hash="abc123",
+            file_size_bytes=1024,
+            instrument_id="i1",
+            lab_id="l1",
         )
         assert rec.prev_hash is None
 
@@ -403,9 +435,12 @@ class TestFileRecord:
 
     def test_compute_chain_hash(self) -> None:
         rec = FileRecord(
-            id="fr1", file_name="data.csv",
-            file_hash="abcdef1234567890", file_size_bytes=100,
-            instrument_id="i1", lab_id="l1",
+            id="fr1",
+            file_name="data.csv",
+            file_hash="abcdef1234567890",
+            file_size_bytes=100,
+            instrument_id="i1",
+            lab_id="l1",
         )
         h = rec.compute_chain_hash()
         assert isinstance(h, str)
@@ -414,8 +449,12 @@ class TestFileRecord:
     def test_chain_hash_genesis(self) -> None:
         """When prev_hash is None, uses 'genesis' as placeholder."""
         rec = FileRecord(
-            id="fr1", file_name="x.csv", file_hash="abc",
-            file_size_bytes=10, instrument_id="i1", lab_id="l1",
+            id="fr1",
+            file_name="x.csv",
+            file_hash="abc",
+            file_size_bytes=10,
+            instrument_id="i1",
+            lab_id="l1",
             prev_hash=None,
         )
         h1 = rec.compute_chain_hash()
@@ -425,16 +464,24 @@ class TestFileRecord:
 
     def test_chain_hash_deterministic(self) -> None:
         rec = FileRecord(
-            id="fr1", file_name="x.csv", file_hash="abc",
-            file_size_bytes=10, instrument_id="i1", lab_id="l1",
+            id="fr1",
+            file_name="x.csv",
+            file_hash="abc",
+            file_size_bytes=10,
+            instrument_id="i1",
+            lab_id="l1",
             prev_hash="prev123",
         )
         assert rec.compute_chain_hash() == rec.compute_chain_hash()
 
     def test_repr(self) -> None:
         rec = FileRecord(
-            id="fr1", file_name="sample.csv", file_hash="h",
-            file_size_bytes=100, instrument_id="i1", lab_id="l1",
+            id="fr1",
+            file_name="sample.csv",
+            file_hash="h",
+            file_size_bytes=100,
+            instrument_id="i1",
+            lab_id="l1",
             status="uploaded",
         )
         r = repr(rec)
@@ -448,7 +495,8 @@ class TestFileRecord:
 class TestParseResult:
     def test_construct(self) -> None:
         pr = ParseResult(
-            id="pr1", file_record_id="fr1",
+            id="pr1",
+            file_record_id="fr1",
             parser_name="spectrophotometer",
             parser_version="1.0.0",
             parsed_data='{"measurements": []}',
@@ -466,9 +514,12 @@ class TestParseResult:
 
     def test_repr(self) -> None:
         pr = ParseResult(
-            id="pr1", file_record_id="fr1",
-            parser_name="hplc", parser_version="1.0",
-            parsed_data="{}", instrument_type="hplc",
+            id="pr1",
+            file_record_id="fr1",
+            parser_name="hplc",
+            parser_version="1.0",
+            parsed_data="{}",
+            instrument_type="hplc",
             measurement_count=42,
         )
         r = repr(pr)
@@ -487,9 +538,12 @@ class TestParseResult:
 class TestDataset:
     def test_construct(self) -> None:
         ds = Dataset(
-            id="ds1", org_id="o1", name="UV Scan",
+            id="ds1",
+            org_id="o1",
+            name="UV Scan",
             instrument_type="spectrophotometer",
-            parser_name="spectrophotometer", parser_version="1.0",
+            parser_name="spectrophotometer",
+            parser_version="1.0",
         )
         assert ds.name == "UV Scan"
 
@@ -502,15 +556,23 @@ class TestDataset:
 
     def test_soft_delete(self) -> None:
         ds = Dataset(
-            id="ds1", org_id="o1", name="X",
-            instrument_type="hplc", parser_name="hplc", parser_version="1.0",
+            id="ds1",
+            org_id="o1",
+            name="X",
+            instrument_type="hplc",
+            parser_name="hplc",
+            parser_version="1.0",
         )
         assert ds.is_deleted is False
 
     def test_repr(self) -> None:
         ds = Dataset(
-            id="ds1", org_id="o1", name="My Data",
-            instrument_type="pcr", parser_name="pcr", parser_version="1.0",
+            id="ds1",
+            org_id="o1",
+            name="My Data",
+            instrument_type="pcr",
+            parser_name="pcr",
+            parser_version="1.0",
         )
         r = repr(ds)
         assert "My Data" in r
@@ -523,8 +585,11 @@ class TestDataset:
 class TestDataPoint:
     def test_construct(self) -> None:
         dp = DataPoint(
-            id="dp1", dataset_id="ds1",
-            name="absorbance", value=0.543, unit="AU",
+            id="dp1",
+            dataset_id="ds1",
+            name="absorbance",
+            value=0.543,
+            unit="AU",
         )
         assert dp.wavelength_nm is None
         assert dp.sample_id is None
@@ -535,8 +600,11 @@ class TestDataPoint:
 
     def test_repr(self) -> None:
         dp = DataPoint(
-            id="dp1", dataset_id="ds1",
-            name="mass", value=12.5, unit="mg",
+            id="dp1",
+            dataset_id="ds1",
+            name="mass",
+            value=12.5,
+            unit="mg",
         )
         r = repr(dp)
         assert "mass" in r
@@ -563,15 +631,19 @@ class TestTag:
 class TestTagAssociation:
     def test_construct(self) -> None:
         ta = TagAssociation(
-            id="ta1", tag_id="t1",
-            resource_type="dataset", resource_id="ds1",
+            id="ta1",
+            tag_id="t1",
+            resource_type="dataset",
+            resource_id="ds1",
         )
         assert ta.resource_type == "dataset"
 
     def test_repr(self) -> None:
         ta = TagAssociation(
-            id="ta1", tag_id="t1",
-            resource_type="experiment", resource_id="exp1",
+            id="ta1",
+            tag_id="t1",
+            resource_type="experiment",
+            resource_id="exp1",
         )
         r = repr(ta)
         assert "experiment" in r
@@ -588,9 +660,17 @@ class TestTagAssociation:
 class TestAuditAction:
     def test_all_actions(self) -> None:
         expected = {
-            "CREATE", "UPDATE", "DELETE", "RESTORE",
-            "LOGIN", "LOGOUT", "UPLOAD", "PARSE",
-            "EXPORT", "CONFIG_CHANGE", "STATE_CHANGE",
+            "CREATE",
+            "UPDATE",
+            "DELETE",
+            "RESTORE",
+            "LOGIN",
+            "LOGOUT",
+            "UPLOAD",
+            "PARSE",
+            "EXPORT",
+            "CONFIG_CHANGE",
+            "STATE_CHANGE",
         }
         assert {a.name for a in AuditAction} == expected
 
@@ -598,15 +678,18 @@ class TestAuditAction:
 class TestNotificationLevel:
     def test_all_levels(self) -> None:
         assert set(NotificationLevel) == {
-            NotificationLevel.INFO, NotificationLevel.WARNING,
-            NotificationLevel.ERROR, NotificationLevel.SUCCESS,
+            NotificationLevel.INFO,
+            NotificationLevel.WARNING,
+            NotificationLevel.ERROR,
+            NotificationLevel.SUCCESS,
         }
 
 
 class TestNotificationStatus:
     def test_all_statuses(self) -> None:
         assert set(NotificationStatus) == {
-            NotificationStatus.UNREAD, NotificationStatus.READ,
+            NotificationStatus.UNREAD,
+            NotificationStatus.READ,
             NotificationStatus.DISMISSED,
         }
 
@@ -614,7 +697,8 @@ class TestNotificationStatus:
 class TestAuditLog:
     def test_construct(self) -> None:
         log = AuditLog(
-            id="al1", sequence=1,
+            id="al1",
+            sequence=1,
             action=AuditAction.CREATE.value,
             resource_type="experiment",
             actor_type="user",
@@ -625,7 +709,8 @@ class TestAuditLog:
 
     def test_compute_hash_deterministic(self) -> None:
         log = AuditLog(
-            id="al1", sequence=1,
+            id="al1",
+            sequence=1,
             action=AuditAction.CREATE.value,
             resource_type="experiment",
             resource_id="exp-1",
@@ -641,21 +726,35 @@ class TestAuditLog:
 
     def test_compute_hash_changes_with_content(self) -> None:
         log1 = AuditLog(
-            id="al1", sequence=1, action="CREATE",
-            resource_type="experiment", actor_id="u1",
-            summary="Created", previous_hash=None, entry_hash="x",
+            id="al1",
+            sequence=1,
+            action="CREATE",
+            resource_type="experiment",
+            actor_id="u1",
+            summary="Created",
+            previous_hash=None,
+            entry_hash="x",
         )
         log2 = AuditLog(
-            id="al1", sequence=1, action="UPDATE",
-            resource_type="experiment", actor_id="u1",
-            summary="Created", previous_hash=None, entry_hash="x",
+            id="al1",
+            sequence=1,
+            action="UPDATE",
+            resource_type="experiment",
+            actor_id="u1",
+            summary="Created",
+            previous_hash=None,
+            entry_hash="x",
         )
         assert log1.compute_hash() != log2.compute_hash()
 
     def test_extra_metadata_property(self) -> None:
         log = AuditLog(
-            id="al1", sequence=1, action="CREATE",
-            resource_type="test", summary="test", entry_hash="h",
+            id="al1",
+            sequence=1,
+            action="CREATE",
+            resource_type="test",
+            summary="test",
+            entry_hash="h",
         )
         assert log.extra_metadata is None
 
@@ -673,8 +772,10 @@ class TestAuditLog:
 class TestAuditEvent:
     def test_construct(self) -> None:
         event = AuditEvent(
-            id="ae1", sequence=1,
-            actor="user@lab.com", actor_type="user",
+            id="ae1",
+            sequence=1,
+            actor="user@lab.com",
+            actor_type="user",
             action=AuditAction.CREATE.value,
             resource_type="experiment",
             event_hash="abc",
@@ -684,7 +785,8 @@ class TestAuditEvent:
 
     def test_compute_hash_deterministic(self) -> None:
         event = AuditEvent(
-            id="ae1", sequence=1,
+            id="ae1",
+            sequence=1,
             actor="user@lab.com",
             action=AuditAction.CREATE.value,
             resource_type="experiment",
@@ -699,8 +801,12 @@ class TestAuditEvent:
 
     def test_detail_dict_property(self) -> None:
         event = AuditEvent(
-            id="ae1", sequence=1, actor="sys", action="CREATE",
-            resource_type="test", event_hash="h",
+            id="ae1",
+            sequence=1,
+            actor="sys",
+            action="CREATE",
+            resource_type="test",
+            event_hash="h",
         )
         assert event.detail_dict is None
 
@@ -714,8 +820,11 @@ class TestAuditEvent:
 
     def test_repr(self) -> None:
         event = AuditEvent(
-            id="ae1", sequence=1, actor="user@lab.com",
-            action="CREATE", resource_type="experiment",
+            id="ae1",
+            sequence=1,
+            actor="user@lab.com",
+            action="CREATE",
+            resource_type="experiment",
             event_hash="h",
         )
         r = repr(event)
@@ -730,7 +839,8 @@ class TestAuditEvent:
 class TestNotification:
     def test_construct(self) -> None:
         n = Notification(
-            id="n1", title="Parse complete",
+            id="n1",
+            title="Parse complete",
             message="File data.csv parsed successfully",
         )
         assert n.read_at is None
@@ -747,8 +857,10 @@ class TestNotification:
 class TestSystemConfig:
     def test_construct(self) -> None:
         cfg = SystemConfig(
-            id="sc1", key="parsers.balance.tolerance",
-            value="0.001", value_type="float",
+            id="sc1",
+            key="parsers.balance.tolerance",
+            value="0.001",
+            value_type="float",
         )
         assert cfg.key == "parsers.balance.tolerance"
 
@@ -780,8 +892,10 @@ class TestSystemConfig:
 
     def test_typed_value_json(self) -> None:
         cfg = SystemConfig(
-            id="1", key="k",
-            value='{"a": [1, 2, 3]}', value_type="json",
+            id="1",
+            key="k",
+            value='{"a": [1, 2, 3]}',
+            value_type="json",
         )
         assert cfg.typed_value == {"a": [1, 2, 3]}
 
@@ -798,12 +912,25 @@ class TestAllTablesRegistered:
     def test_all_tables_in_metadata(self) -> None:
         """All domain tables must be registered in Base.metadata."""
         expected_tables = {
-            "organizations", "users", "roles", "api_keys",
-            "instrument_drivers", "instruments", "watched_folders",
-            "file_records", "parse_results",
-            "datasets", "data_points", "tags", "tag_associations",
-            "audit_logs", "audit_events", "notifications",
-            "system_configs", "experiments", "experiment_files",
+            "organizations",
+            "users",
+            "roles",
+            "api_keys",
+            "instrument_drivers",
+            "instruments",
+            "watched_folders",
+            "file_records",
+            "parse_results",
+            "datasets",
+            "data_points",
+            "tags",
+            "tag_associations",
+            "audit_logs",
+            "audit_events",
+            "notifications",
+            "system_configs",
+            "experiments",
+            "experiment_files",
         }
         actual_tables = set(Base.metadata.tables.keys())
         missing = expected_tables - actual_tables

@@ -28,6 +28,7 @@ try:
     from allotropy.parser_factory import Vendor as _Vendor
     from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
     from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+
     _ALLOTROPY_AVAILABLE = True
 except ImportError:
     _ALLOTROPY_AVAILABLE = False
@@ -140,6 +141,7 @@ class PlateReaderParser(BaseParser):
             return None
         try:
             import io as _io
+
             vendor = getattr(_Vendor, vendor_name)
             asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
             return _asm_to_parsed_result(
@@ -547,7 +549,12 @@ class PlateReaderParser(BaseParser):
         elif row_count <= 16 and col_count <= 24:
             return {"rows": 16, "cols": 24, "format": "384-well", "wells_with_data": len(wells)}
         else:
-            return {"rows": row_count, "cols": col_count, "format": f"custom", "wells_with_data": len(wells)}
+            return {
+                "rows": row_count,
+                "cols": col_count,
+                "format": "custom",
+                "wells_with_data": len(wells),
+            }
 
     @staticmethod
     def _get_unit(measurement_type: str) -> str:

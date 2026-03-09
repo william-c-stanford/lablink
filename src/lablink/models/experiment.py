@@ -5,13 +5,18 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.campaign import Campaign
+    from lablink.models.experiment_upload import ExperimentUpload
 
 
 class ExperimentStatus(str, PyEnum):
@@ -86,13 +91,18 @@ class Experiment(Base):
 
     # Parameters and design
     parameters: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, default=dict, nullable=True,
+        JSON,
+        default=dict,
+        nullable=True,
     )
     constraints: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, default=dict, nullable=True,
+        JSON,
+        default=dict,
+        nullable=True,
     )
     outcome: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True,
+        JSON,
+        nullable=True,
     )
     design_method: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     design_agent: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -112,10 +122,12 @@ class Experiment(Base):
         nullable=False,
     )
     started_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
     completed_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     # -- relationships -------------------------------------------------------

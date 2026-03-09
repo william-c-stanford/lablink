@@ -97,9 +97,7 @@ class TestMettlerToledoParsing:
         result = parser.parse(ctx)
 
         mass_by_sample = {
-            m.sample_id: m.value
-            for m in result.measurements
-            if m.name == "mass" and m.sample_id
+            m.sample_id: m.value for m in result.measurements if m.name == "mass" and m.sample_id
         }
         assert mass_by_sample["API_Batch_01"] == pytest.approx(125.4532)
         assert mass_by_sample["Reference_Std"] == pytest.approx(10.0001)
@@ -130,8 +128,7 @@ class TestMettlerToledoParsing:
 
         # Excipient_B has Stability=Unstable
         excipient_b = [
-            m for m in result.measurements
-            if m.sample_id == "Excipient_B" and m.name == "mass"
+            m for m in result.measurements if m.sample_id == "Excipient_B" and m.name == "mass"
         ]
         assert len(excipient_b) == 1
         assert excipient_b[0].quality == QualityFlag.SUSPECT
@@ -142,8 +139,7 @@ class TestMettlerToledoParsing:
         result = parser.parse(ctx)
 
         stable_mass = [
-            m for m in result.measurements
-            if m.name == "mass" and m.sample_id != "Excipient_B"
+            m for m in result.measurements if m.name == "mass" and m.sample_id != "Excipient_B"
         ]
         assert all(m.quality == QualityFlag.GOOD for m in stable_mass)
 
@@ -196,9 +192,7 @@ class TestSartoriusParsing:
         result = parser.parse(ctx)
 
         mass_by_sample = {
-            m.sample_id: m.value
-            for m in result.measurements
-            if m.name == "mass" and m.sample_id
+            m.sample_id: m.value for m in result.measurements if m.name == "mass" and m.sample_id
         }
         assert mass_by_sample["Compound_A"] == pytest.approx(0.5023)
         assert mass_by_sample["Compound_D"] == pytest.approx(2.3456)
@@ -210,8 +204,7 @@ class TestSartoriusParsing:
 
         # Compound_E has mass -0.0012
         compound_e = [
-            m for m in result.measurements
-            if m.sample_id == "Compound_E" and m.name == "mass"
+            m for m in result.measurements if m.sample_id == "Compound_E" and m.name == "mass"
         ]
         assert len(compound_e) == 1
         assert compound_e[0].quality == QualityFlag.SUSPECT

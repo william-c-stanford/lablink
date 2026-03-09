@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import pytest
-
 
 # ---------------------------------------------------------------------------
 # POST /auth/register
 # ---------------------------------------------------------------------------
+
 
 class TestRegisterEndpoint:
     async def test_register_success(self, client):
@@ -103,6 +102,7 @@ class TestRegisterEndpoint:
 # POST /auth/login
 # ---------------------------------------------------------------------------
 
+
 class TestLoginEndpoint:
     async def _register_user(self, client, email="login@lab.io"):
         await client.post(
@@ -162,6 +162,7 @@ class TestLoginEndpoint:
 # ---------------------------------------------------------------------------
 # GET /auth/me
 # ---------------------------------------------------------------------------
+
 
 class TestMeEndpoint:
     async def _get_token(self, client, email="me@lab.io") -> str:

@@ -1,7 +1,5 @@
 """Shared types and data structures for the MCP server."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -55,7 +53,7 @@ class ToolResult:
         return result
 
     @classmethod
-    def ok(cls, data: Any, **meta: Any) -> ToolResult:
+    def ok(cls, data: Any, **meta: Any) -> "ToolResult":
         return cls(data=data, meta=meta)
 
     @classmethod
@@ -65,7 +63,7 @@ class ToolResult:
         message: str,
         *,
         suggestion: str | None = None,
-    ) -> ToolResult:
+    ) -> "ToolResult":
         return cls(
             errors=[{"code": code, "message": message}],
             suggestion=suggestion,

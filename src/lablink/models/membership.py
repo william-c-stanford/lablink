@@ -6,10 +6,17 @@ import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.user import User
+    from lablink.models.organization import Organization
 
 
 class MemberRole(str, PyEnum):
@@ -30,7 +37,9 @@ class Membership(Base):
     __tablename__ = "memberships"
     __table_args__ = (
         UniqueConstraint(
-            "user_id", "organization_id", name="uq_membership_user_org",
+            "user_id",
+            "organization_id",
+            name="uq_membership_user_org",
         ),
     )
 
@@ -67,7 +76,8 @@ class Membership(Base):
     # -- relationships -------------------------------------------------------
     user: Mapped["User"] = relationship("User", back_populates="memberships")  # noqa: F821
     organization: Mapped["Organization"] = relationship(  # noqa: F821
-        "Organization", back_populates="memberships",
+        "Organization",
+        back_populates="memberships",
     )
 
     def __repr__(self) -> str:

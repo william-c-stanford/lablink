@@ -10,7 +10,6 @@ from jose import jwt
 
 from app.config import Settings
 from app.exceptions import AuthenticationError, ConflictError
-from app.models.identity import Organization, User
 from app.schemas.auth import TokenResponse, UserResponse
 from app.services.auth import (
     authenticate_user,
@@ -28,6 +27,7 @@ from app.services.auth import (
 # ---------------------------------------------------------------------------
 # Password hashing
 # ---------------------------------------------------------------------------
+
 
 class TestPasswordHashing:
     def test_hash_password_returns_bcrypt_hash(self):
@@ -51,6 +51,7 @@ class TestPasswordHashing:
 # ---------------------------------------------------------------------------
 # JWT
 # ---------------------------------------------------------------------------
+
 
 class TestJWT:
     @pytest.fixture
@@ -122,6 +123,7 @@ class TestJWT:
 # Register
 # ---------------------------------------------------------------------------
 
+
 class TestRegisterUser:
     @pytest.fixture
     def settings(self) -> Settings:
@@ -161,9 +163,8 @@ class TestRegisterUser:
         # Refresh to load relationships
         from sqlalchemy import select
         from app.models.identity import Role
-        result = await session.execute(
-            select(Role).where(Role.user_id == user.id)
-        )
+
+        result = await session.execute(select(Role).where(Role.user_id == user.id))
         role = result.scalar_one()
         assert role.role_name == "owner"
         assert role.org_id == org.id
@@ -205,6 +206,7 @@ class TestRegisterUser:
 # ---------------------------------------------------------------------------
 # Authenticate
 # ---------------------------------------------------------------------------
+
 
 class TestAuthenticateUser:
     @pytest.fixture
@@ -283,6 +285,7 @@ class TestAuthenticateUser:
 # ---------------------------------------------------------------------------
 # get_user_by_id
 # ---------------------------------------------------------------------------
+
 
 class TestGetUserById:
     @pytest.fixture
@@ -391,15 +394,11 @@ class TestLoginUser:
 
     async def test_login_nonexistent_email_raises(self, session, settings):
         with pytest.raises(AuthenticationError):
-            await login_user(
-                session, email="nobody@lab.io", password="any", settings=settings
-            )
+            await login_user(session, email="nobody@lab.io", password="any", settings=settings)
 
     async def test_login_error_has_suggestion(self, session, settings):
         with pytest.raises(AuthenticationError) as exc_info:
-            await login_user(
-                session, email="nobody@lab.io", password="any", settings=settings
-            )
+            await login_user(session, email="nobody@lab.io", password="any", settings=settings)
         assert exc_info.value.suggestion is not None
 
     async def test_login_disabled_account_raises(self, session, settings):
@@ -477,7 +476,9 @@ class TestGetCurrentUserFromToken:
 
         # Create an already-expired token
         expired_token, _ = create_access_token(
-            user.id, user.email, org.id,
+            user.id,
+            user.email,
+            org.id,
             settings=settings,
             expires_delta=timedelta(seconds=-1),
         )
@@ -519,7 +520,9 @@ class TestGetCurrentUserFromToken:
     async def test_get_current_user_nonexistent_user_id_in_token(self, session, settings):
         """Token has valid signature but user doesn't exist in DB."""
         fake_token, _ = create_access_token(
-            str(uuid.uuid4()), "ghost@lab.io", str(uuid.uuid4()),
+            str(uuid.uuid4()),
+            "ghost@lab.io",
+            str(uuid.uuid4()),
             settings=settings,
         )
 

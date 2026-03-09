@@ -1,0 +1,57 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "LabLink",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0066CC",
+    "light": "#3399FF",
+    "dark": "#0044AA"
+  },
+  "api": {
+    "baseUrl": "https://api.lablink.io",
+    "auth": { "method": "bearer" },
+    "playground": { "mode": "simple" }
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Quickstart",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "quickstart/for-developers",
+              "quickstart/for-agents",
+              "quickstart/for-sdk-users"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "MCP Server",
+        "groups": [
+          {
+            "group": "Reference",
+            "pages": ["mcp/overview", "mcp/toolsets"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Endpoints",
+            "openapi": {
+              "source": "/api/openapi.json",
+              "directory": "api-reference"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.experiment import Experiment
 
 
 class ExperimentUpload(Base):
@@ -20,9 +24,7 @@ class ExperimentUpload(Base):
     """
 
     __tablename__ = "experiment_uploads"
-    __table_args__ = (
-        UniqueConstraint("experiment_id", "upload_id", name="uq_experiment_upload"),
-    )
+    __table_args__ = (UniqueConstraint("experiment_id", "upload_id", name="uq_experiment_upload"),)
 
     experiment_id: Mapped[str] = mapped_column(
         String(36),
@@ -54,6 +56,5 @@ class ExperimentUpload(Base):
 
     def __repr__(self) -> str:
         return (
-            f"<ExperimentUpload experiment_id={self.experiment_id!r} "
-            f"upload_id={self.upload_id!r}>"
+            f"<ExperimentUpload experiment_id={self.experiment_id!r} upload_id={self.upload_id!r}>"
         )

@@ -14,10 +14,7 @@ Run standalone::
     python -m lablink.mcp.server
 """
 
-from __future__ import annotations
-
 import uuid
-from datetime import datetime
 from typing import Any, Optional
 
 from fastmcp import FastMCP
@@ -26,7 +23,7 @@ from fastmcp import FastMCP
 # Server instance
 # ---------------------------------------------------------------------------
 
-mcp = FastMCP(
+mcp: FastMCP = FastMCP(
     "LabLink",
     instructions=(
         "LabLink is a lab data integration platform. Use the discovery tools "
@@ -81,7 +78,6 @@ _TOOLSETS: dict[str, dict[str, str]] = {
 # ╚═════════════════════════════════════════════════════════════════════════╝
 
 
-@mcp.tool()
 def list_toolsets() -> dict[str, Any]:
     """List available toolset categories and their tool counts.
 
@@ -104,7 +100,9 @@ def list_toolsets() -> dict[str, Any]:
     return {"data": result, "meta": {"total_toolsets": len(result)}}
 
 
-@mcp.tool()
+mcp.tool()(list_toolsets)
+
+
 def get_toolset(name: str) -> dict[str, Any]:
     """Retrieve tool names and descriptions for a named toolset.
 
@@ -130,6 +128,9 @@ def get_toolset(name: str) -> dict[str, Any]:
         }
     tools = [{"name": k, "description": v} for k, v in toolset.items()]
     return {"data": {"toolset": name, "tools": tools}, "meta": {"tool_count": len(tools)}}
+
+
+mcp.tool()(get_toolset)
 
 
 # ╔═════════════════════════════════════════════════════════════════════════╗
@@ -185,13 +186,15 @@ async def list_experiments(
 
         items = []
         for exp in experiments:
-            items.append({
-                "id": str(exp.id),
-                "intent": exp.intent,
-                "status": exp.status,
-                "campaign_id": str(exp.campaign_id) if exp.campaign_id else None,
-                "created_at": exp.created_at.isoformat() if exp.created_at else None,
-            })
+            items.append(
+                {
+                    "id": str(exp.id),
+                    "intent": exp.intent,
+                    "status": exp.status,
+                    "campaign_id": str(exp.campaign_id) if exp.campaign_id else None,
+                    "created_at": exp.created_at.isoformat() if exp.created_at else None,
+                }
+            )
 
         return {
             "data": items,
@@ -233,9 +236,7 @@ async def get_experiment(experiment_id: str) -> dict[str, Any]:
                 "campaign_id": str(exp.campaign_id) if exp.campaign_id else None,
                 "created_at": exp.created_at.isoformat() if exp.created_at else None,
                 "completed_at": (
-                    exp.completed_at.isoformat()
-                    if getattr(exp, "completed_at", None)
-                    else None
+                    exp.completed_at.isoformat() if getattr(exp, "completed_at", None) else None
                 ),
             },
         }
@@ -268,27 +269,31 @@ async def get_instrument_data(upload_id: str) -> dict[str, Any]:
         if not parsed_records:
             return {
                 "data": None,
-                "errors": [{
-                    "code": "not_found",
-                    "message": f"No parsed data found for upload {upload_id}.",
-                    "suggestion": "Check upload status with get_upload. The file may not be parsed yet.",
-                }],
+                "errors": [
+                    {
+                        "code": "not_found",
+                        "message": f"No parsed data found for upload {upload_id}.",
+                        "suggestion": "Check upload status with get_upload. The file may not be parsed yet.",
+                    }
+                ],
             }
 
         items = []
         for pd in parsed_records:
-            items.append({
-                "id": str(pd.id),
-                "upload_id": str(pd.upload_id),
-                "instrument_type": pd.instrument_type,
-                "measurement_type": pd.measurement_type,
-                "parser_version": pd.parser_version,
-                "sample_count": pd.sample_count,
-                "measurements": pd.measurements,
-                "instrument_settings": pd.instrument_settings,
-                "data_summary": pd.data_summary,
-                "metadata": pd.metadata_,
-            })
+            items.append(
+                {
+                    "id": str(pd.id),
+                    "upload_id": str(pd.upload_id),
+                    "instrument_type": pd.instrument_type,
+                    "measurement_type": pd.measurement_type,
+                    "parser_version": pd.parser_version,
+                    "sample_count": pd.sample_count,
+                    "measurements": pd.measurements,
+                    "instrument_settings": pd.instrument_settings,
+                    "data_summary": pd.data_summary,
+                    "metadata": pd.metadata_,
+                }
+            )
 
         return {"data": items, "meta": {"record_count": len(items)}}
 
@@ -352,16 +357,18 @@ async def list_instruments() -> dict[str, Any]:
 
         items = []
         for inst in instruments:
-            items.append({
-                "id": str(inst.id),
-                "name": inst.name,
-                "instrument_type": inst.instrument_type,
-                "manufacturer": inst.manufacturer,
-                "model": inst.model,
-                "serial_number": inst.serial_number,
-                "location": inst.location,
-                "agent_id": str(inst.agent_id) if inst.agent_id else None,
-            })
+            items.append(
+                {
+                    "id": str(inst.id),
+                    "name": inst.name,
+                    "instrument_type": inst.instrument_type,
+                    "manufacturer": inst.manufacturer,
+                    "model": inst.model,
+                    "serial_number": inst.serial_number,
+                    "location": inst.location,
+                    "agent_id": str(inst.agent_id) if inst.agent_id else None,
+                }
+            )
 
         return {"data": items, "meta": {"total": len(items)}}
 
@@ -417,18 +424,20 @@ async def list_uploads(
 
         items = []
         for u in uploads:
-            items.append({
-                "id": str(u.id),
-                "filename": u.filename,
-                "status": u.status.value if hasattr(u.status, "value") else u.status,
-                "file_size_bytes": u.file_size_bytes,
-                "mime_type": u.mime_type,
-                "instrument_type_detected": u.instrument_type_detected,
-                "parser_used": u.parser_used,
-                "created_at": u.created_at.isoformat() if u.created_at else None,
-                "parsed_at": u.parsed_at.isoformat() if u.parsed_at else None,
-                "indexed_at": u.indexed_at.isoformat() if u.indexed_at else None,
-            })
+            items.append(
+                {
+                    "id": str(u.id),
+                    "filename": u.filename,
+                    "status": u.status.value if hasattr(u.status, "value") else u.status,
+                    "file_size_bytes": u.file_size_bytes,
+                    "mime_type": u.mime_type,
+                    "instrument_type_detected": u.instrument_type_detected,
+                    "parser_used": u.parser_used,
+                    "created_at": u.created_at.isoformat() if u.created_at else None,
+                    "parsed_at": u.parsed_at.isoformat() if u.parsed_at else None,
+                    "indexed_at": u.indexed_at.isoformat() if u.indexed_at else None,
+                }
+            )
 
         return {
             "data": items,
@@ -463,11 +472,13 @@ async def get_chart_data(upload_id: str) -> dict[str, Any]:
         if parsed is None:
             return {
                 "data": None,
-                "errors": [{
-                    "code": "not_found",
-                    "message": f"No parsed data for upload {upload_id}.",
-                    "suggestion": "Ensure the upload has been parsed. Use get_upload to check status.",
-                }],
+                "errors": [
+                    {
+                        "code": "not_found",
+                        "message": f"No parsed data for upload {upload_id}.",
+                        "suggestion": "Ensure the upload has been parsed. Use get_upload to check status.",
+                    }
+                ],
             }
 
         # Build Plotly-compatible trace
@@ -531,11 +542,13 @@ async def create_export(
     except ValueError:
         return {
             "data": None,
-            "errors": [{
-                "code": "validation_error",
-                "message": f"Unsupported format '{format}'.",
-                "suggestion": "Use one of: csv, json, xlsx, pdf.",
-            }],
+            "errors": [
+                {
+                    "code": "validation_error",
+                    "message": f"Unsupported format '{format}'.",
+                    "suggestion": "Use one of: csv, json, xlsx, pdf.",
+                }
+            ],
         }
 
     export_svc = ExportService.from_settings()
@@ -623,10 +636,12 @@ async def create_experiment(
                     except Exception as exc:
                         return {
                             "data": None,
-                            "errors": [{
-                                "code": "validation_error",
-                                "message": f"Failed to link predecessor {pred_id}: {exc}",
-                            }],
+                            "errors": [
+                                {
+                                    "code": "validation_error",
+                                    "message": f"Failed to link predecessor {pred_id}: {exc}",
+                                }
+                            ],
                         }
 
             return {
@@ -678,6 +693,7 @@ async def update_experiment(
                     )
                 else:
                     from lablink.services.experiment_service import get_experiment as svc_get
+
                     exp = await svc_get(session, uuid.UUID(experiment_id))
             except Exception as exc:
                 return {"data": None, "errors": [{"code": "error", "message": str(exc)}]}
@@ -689,9 +705,7 @@ async def update_experiment(
                     "status": exp.status,
                     "outcome": getattr(exp, "outcome", None),
                     "completed_at": (
-                        exp.completed_at.isoformat()
-                        if getattr(exp, "completed_at", None)
-                        else None
+                        exp.completed_at.isoformat() if getattr(exp, "completed_at", None) else None
                     ),
                 },
             }
@@ -741,9 +755,7 @@ async def record_outcome(
                     "status": exp.status,
                     "outcome": getattr(exp, "outcome", None),
                     "completed_at": (
-                        exp.completed_at.isoformat()
-                        if getattr(exp, "completed_at", None)
-                        else None
+                        exp.completed_at.isoformat() if getattr(exp, "completed_at", None) else None
                     ),
                 },
             }
@@ -784,7 +796,9 @@ async def link_upload_to_experiment(
                 "data": {
                     "experiment_id": str(link.experiment_id),
                     "upload_id": str(link.upload_id),
-                    "linked_at": link.created_at.isoformat() if hasattr(link, "created_at") and link.created_at else None,
+                    "linked_at": link.created_at.isoformat()
+                    if hasattr(link, "created_at") and link.created_at
+                    else None,
                 },
             }
 
@@ -883,14 +897,16 @@ async def list_campaigns(
 
         items = []
         for c in campaigns:
-            items.append({
-                "id": str(c.id),
-                "name": c.name,
-                "objective": c.objective,
-                "status": c.status,
-                "optimization_method": c.optimization_method,
-                "created_at": c.created_at.isoformat() if c.created_at else None,
-            })
+            items.append(
+                {
+                    "id": str(c.id),
+                    "name": c.name,
+                    "objective": c.objective,
+                    "status": c.status,
+                    "optimization_method": c.optimization_method,
+                    "created_at": c.created_at.isoformat() if c.created_at else None,
+                }
+            )
 
         return {"data": items, "meta": {"total": total}}
 
@@ -929,11 +945,13 @@ async def create_upload(
     if not path.exists():
         return {
             "data": None,
-            "errors": [{
-                "code": "not_found",
-                "message": f"File not found: {file_path}",
-                "suggestion": "Provide an absolute path to an existing file.",
-            }],
+            "errors": [
+                {
+                    "code": "not_found",
+                    "message": f"File not found: {file_path}",
+                    "suggestion": "Provide an absolute path to an existing file.",
+                }
+            ],
         }
 
     file_bytes = path.read_bytes()
@@ -1008,11 +1026,13 @@ async def get_upload(upload_id: str) -> dict[str, Any]:
         if upload is None:
             return {
                 "data": None,
-                "errors": [{
-                    "code": "not_found",
-                    "message": f"Upload {upload_id} not found.",
-                    "suggestion": "Use list_uploads to find valid upload IDs.",
-                }],
+                "errors": [
+                    {
+                        "code": "not_found",
+                        "message": f"Upload {upload_id} not found.",
+                        "suggestion": "Use list_uploads to find valid upload IDs.",
+                    }
+                ],
             }
 
         return {
@@ -1054,11 +1074,13 @@ async def reparse_upload(upload_id: str) -> dict[str, Any]:
             if upload is None:
                 return {
                     "data": None,
-                    "errors": [{
-                        "code": "not_found",
-                        "message": f"Upload {upload_id} not found.",
-                        "suggestion": "Use list_uploads to find valid upload IDs.",
-                    }],
+                    "errors": [
+                        {
+                            "code": "not_found",
+                            "message": f"Upload {upload_id} not found.",
+                            "suggestion": "Use list_uploads to find valid upload IDs.",
+                        }
+                    ],
                 }
 
             # Reset status to uploaded so the parse task picks it up
@@ -1171,17 +1193,19 @@ async def list_agents() -> dict[str, Any]:
 
         items = []
         for a in agents:
-            items.append({
-                "id": str(a.id),
-                "name": a.name,
-                "platform": a.platform,
-                "version": a.version,
-                "status": a.status,
-                "last_heartbeat_at": (
-                    a.last_heartbeat_at.isoformat() if a.last_heartbeat_at else None
-                ),
-                "instrument_count": len(a.instruments) if a.instruments else 0,
-            })
+            items.append(
+                {
+                    "id": str(a.id),
+                    "name": a.name,
+                    "platform": a.platform,
+                    "version": a.version,
+                    "status": a.status,
+                    "last_heartbeat_at": (
+                        a.last_heartbeat_at.isoformat() if a.last_heartbeat_at else None
+                    ),
+                    "instrument_count": len(a.instruments) if a.instruments else 0,
+                }
+            )
 
         return {"data": items, "meta": {"total": len(items)}}
 

@@ -42,6 +42,7 @@ logger = logging.getLogger("lablink")
 # Lifespan
 # ---------------------------------------------------------------------------
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan: startup and shutdown events."""
@@ -53,6 +54,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         settings.debug,
     )
     from lablink.database import init_db
+
     await init_db()
     yield
     logger.info("LabLink shutting down")
@@ -61,6 +63,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 # ---------------------------------------------------------------------------
 # Exception handlers
 # ---------------------------------------------------------------------------
+
 
 def _error_envelope(
     status_code: int,
@@ -90,9 +93,7 @@ def _error_envelope(
     )
 
 
-async def http_exception_handler(
-    request: Request, exc: StarletteHTTPException
-) -> JSONResponse:
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     """Wrap FastAPI/Starlette HTTPExceptions in the standard envelope."""
     request_id = getattr(request.state, "request_id", None)
 
@@ -157,9 +158,7 @@ async def validation_exception_handler(
     )
 
 
-async def lablink_exception_handler(
-    request: Request, exc: LabLinkError
-) -> JSONResponse:
+async def lablink_exception_handler(request: Request, exc: LabLinkError) -> JSONResponse:
     """Handle LabLinkError subclasses with structured Envelope responses."""
     request_id = getattr(request.state, "request_id", None)
     return _error_envelope(
@@ -172,9 +171,7 @@ async def lablink_exception_handler(
     )
 
 
-async def generic_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
+async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Catch-all for unhandled exceptions — never leak stack traces."""
     request_id = getattr(request.state, "request_id", None)
     logger.exception("Unhandled exception (request_id=%s)", request_id)
@@ -195,6 +192,7 @@ async def generic_exception_handler(
 # Middleware
 # ---------------------------------------------------------------------------
 
+
 async def request_id_middleware(request: Request, call_next):
     """Attach a unique request ID to every request for tracing.
 
@@ -214,7 +212,9 @@ async def request_id_middleware(request: Request, call_next):
         response = _error_envelope(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             code="INTERNAL_ERROR",
-            message="An internal error occurred." if not settings.debug else "Internal server error",
+            message="An internal error occurred."
+            if not settings.debug
+            else "Internal server error",
             suggestion="If this persists, contact support with the request_id.",
             request_id=request_id,
         )
@@ -237,6 +237,7 @@ async def request_id_middleware(request: Request, call_next):
 # ---------------------------------------------------------------------------
 # App factory
 # ---------------------------------------------------------------------------
+
 
 def create_app(settings=None) -> FastAPI:
     """Create and configure the LabLink FastAPI application.
@@ -275,12 +276,8 @@ def create_app(settings=None) -> FastAPI:
     application.middleware("http")(request_id_middleware)
 
     # -- Exception handlers --
-    application.add_exception_handler(
-        StarletteHTTPException, http_exception_handler
-    )
-    application.add_exception_handler(
-        RequestValidationError, validation_exception_handler
-    )
+    application.add_exception_handler(StarletteHTTPException, http_exception_handler)  # type: ignore[arg-type]
+    application.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
     application.add_exception_handler(LabLinkError, lablink_exception_handler)
     application.add_exception_handler(Exception, generic_exception_handler)
 

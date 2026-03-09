@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,6 +12,10 @@ from sqlalchemy.types import JSON
 from lablink.database import Base
 
 from datetime import datetime, timezone
+
+
+if TYPE_CHECKING:
+    from lablink.models.agent import Agent
 
 
 class Instrument(Base):
@@ -23,9 +27,7 @@ class Instrument(Base):
     """
 
     __tablename__ = "instruments"
-    __table_args__ = (
-        Index("ix_instruments_org_type", "organization_id", "instrument_type"),
-    )
+    __table_args__ = (Index("ix_instruments_org_type", "organization_id", "instrument_type"),)
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -51,7 +53,10 @@ class Instrument(Base):
         index=True,
     )
     metadata_: Mapped[Optional[dict]] = mapped_column(
-        "metadata", JSON, default=dict, nullable=True,
+        "metadata",
+        JSON,
+        default=dict,
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

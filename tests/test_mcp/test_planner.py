@@ -3,15 +3,11 @@
 Planner tools are sync functions called directly (not via FastMCP dispatch).
 """
 
-import pytest
-
 from app.mcp_server.tools.planner import (
-    PipelineStatus,
     create_pipeline,
     delete_pipeline,
     estimate_duration,
     get_pipeline,
-    get_pipeline_store,
     list_pipelines,
     update_pipeline,
     validate_pipeline,
@@ -37,9 +33,7 @@ class TestCreatePipeline:
         assert result["pipeline"]["instrument_type"] == "hplc"
         assert result["pipeline"]["status"] == "draft"
 
-    def test_pipeline_gets_uuid_id(
-        self, pipeline_store, sample_org_id, sample_pipeline_steps
-    ):
+    def test_pipeline_gets_uuid_id(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Created pipeline has a valid UUID-style ID."""
         result = create_pipeline(
             org_id=sample_org_id,
@@ -63,9 +57,7 @@ class TestCreatePipeline:
         assert "suggestion" in result
         assert "Valid instrument types" in result["suggestion"]
 
-    def test_empty_name_returns_error(
-        self, pipeline_store, sample_org_id, sample_pipeline_steps
-    ):
+    def test_empty_name_returns_error(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Empty name returns error."""
         result = create_pipeline(
             org_id=sample_org_id,
@@ -87,9 +79,7 @@ class TestCreatePipeline:
         assert result["success"] is False
         assert "details" in result
 
-    def test_suggestion_field_present(
-        self, pipeline_store, sample_org_id, sample_pipeline_steps
-    ):
+    def test_suggestion_field_present(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Success response includes suggestion for next action."""
         result = create_pipeline(
             org_id=sample_org_id,
@@ -104,9 +94,7 @@ class TestCreatePipeline:
 class TestValidatePipeline:
     """Tests for validate_pipeline tool."""
 
-    def test_valid_pipeline_passes(
-        self, pipeline_store, sample_org_id, sample_pipeline_steps
-    ):
+    def test_valid_pipeline_passes(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """A well-formed pipeline validates successfully."""
         create_result = create_pipeline(
             org_id=sample_org_id,
@@ -220,18 +208,22 @@ class TestListPipelines:
         assert result["pipelines"] == []
         assert result["total"] == 0
 
-    def test_lists_created_pipelines(
-        self, pipeline_store, sample_org_id, sample_pipeline_steps
-    ):
+    def test_lists_created_pipelines(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """After creating pipelines, they appear in list."""
-        create_pipeline(org_id=sample_org_id, name="P1", instrument_type="hplc", steps=sample_pipeline_steps)
-        create_pipeline(org_id=sample_org_id, name="P2", instrument_type="pcr", steps=sample_pipeline_steps)
+        create_pipeline(
+            org_id=sample_org_id, name="P1", instrument_type="hplc", steps=sample_pipeline_steps
+        )
+        create_pipeline(
+            org_id=sample_org_id, name="P2", instrument_type="pcr", steps=sample_pipeline_steps
+        )
         result = list_pipelines(org_id=sample_org_id)
         assert result["total"] == 2
 
     def test_filter_by_status(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Status filter narrows results."""
-        create_pipeline(org_id=sample_org_id, name="Draft", instrument_type="hplc", steps=sample_pipeline_steps)
+        create_pipeline(
+            org_id=sample_org_id, name="Draft", instrument_type="hplc", steps=sample_pipeline_steps
+        )
         result = list_pipelines(org_id=sample_org_id, status="active")
         assert result["total"] == 0  # all are draft
 
@@ -253,7 +245,10 @@ class TestGetPipeline:
     def test_gets_existing_pipeline(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Can retrieve a created pipeline by ID."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="Retrievable", instrument_type="balance", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="Retrievable",
+            instrument_type="balance",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         result = get_pipeline(pipeline_id=pid)
@@ -273,7 +268,10 @@ class TestUpdatePipeline:
     def test_update_name(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Can update pipeline name."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="Old Name", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="Old Name",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         result = update_pipeline(pipeline_id=pid, name="New Name")
@@ -283,17 +281,25 @@ class TestUpdatePipeline:
     def test_activate_draft_pipeline(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Can transition draft -> active."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="To Activate", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="To Activate",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         result = update_pipeline(pipeline_id=pid, status="active")
         assert result["success"] is True
         assert result["pipeline"]["status"] == "active"
 
-    def test_invalid_transition_returns_error(self, pipeline_store, sample_org_id, sample_pipeline_steps):
+    def test_invalid_transition_returns_error(
+        self, pipeline_store, sample_org_id, sample_pipeline_steps
+    ):
         """Invalid state transition returns error with suggestion."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="Can't Pause Draft", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="Can't Pause Draft",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         result = update_pipeline(pipeline_id=pid, status="paused")
@@ -303,7 +309,10 @@ class TestUpdatePipeline:
     def test_cannot_update_archived(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Archived pipeline cannot be updated."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="To Archive", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="To Archive",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         delete_pipeline(pipeline_id=pid)
@@ -318,7 +327,10 @@ class TestDeletePipeline:
     def test_soft_deletes_pipeline(self, pipeline_store, sample_org_id, sample_pipeline_steps):
         """Deleting a pipeline archives it (soft delete)."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="To Delete", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="To Delete",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         result = delete_pipeline(pipeline_id=pid)
@@ -326,10 +338,15 @@ class TestDeletePipeline:
         assert result["current_status"] == "archived"
         assert result["previous_status"] == "draft"
 
-    def test_already_archived_returns_error(self, pipeline_store, sample_org_id, sample_pipeline_steps):
+    def test_already_archived_returns_error(
+        self, pipeline_store, sample_org_id, sample_pipeline_steps
+    ):
         """Double-archiving returns error."""
         create_result = create_pipeline(
-            org_id=sample_org_id, name="Already Archived", instrument_type="hplc", steps=sample_pipeline_steps
+            org_id=sample_org_id,
+            name="Already Archived",
+            instrument_type="hplc",
+            steps=sample_pipeline_steps,
         )
         pid = create_result["pipeline"]["id"]
         delete_pipeline(pipeline_id=pid)

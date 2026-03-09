@@ -30,7 +30,9 @@ class UploadResponse(BaseModel):
     file_size_bytes: int = Field(..., description="File size in bytes")
     s3_key: str = Field(..., description="S3 object key where the file is stored")
     mime_type: str | None = Field(None, description="Detected MIME type of the file")
-    status: str = Field(..., description="Pipeline status: uploaded, parsing, parsed, parse_failed, indexed")
+    status: str = Field(
+        ..., description="Pipeline status: uploaded, parsing, parsed, parse_failed, indexed"
+    )
     error_message: str | None = Field(None, description="Error details if parsing failed")
     instrument_type_detected: str | None = Field(
         None, description="Instrument type detected by the parser"
@@ -38,7 +40,9 @@ class UploadResponse(BaseModel):
     parser_used: str | None = Field(None, description="Name of the parser that processed the file")
     created_at: datetime = Field(..., description="Upload timestamp")
     parsed_at: datetime | None = Field(None, description="Timestamp when parsing completed")
-    indexed_at: datetime | None = Field(None, description="Timestamp when indexing to Elasticsearch completed")
+    indexed_at: datetime | None = Field(
+        None, description="Timestamp when indexing to Elasticsearch completed"
+    )
     project_id: uuid.UUID | None = Field(None, description="Associated project, if any")
     instrument_id: uuid.UUID | None = Field(None, description="Associated instrument, if any")
 

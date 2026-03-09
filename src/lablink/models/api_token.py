@@ -7,13 +7,18 @@ import secrets
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 from lablink.models.base import SoftDeleteMixin
+
+
+if TYPE_CHECKING:
+    from lablink.models.organization import Organization
+    from lablink.models.user import User
 
 
 class TokenScope(str, PyEnum):
@@ -64,10 +69,15 @@ class ApiToken(Base, SoftDeleteMixin):
         doc="User who created this token",
     )
     name: Mapped[str] = mapped_column(
-        String(255), nullable=False, doc="Human label for the token",
+        String(255),
+        nullable=False,
+        doc="Human label for the token",
     )
     token_hash: Mapped[str] = mapped_column(
-        String(255), nullable=False, unique=True, index=True,
+        String(255),
+        nullable=False,
+        unique=True,
+        index=True,
         doc="SHA-256 hash of the full token value",
     )
     scope: Mapped[str] = mapped_column(
@@ -83,13 +93,20 @@ class ApiToken(Base, SoftDeleteMixin):
         doc="Token identity: user, agent, integration",
     )
     expires_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), default=None, nullable=True,
+        DateTime(timezone=True),
+        default=None,
+        nullable=True,
     )
     last_used_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), default=None, nullable=True,
+        DateTime(timezone=True),
+        default=None,
+        nullable=True,
     )
     is_active: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False, doc="Token enabled flag",
+        Boolean,
+        default=True,
+        nullable=False,
+        doc="Token enabled flag",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -100,7 +117,8 @@ class ApiToken(Base, SoftDeleteMixin):
 
     # -- relationships -------------------------------------------------------
     organization: Mapped["Organization"] = relationship(  # noqa: F821
-        "Organization", back_populates="api_tokens",
+        "Organization",
+        back_populates="api_tokens",
     )
     creator: Mapped["User"] = relationship("User")  # noqa: F821
 

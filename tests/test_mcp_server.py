@@ -39,19 +39,35 @@ from app.mcp_server.tools.planner import PLANNER_TOOLS, get_pipeline_store
 
 EXPECTED_DISCOVERY_TOOLS = {"list_toolsets", "get_tool_help"}
 EXPECTED_EXPLORER_TOOLS = {
-    "search_files", "list_experiments", "get_file_metadata",
-    "get_experiment_detail", "list_datasets", "get_parse_result",
-    "list_instruments", "get_dataset_summary",
+    "search_files",
+    "list_experiments",
+    "get_file_metadata",
+    "get_experiment_detail",
+    "list_datasets",
+    "get_parse_result",
+    "list_instruments",
+    "get_dataset_summary",
 }
 EXPECTED_PLANNER_TOOLS = {
-    "create_pipeline", "validate_pipeline", "estimate_duration",
-    "list_pipelines", "get_pipeline", "update_pipeline", "delete_pipeline",
+    "create_pipeline",
+    "validate_pipeline",
+    "estimate_duration",
+    "list_pipelines",
+    "get_pipeline",
+    "update_pipeline",
+    "delete_pipeline",
 }
 EXPECTED_INGESTOR_TOOLS = {
-    "ingest_file", "check_ingest_status", "retry_ingest", "list_parsers",
+    "ingest_file",
+    "check_ingest_status",
+    "retry_ingest",
+    "list_parsers",
 }
 EXPECTED_ADMIN_TOOLS = {
-    "manage_users", "get_audit_log", "update_settings", "get_system_health",
+    "manage_users",
+    "get_audit_log",
+    "update_settings",
+    "get_system_health",
 }
 
 ALL_EXPECTED_TOOLS = (
@@ -142,34 +158,38 @@ def mcp_ctx() -> MCPContext:
     }
 
     # Seed search_index (datasets)
-    ctx.search_index.append({
-        "type": "dataset",
-        "id": "ds-1",
-        "name": "UV-Vis Dataset #1",
-        "instrument_type": "spectrophotometer",
-        "org_id": "org-test",
-        "sample_count": 2,
-        "measurement_count": 6,
-        "warning_count": 0,
-        "error_count": 0,
-        "parser_name": "spectrophotometer",
-        "created_at": "2025-01-01T12:00:00Z",
-        "measurements": [
-            {"name": "absorbance", "value": 0.52, "sample_id": "s1", "quality": "good"},
-            {"name": "absorbance", "value": 0.89, "sample_id": "s2", "quality": "good"},
-            {"name": "absorbance", "value": 1.23, "sample_id": "s3", "quality": "warning"},
-        ],
-        "instrument_settings": {"wavelength_range": "200-800nm"},
-    })
-    ctx.search_index.append({
-        "type": "dataset",
-        "id": "ds-2",
-        "name": "HPLC Dataset #1",
-        "instrument_type": "hplc",
-        "org_id": "org-test",
-        "created_at": "2025-01-02T12:00:00Z",
-        "measurements": [],
-    })
+    ctx.search_index.append(
+        {
+            "type": "dataset",
+            "id": "ds-1",
+            "name": "UV-Vis Dataset #1",
+            "instrument_type": "spectrophotometer",
+            "org_id": "org-test",
+            "sample_count": 2,
+            "measurement_count": 6,
+            "warning_count": 0,
+            "error_count": 0,
+            "parser_name": "spectrophotometer",
+            "created_at": "2025-01-01T12:00:00Z",
+            "measurements": [
+                {"name": "absorbance", "value": 0.52, "sample_id": "s1", "quality": "good"},
+                {"name": "absorbance", "value": 0.89, "sample_id": "s2", "quality": "good"},
+                {"name": "absorbance", "value": 1.23, "sample_id": "s3", "quality": "warning"},
+            ],
+            "instrument_settings": {"wavelength_range": "200-800nm"},
+        }
+    )
+    ctx.search_index.append(
+        {
+            "type": "dataset",
+            "id": "ds-2",
+            "name": "HPLC Dataset #1",
+            "instrument_type": "hplc",
+            "org_id": "org-test",
+            "created_at": "2025-01-02T12:00:00Z",
+            "measurements": [],
+        }
+    )
 
     return ctx
 
@@ -656,10 +676,12 @@ class TestEstimateDuration:
 
     def test_estimate_scales_with_file_count(self, mcp_server):
         r1 = PLANNER_TOOLS["estimate_duration"](
-            steps=[{"step_type": "parse"}], file_count=1,
+            steps=[{"step_type": "parse"}],
+            file_count=1,
         )
         r10 = PLANNER_TOOLS["estimate_duration"](
-            steps=[{"step_type": "parse"}], file_count=10,
+            steps=[{"step_type": "parse"}],
+            file_count=10,
         )
         assert r10["estimated_total_seconds"] > r1["estimated_total_seconds"]
 
@@ -675,7 +697,9 @@ class TestListPipelines:
 
     def test_list_with_pipelines(self, mcp_server):
         PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="P1", instrument_type="hplc",
+            org_id="org-1",
+            name="P1",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         result = PLANNER_TOOLS["list_pipelines"](org_id="org-1")
@@ -683,7 +707,9 @@ class TestListPipelines:
 
     def test_list_filter_by_status(self, mcp_server):
         PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="P1", instrument_type="hplc",
+            org_id="org-1",
+            name="P1",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         result = PLANNER_TOOLS["list_pipelines"](org_id="org-1", status="active")
@@ -700,7 +726,9 @@ class TestGetPipeline:
 
     def test_get_existing(self, mcp_server):
         create_result = PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="P1", instrument_type="hplc",
+            org_id="org-1",
+            name="P1",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         pid = create_result["pipeline"]["id"]
@@ -720,8 +748,10 @@ class TestUpdatePipeline:
 
     def _create_pipeline(self):
         return PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="Updatable",
-            instrument_type="hplc", steps=[{"step_type": "parse"}],
+            org_id="org-1",
+            name="Updatable",
+            instrument_type="hplc",
+            steps=[{"step_type": "parse"}],
         )
 
     def test_update_name(self, mcp_server):
@@ -758,7 +788,9 @@ class TestDeletePipeline:
 
     def test_delete_pipeline(self, mcp_server):
         create_result = PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="To Delete", instrument_type="hplc",
+            org_id="org-1",
+            name="To Delete",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         pid = create_result["pipeline"]["id"]
@@ -770,7 +802,9 @@ class TestDeletePipeline:
 
     def test_delete_already_archived(self, mcp_server):
         create_result = PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="Already Archived", instrument_type="hplc",
+            org_id="org-1",
+            name="Already Archived",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         pid = create_result["pipeline"]["id"]
@@ -814,6 +848,7 @@ class TestIngestorToolsRegistered:
     async def test_list_parsers_invocation(self, mcp_server):
         """Verify list_parsers can be called directly and returns expected structure."""
         from app.mcp_server.tools.ingestor import list_parsers
+
         result = await list_parsers()
         assert result["total"] == 5
         assert "suggestion" in result
@@ -847,6 +882,7 @@ class TestAdminToolsRegistered:
     async def test_get_system_health_invocation(self, mcp_server):
         """Verify get_system_health returns healthy status."""
         from app.mcp_server.tools.admin import get_system_health
+
         result = await get_system_health()
         assert result["status"] == "healthy"
         assert "suggestion" in result
@@ -855,6 +891,7 @@ class TestAdminToolsRegistered:
     async def test_manage_users_invocation(self, mcp_server):
         """Verify manage_users list returns structured result."""
         from app.mcp_server.tools.admin import manage_users
+
         result = await manage_users(action="list")
         assert result["status"] == "ok"
         assert "suggestion" in result
@@ -892,7 +929,9 @@ class TestSuggestionField:
     def test_planner_tools_have_suggestion(self, mcp_server):
         # create_pipeline
         r = PLANNER_TOOLS["create_pipeline"](
-            org_id="org-1", name="P", instrument_type="hplc",
+            org_id="org-1",
+            name="P",
+            instrument_type="hplc",
             steps=[{"step_type": "parse"}],
         )
         assert "suggestion" in r
@@ -932,14 +971,22 @@ class TestToolNamingConvention:
     def test_tools_start_with_verb(self, mcp_server):
         """All tool names start with a known verb."""
         known_verbs = {
-            "list", "get", "search", "create", "validate", "estimate",
-            "update", "delete", "ingest", "check", "retry", "manage",
+            "list",
+            "get",
+            "search",
+            "create",
+            "validate",
+            "estimate",
+            "update",
+            "delete",
+            "ingest",
+            "check",
+            "retry",
+            "manage",
         }
         for name in _TOOL_TOOLSET_MAP:
             verb = name.split("_")[0]
-            assert verb in known_verbs, (
-                f"Tool '{name}' starts with unknown verb '{verb}'"
-            )
+            assert verb in known_verbs, f"Tool '{name}' starts with unknown verb '{verb}'"
 
 
 class TestToolsetCounts:

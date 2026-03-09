@@ -4,11 +4,18 @@ from __future__ import annotations
 
 from enum import Enum as PyEnum
 
+from typing import TYPE_CHECKING
+
 from sqlalchemy import BigInteger, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
 from lablink.models.base import TimestampMixin, SoftDeleteMixin
+
+
+if TYPE_CHECKING:
+    from lablink.models.membership import Membership
+    from lablink.models.api_token import ApiToken
 
 
 class Tier(str, PyEnum):
@@ -30,7 +37,9 @@ class Organization(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "organizations"
 
     name: Mapped[str] = mapped_column(
-        String(255), nullable=False, doc="Display name",
+        String(255),
+        nullable=False,
+        doc="Display name",
     )
     slug: Mapped[str] = mapped_column(
         String(100),

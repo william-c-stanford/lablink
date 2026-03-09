@@ -129,7 +129,8 @@ class AuthenticationError(LabLinkError):
         self,
         message: str = "Authentication required",
         *,
-        suggestion: str | None = "Provide a valid JWT token in the Authorization header as 'Bearer <token>'.",
+        suggestion: str
+        | None = "Provide a valid JWT token in the Authorization header as 'Bearer <token>'.",
     ) -> None:
         super().__init__(message, suggestion=suggestion)
 

@@ -7,15 +7,12 @@ Tools:
     get_system_health  — Get system health status including DB, storage, and parser info.
 """
 
-from __future__ import annotations
-
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
-from app.config import Settings, get_settings
+from app.config import get_settings
 from app.parsers import PARSER_REGISTRY
-
 
 # ---------------------------------------------------------------------------
 # In-memory stores for dev/test (production uses real DB + services)
@@ -29,7 +26,7 @@ _mock_settings: dict[str, dict[str, Any]] = {
         "value_type": "bool",
         "description": "Enable automatic parser detection for uploaded files",
         "category": "parsers",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     },
     "retention.soft_delete_days": {
         "key": "retention.soft_delete_days",
@@ -37,7 +34,7 @@ _mock_settings: dict[str, dict[str, Any]] = {
         "value_type": "int",
         "description": "Days to retain soft-deleted records before permanent purge",
         "category": "retention",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     },
     "storage.backend": {
         "key": "storage.backend",
@@ -45,7 +42,7 @@ _mock_settings: dict[str, dict[str, Any]] = {
         "value_type": "string",
         "description": "File storage backend: 'local' or 's3'",
         "category": "storage",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     },
     "ingest.max_file_size_mb": {
         "key": "ingest.max_file_size_mb",
@@ -53,7 +50,7 @@ _mock_settings: dict[str, dict[str, Any]] = {
         "value_type": "int",
         "description": "Maximum file size in MB for ingestion",
         "category": "ingest",
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
     },
 }
 
@@ -146,7 +143,7 @@ async def manage_users(
 
     if action == "activate":
         user["is_active"] = True
-        user["updated_at"] = datetime.now(timezone.utc).isoformat()
+        user["updated_at"] = datetime.now(UTC).isoformat()
         return {
             "status": "ok",
             "action": "activate",
@@ -157,7 +154,7 @@ async def manage_users(
 
     else:  # deactivate
         user["is_active"] = False
-        user["updated_at"] = datetime.now(timezone.utc).isoformat()
+        user["updated_at"] = datetime.now(UTC).isoformat()
         return {
             "status": "ok",
             "action": "deactivate",
@@ -326,7 +323,7 @@ async def update_settings(
         }
 
     existing = _mock_settings.get(key)
-    now = datetime.now(timezone.utc).isoformat()
+    now = datetime.now(UTC).isoformat()
 
     if existing:
         old_value = existing["value"]
@@ -467,7 +464,7 @@ async def get_system_health() -> dict[str, Any]:
         "environment": settings.environment.value,
         "uptime_seconds": uptime_seconds,
         "checks": checks,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "suggestion": (
             "All systems operational."
             if all_ok

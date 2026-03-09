@@ -22,9 +22,9 @@ import logging
 import secrets
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
-from sqlalchemy import select, func, update
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from lablink.models import (
@@ -181,7 +181,7 @@ class WebhookService:
         result = await db.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def list(
+    async def list_webhooks(
         self,
         db: AsyncSession,
         *,
@@ -197,9 +197,7 @@ class WebhookService:
         tuple[Sequence[Webhook], int]
             (webhooks, total_count)
         """
-        base = select(Webhook).where(
-            Webhook.organization_id == organization_id
-        )
+        base = select(Webhook).where(Webhook.organization_id == organization_id)
         if is_active is not None:
             base = base.where(Webhook.is_active == is_active)
 
@@ -209,10 +207,7 @@ class WebhookService:
 
         # Paginated results
         stmt = (
-            base
-            .order_by(Webhook.created_at.desc())
-            .offset((page - 1) * page_size)
-            .limit(page_size)
+            base.order_by(Webhook.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
         )
         result = await db.execute(stmt)
         return result.scalars().all(), total
@@ -254,9 +249,7 @@ class WebhookService:
                 raise ValueError("At least one event type must be specified")
             unsupported = set(events) - Webhook.SUPPORTED_EVENTS
             if unsupported:
-                raise ValueError(
-                    f"Unsupported event types: {', '.join(sorted(unsupported))}"
-                )
+                raise ValueError(f"Unsupported event types: {', '.join(sorted(unsupported))}")
             webhook.events = list(set(events))
 
         if is_active is not None:
@@ -353,9 +346,7 @@ class WebhookService:
         self, db: AsyncSession, webhook_id: uuid.UUID
     ) -> Webhook | None:
         """Fetch webhook for delivery attempt."""
-        result = await db.execute(
-            select(Webhook).where(Webhook.id == webhook_id)
-        )
+        result = await db.execute(select(Webhook).where(Webhook.id == webhook_id))
         return result.scalar_one_or_none()
 
     async def _attempt_delivery(
@@ -438,9 +429,7 @@ class WebhookService:
         WebhookDelivery | None
             The updated delivery, or None if not found or not retryable.
         """
-        result = await db.execute(
-            select(WebhookDelivery).where(WebhookDelivery.id == delivery_id)
-        )
+        result = await db.execute(select(WebhookDelivery).where(WebhookDelivery.id == delivery_id))
         delivery = result.scalar_one_or_none()
         if delivery is None or not delivery.can_retry:
             return None
@@ -485,9 +474,7 @@ class WebhookService:
         )
 
         if organization_id is not None:
-            stmt = stmt.join(Webhook).where(
-                Webhook.organization_id == organization_id
-            )
+            stmt = stmt.join(Webhook).where(Webhook.organization_id == organization_id)
 
         result = await db.execute(stmt)
         deliveries = result.scalars().all()
@@ -520,9 +507,7 @@ class WebhookService:
         tuple[Sequence[WebhookDelivery], int]
             (deliveries, total_count)
         """
-        base = select(WebhookDelivery).where(
-            WebhookDelivery.webhook_id == webhook_id
-        )
+        base = select(WebhookDelivery).where(WebhookDelivery.webhook_id == webhook_id)
         if status is not None:
             base = base.where(WebhookDelivery.status == status)
 
@@ -530,8 +515,7 @@ class WebhookService:
         total = (await db.execute(count_stmt)).scalar_one()
 
         stmt = (
-            base
-            .order_by(WebhookDelivery.created_at.desc())
+            base.order_by(WebhookDelivery.created_at.desc())
             .offset((page - 1) * page_size)
             .limit(page_size)
         )
@@ -544,7 +528,5 @@ class WebhookService:
         delivery_id: uuid.UUID,
     ) -> WebhookDelivery | None:
         """Fetch a single delivery by ID."""
-        result = await db.execute(
-            select(WebhookDelivery).where(WebhookDelivery.id == delivery_id)
-        )
+        result = await db.execute(select(WebhookDelivery).where(WebhookDelivery.id == delivery_id))
         return result.scalar_one_or_none()

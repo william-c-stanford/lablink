@@ -24,8 +24,7 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -132,8 +131,7 @@ async def create_audit_event(
     # Validate actor_type
     if actor_type not in AuditEvent.VALID_ACTOR_TYPES:
         raise ValueError(
-            f"Invalid actor_type '{actor_type}'; "
-            f"must be one of {AuditEvent.VALID_ACTOR_TYPES}"
+            f"Invalid actor_type '{actor_type}'; must be one of {AuditEvent.VALID_ACTOR_TYPES}"
         )
 
     # Get previous hash for chain linking

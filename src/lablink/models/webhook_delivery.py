@@ -5,13 +5,17 @@ from __future__ import annotations
 import enum
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.webhook import Webhook
 
 
 class DeliveryStatus(str, enum.Enum):
@@ -52,7 +56,8 @@ class WebhookDelivery(Base):
     )
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     last_attempt_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
     response_status: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     response_body: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -81,7 +86,4 @@ class WebhookDelivery(Base):
     @property
     def can_retry(self) -> bool:
         """Whether this delivery can be retried."""
-        return (
-            self.status == DeliveryStatus.failed.value
-            and self.attempts < self.MAX_ATTEMPTS
-        )
+        return self.status == DeliveryStatus.failed.value and self.attempts < self.MAX_ATTEMPTS

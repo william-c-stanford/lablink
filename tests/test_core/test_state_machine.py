@@ -125,9 +125,7 @@ class TestValidateTransition:
         assert err.valid_targets == set()
         assert "terminal state" in err.suggestion
 
-    def test_error_suggestion_lists_valid_targets(
-        self, task_sm: StateMachine[TaskStatus]
-    ) -> None:
+    def test_error_suggestion_lists_valid_targets(self, task_sm: StateMachine[TaskStatus]) -> None:
         with pytest.raises(InvalidTransitionError) as exc_info:
             task_sm.validate_transition(TaskStatus.TODO, TaskStatus.DONE)
         err = exc_info.value

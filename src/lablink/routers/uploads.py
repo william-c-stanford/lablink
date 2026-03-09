@@ -177,7 +177,9 @@ async def get_upload(
 )
 async def reparse_upload(
     upload_id: uuid.UUID,
-    instrument_type: str | None = Query(None, description="Instrument type hint for parser selection"),
+    instrument_type: str | None = Query(
+        None, description="Instrument type hint for parser selection"
+    ),
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
     org: Organization = Depends(get_current_org),

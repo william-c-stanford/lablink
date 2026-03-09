@@ -18,7 +18,6 @@ from sqlalchemy.pool import StaticPool
 
 from app.config import Environment, Settings
 from app.core.database import get_session
-from app.core.security import hash_password
 from app.main import create_app
 from app.models.base import Base
 
@@ -93,6 +92,7 @@ async def app(test_settings, session_factory):
     application.dependency_overrides[get_session] = _override_get_session
     # Override get_settings at module level to ensure settings injection
     from app.config import get_settings as _gs
+
     application.dependency_overrides[_gs] = lambda: test_settings
 
     yield application
@@ -111,6 +111,7 @@ async def client(app) -> AsyncGenerator[AsyncClient, None]:
 # ---------------------------------------------------------------------------
 # User / auth helpers
 # ---------------------------------------------------------------------------
+
 
 @pytest_asyncio.fixture
 async def registered_user(client) -> dict:
@@ -150,6 +151,7 @@ async def auth_headers(registered_user) -> dict[str, str]:
 # ---------------------------------------------------------------------------
 # Seed data helpers
 # ---------------------------------------------------------------------------
+
 
 @pytest_asyncio.fixture
 async def seed_org_and_instrument(session):

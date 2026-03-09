@@ -78,7 +78,11 @@ class TestNanoDropParsing:
         ctx = _ctx(FIXTURES / "nanodrop_sample.csv")
         result = parser.parse(ctx)
 
-        conc = [m for m in result.measurements if "concentration" in m.name.lower() or "ng" in m.name.lower()]
+        conc = [
+            m
+            for m in result.measurements
+            if "concentration" in m.name.lower() or "ng" in m.name.lower()
+        ]
         conc_by_sample = {m.sample_id: m.value for m in conc if m.sample_id}
 
         assert conc_by_sample["DNA_Sample_01"] == pytest.approx(152.3)
@@ -119,7 +123,11 @@ class TestNanoDropParsing:
         ctx = _ctx(FIXTURES / "nanodrop_sample.csv")
         result = parser.parse(ctx)
 
-        ratio_meas = [m for m in result.measurements if "260_280" in m.name.lower() or "260/280" in m.name.lower()]
+        ratio_meas = [
+            m
+            for m in result.measurements
+            if "260_280" in m.name.lower() or "260/280" in m.name.lower()
+        ]
         assert len(ratio_meas) > 0
         ratio_by_sample = {m.sample_id: m.value for m in ratio_meas if m.sample_id}
         assert ratio_by_sample["DNA_Sample_01"] == pytest.approx(1.92)
@@ -131,7 +139,8 @@ class TestNanoDropParsing:
 
         # High_Conc_Sample has A260=37.000, well above 5.0
         high_a260 = [
-            m for m in result.measurements
+            m
+            for m in result.measurements
             if m.sample_id == "High_Conc_Sample" and "a260" in m.name.lower()
         ]
         assert len(high_a260) == 1
@@ -145,7 +154,8 @@ class TestNanoDropParsing:
 
         # Blank has concentration -0.2
         blank_conc = [
-            m for m in result.measurements
+            m
+            for m in result.measurements
             if m.sample_id == "Blank" and ("ng" in m.name.lower() or "conc" in m.name.lower())
         ]
         assert any(m.quality == QualityFlag.SUSPECT for m in blank_conc)
@@ -172,7 +182,11 @@ class TestNanoDropTSV:
         ctx = _ctx(FIXTURES / "nanodrop_tsv.tsv")
         result = parser.parse(ctx)
 
-        conc = [m for m in result.measurements if "concentration" in m.name.lower() or "conc" in m.name.lower()]
+        conc = [
+            m
+            for m in result.measurements
+            if "concentration" in m.name.lower() or "conc" in m.name.lower()
+        ]
         conc_by_sample = {m.sample_id: m.value for m in conc if m.sample_id}
         assert conc_by_sample["gDNA_Mouse_Liver"] == pytest.approx(520.4)
         assert conc_by_sample["mRNA_HeLa"] == pytest.approx(890.2)
@@ -211,7 +225,9 @@ class TestCaryUVVisParsing:
         ctx = _ctx(FIXTURES / "cary_uv_vis_scan.csv")
         result = parser.parse(ctx)
 
-        abs_meas = [m for m in result.measurements if "abs" in m.name.lower() or "sample" in m.name.lower()]
+        abs_meas = [
+            m for m in result.measurements if "abs" in m.name.lower() or "sample" in m.name.lower()
+        ]
         for m in abs_meas:
             assert m.unit == "AU"
 

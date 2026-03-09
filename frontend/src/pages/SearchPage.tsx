@@ -92,7 +92,7 @@ export default function SearchPage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="search-page">
       {/* Page header */}
       <div>
         <h2
@@ -114,6 +114,7 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="text-base py-4 px-6"
+          data-testid="search-input"
           leftIcon={
             <SearchIcon
               size={20}
@@ -199,7 +200,7 @@ export default function SearchPage() {
 
       {/* Results list */}
       {hits.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-3" data-testid="search-results">
           {hits.map((hit, i) => (
             <Card
               key={hit.id ?? `hit-${i}`}

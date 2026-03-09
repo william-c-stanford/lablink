@@ -24,10 +24,7 @@ def _validate_slug(v: str) -> str:
     """Ensure slug is lowercase alphanumeric with hyphens only."""
     v = v.strip().lower()
     if not _SLUG_RE.match(v):
-        raise ValueError(
-            "Slug must be lowercase alphanumeric with hyphens only "
-            "(e.g. 'acme-labs')"
-        )
+        raise ValueError("Slug must be lowercase alphanumeric with hyphens only (e.g. 'acme-labs')")
     return v
 
 
@@ -35,11 +32,15 @@ class OrganizationCreate(BaseModel):
     """Request body to create a new organization."""
 
     name: str = Field(
-        ..., min_length=1, max_length=255,
+        ...,
+        min_length=1,
+        max_length=255,
         description="Display name of the organization",
     )
     slug: str = Field(
-        ..., min_length=2, max_length=100,
+        ...,
+        min_length=2,
+        max_length=100,
         description="URL-safe unique identifier",
     )
     tier: Tier = Field(default=Tier.free, description="Pricing tier")

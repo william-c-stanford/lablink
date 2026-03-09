@@ -44,6 +44,7 @@ FIXTURES_DIR = Path(__file__).parent / "fixtures"
 # Celery eager-mode configuration (sync fallback for tests)
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture(autouse=True, scope="session")
 def celery_eager_mode():
     """Configure Celery to run tasks synchronously in tests.
@@ -69,6 +70,7 @@ def celery_eager_mode():
 # ---------------------------------------------------------------------------
 # Core fixtures: settings, engine, sessions
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def test_settings() -> Settings:
@@ -114,7 +116,9 @@ async def session_factory(engine: AsyncEngine) -> async_sessionmaker[AsyncSessio
 
 
 @pytest_asyncio.fixture
-async def session(session_factory: async_sessionmaker[AsyncSession]) -> AsyncGenerator[AsyncSession, None]:
+async def session(
+    session_factory: async_sessionmaker[AsyncSession],
+) -> AsyncGenerator[AsyncSession, None]:
     """Async session for direct service-layer tests."""
     async with session_factory() as sess:
         yield sess
@@ -123,6 +127,7 @@ async def session(session_factory: async_sessionmaker[AsyncSession]) -> AsyncGen
 # ---------------------------------------------------------------------------
 # FastAPI app + HTTP client
 # ---------------------------------------------------------------------------
+
 
 @pytest_asyncio.fixture
 async def app(test_settings: Settings, session_factory: async_sessionmaker[AsyncSession]):
@@ -154,6 +159,7 @@ async def client(app) -> AsyncGenerator[AsyncClient, None]:
 # ---------------------------------------------------------------------------
 # Fixture directory helpers
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def fixtures_dir() -> Path:
@@ -195,6 +201,7 @@ def balance_fixtures_dir() -> Path:
 # FileContext factory helpers for parser tests
 # ---------------------------------------------------------------------------
 
+
 def _load_fixture(rel_path: str) -> bytes:
     """Load fixture file bytes by path relative to fixtures dir."""
     full_path = FIXTURES_DIR / rel_path
@@ -217,6 +224,7 @@ def _make_file_context(
 
 
 # --- Spectrophotometer fixtures ---
+
 
 @pytest.fixture
 def spectro_nanodrop_ctx() -> FileContext:
@@ -248,6 +256,7 @@ def spectro_corrupted_ctx() -> FileContext:
 
 # --- Plate reader fixtures ---
 
+
 @pytest.fixture
 def plate_softmax_ctx() -> FileContext:
     """FileContext for SoftMax Pro 96-well plate reader fixture."""
@@ -277,6 +286,7 @@ def plate_corrupted_ctx() -> FileContext:
 
 
 # --- HPLC fixtures ---
+
 
 @pytest.fixture
 def hplc_agilent_ctx() -> FileContext:
@@ -322,6 +332,7 @@ def hplc_corrupted_ctx() -> FileContext:
 
 # --- PCR fixtures ---
 
+
 @pytest.fixture
 def pcr_quantstudio_ctx() -> FileContext:
     """FileContext for Thermo QuantStudio qPCR export fixture."""
@@ -359,6 +370,7 @@ def pcr_corrupted_ctx() -> FileContext:
 
 # --- Balance fixtures ---
 
+
 @pytest.fixture
 def balance_mettler_ctx() -> FileContext:
     """FileContext for Mettler Toledo balance export fixture."""
@@ -395,6 +407,7 @@ def balance_corrupted_ctx() -> FileContext:
 
 
 # --- Empty file fixture (works for any parser) ---
+
 
 @pytest.fixture
 def empty_file_ctx() -> FileContext:

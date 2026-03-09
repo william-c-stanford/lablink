@@ -85,16 +85,24 @@ class ExperimentResponse(BaseModel):
     id: uuid.UUID = Field(..., description="Unique experiment identifier")
     intent: str = Field(..., description="What the experiment aims to achieve")
     hypothesis: str | None = Field(None, description="Scientific hypothesis being tested")
-    status: str = Field(..., description="Lifecycle status: planned, running, completed, failed, cancelled")
+    status: str = Field(
+        ..., description="Lifecycle status: planned, running, completed, failed, cancelled"
+    )
     parameters: dict[str, Any] | None = Field(None, description="Experimental conditions")
     constraints: dict[str, Any] | None = Field(None, description="Bounds on parameters")
     outcome: dict[str, Any] | None = Field(None, description="Recorded results after completion")
-    design_method: str | None = Field(None, description="How parameters were chosen: manual, bayesian_optimization, etc.")
+    design_method: str | None = Field(
+        None, description="How parameters were chosen: manual, bayesian_optimization, etc."
+    )
     campaign_id: uuid.UUID | None = Field(None, description="Associated campaign, if any")
     created_by: uuid.UUID | None = Field(None, description="User who created the experiment")
     created_at: datetime = Field(..., description="Experiment creation timestamp")
-    started_at: datetime | None = Field(None, description="Timestamp when experiment moved to running")
-    completed_at: datetime | None = Field(None, description="Timestamp when experiment completed or failed")
+    started_at: datetime | None = Field(
+        None, description="Timestamp when experiment moved to running"
+    )
+    completed_at: datetime | None = Field(
+        None, description="Timestamp when experiment completed or failed"
+    )
 
 
 # ---------------------------------------------------------------------------

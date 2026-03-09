@@ -12,7 +12,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
-from lablink.models import MemberRole, Tier
+from lablink.models import MemberRole
 
 
 _SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -52,8 +52,7 @@ class OrganizationCreate(BaseModel):
         v = v.strip().lower()
         if not _SLUG_RE.match(v):
             raise ValueError(
-                "Slug must be lowercase alphanumeric with hyphens only "
-                "(e.g. 'acme-labs')"
+                "Slug must be lowercase alphanumeric with hyphens only (e.g. 'acme-labs')"
             )
         return v
 

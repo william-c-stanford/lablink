@@ -229,11 +229,9 @@ class TestListExperiments:
     @pytest.mark.asyncio
     async def test_list_filter_by_status(self, session, org_id):
         """Status filter narrows results."""
-        exp1 = await create_experiment(session, org_id=org_id, name="Planned")
+        await create_experiment(session, org_id=org_id, name="Planned")
         exp2 = await create_experiment(session, org_id=org_id, name="Running")
-        await transition_experiment(
-            session, exp2.id, ExperimentStatus.RUNNING
-        )
+        await transition_experiment(session, exp2.id, ExperimentStatus.RUNNING)
 
         planned, total_planned = await list_experiments(
             session, org_id=org_id, status=ExperimentStatus.DRAFT
@@ -254,21 +252,17 @@ class TestListExperiments:
         for i in range(5):
             await create_experiment(session, org_id=org_id, name=f"Exp {i}")
 
-        page1, total = await list_experiments(
-            session, org_id=org_id, page=1, page_size=2
-        )
+        page1, total = await list_experiments(session, org_id=org_id, page=1, page_size=2)
         assert len(page1) == 2
         assert total == 5
 
-        page3, _ = await list_experiments(
-            session, org_id=org_id, page=3, page_size=2
-        )
+        page3, _ = await list_experiments(session, org_id=org_id, page=3, page_size=2)
         assert len(page3) == 1  # 5th item
 
     @pytest.mark.asyncio
     async def test_list_excludes_deleted(self, session, org_id):
         """Deleted experiments are excluded from listing by default."""
-        exp1 = await create_experiment(session, org_id=org_id, name="Active")
+        await create_experiment(session, org_id=org_id, name="Active")
         exp2 = await create_experiment(session, org_id=org_id, name="Deleted")
         await soft_delete_experiment(session, exp2.id)
 
@@ -325,9 +319,7 @@ class TestUpdateExperiment:
     async def test_update_ignores_unknown_fields(self, session, org_id):
         """Unknown fields are silently ignored."""
         exp = await create_experiment(session, org_id=org_id, name="Test")
-        updated = await update_experiment(
-            session, exp.id, name="Updated", bogus_field="ignored"
-        )
+        updated = await update_experiment(session, exp.id, name="Updated", bogus_field="ignored")
         assert updated.name == "Updated"
 
     @pytest.mark.asyncio
@@ -339,7 +331,10 @@ class TestUpdateExperiment:
 
         with pytest.raises(ValidationError) as exc_info:
             await update_experiment(session, exp.id, name="Nope")
-        assert "terminal" in exc_info.value.suggestion.lower() or "completed" in exc_info.value.suggestion.lower()
+        assert (
+            "terminal" in exc_info.value.suggestion.lower()
+            or "completed" in exc_info.value.suggestion.lower()
+        )
 
     @pytest.mark.asyncio
     async def test_update_failed_raises(self, session, org_id):
@@ -496,7 +491,10 @@ class TestInvalidTransitions:
         assert "draft" in exc_info.value.message.lower()
         assert "completed" in exc_info.value.message.lower()
         assert exc_info.value.suggestion is not None
-        assert "running" in exc_info.value.suggestion.lower() or "cancelled" in exc_info.value.suggestion.lower()
+        assert (
+            "running" in exc_info.value.suggestion.lower()
+            or "cancelled" in exc_info.value.suggestion.lower()
+        )
 
     @pytest.mark.asyncio
     async def test_planned_to_failed(self, session, org_id):

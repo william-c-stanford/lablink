@@ -9,7 +9,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 # ---------------------------------------------------------------------------
@@ -98,6 +98,8 @@ class WebhookDeliveryResponse(BaseModel):
     event_type: str = Field(..., description="Event type that triggered this delivery")
     status: str = Field(..., description="Delivery status: pending, delivered, failed")
     attempts: int = Field(..., description="Number of delivery attempts made")
-    last_attempt_at: datetime | None = Field(None, description="Timestamp of the most recent attempt")
+    last_attempt_at: datetime | None = Field(
+        None, description="Timestamp of the most recent attempt"
+    )
     response_status: int | None = Field(None, description="HTTP status code from the endpoint")
     created_at: datetime = Field(..., description="Delivery record creation timestamp")

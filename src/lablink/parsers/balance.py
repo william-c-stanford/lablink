@@ -12,7 +12,6 @@ stability quality flags, and negative-mass warnings.
 from __future__ import annotations
 
 import csv
-import io
 import re
 from typing import Any, ClassVar
 
@@ -34,9 +33,7 @@ _QUDT_MASS_URIS: dict[str, str] = {
 }
 
 # Keywords that indicate a balance/mass data file
-_BALANCE_KEYWORDS = frozenset(
-    {"mass", "weight", "balance", "tare", "net", "gross", "net weight"}
-)
+_BALANCE_KEYWORDS = frozenset({"mass", "weight", "balance", "tare", "net", "gross", "net weight"})
 
 
 @ParserRegistry.register
@@ -154,9 +151,7 @@ class BalanceParser(BaseParser):
                 continue
 
             # Determine unit
-            unit = detected_unit or self._get_unit_from_record(
-                record, col_map, default_unit
-            )
+            unit = detected_unit or self._get_unit_from_record(record, col_map, default_unit)
             qudt_uri = _QUDT_MASS_URIS.get(unit.lower())
 
             # Quality flag
@@ -175,8 +170,7 @@ class BalanceParser(BaseParser):
             if mass_val < 0:
                 quality_flag = "suspect"
                 warnings.append(
-                    f"Negative mass {mass_val} {unit} for sample "
-                    f"'{sample_id or f'row {row_num}'}'"
+                    f"Negative mass {mass_val} {unit} for sample '{sample_id or f'row {row_num}'}'"
                 )
 
             measurements.append(
@@ -242,9 +236,7 @@ class BalanceParser(BaseParser):
         )
 
         unique_samples = {
-            m.sample_id or m.sample_name
-            for m in measurements
-            if m.sample_id or m.sample_name
+            m.sample_id or m.sample_name for m in measurements if m.sample_id or m.sample_name
         }
 
         return ParsedResult(
@@ -266,17 +258,12 @@ class BalanceParser(BaseParser):
 
     # -- Private helpers -------------------------------------------------------
 
-    def _find_data_header(
-        self, lines: list[str], raw_meta: dict[str, Any]
-    ) -> int:
+    def _find_data_header(self, lines: list[str], raw_meta: dict[str, Any]) -> int:
         """Find the index of the CSV data header row, extracting metadata above it."""
         for i, line in enumerate(lines):
             lower = line.lower().strip()
             # Check if this line looks like a CSV data header
-            if any(
-                kw in lower
-                for kw in ("mass", "weight", "net", "gross", "value", "sample")
-            ):
+            if any(kw in lower for kw in ("mass", "weight", "net", "gross", "value", "sample")):
                 return i
             # Extract key: value metadata from preamble
             if ":" in line and not any(c.isdigit() for c in line.split(":")[0]):

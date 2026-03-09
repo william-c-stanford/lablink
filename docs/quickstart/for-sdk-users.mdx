@@ -1,0 +1,145 @@
+---
+title: "Python SDK Quickstart"
+sidebarTitle: "For SDK Users"
+description: "Use LabLink from Python with the httpx async client."
+---
+
+<Note>
+A first-party `pip install lablink` SDK is planned for Q2. This guide covers the interim pattern using `httpx` directly — the patterns shown here will remain valid after the SDK ships.
+</Note>
+
+## Install
+
+```bash
+pip install httpx
+```
+
+## Client Setup
+
+```python
+import httpx
+
+BASE_URL = "https://api.lablink.io"
+TOKEN = "ll_your_token_here"  # or read from env: os.environ["LABLINK_TOKEN"]
+
+client = httpx.AsyncClient(
+    base_url=BASE_URL,
+    headers={"Authorization": f"Bearer {TOKEN}"},
+    timeout=30.0,
+)
+```
+
+For scripts that do not run in an async context, use `httpx.Client` (synchronous) with the same configuration.
+
+## Unwrapping the Envelope
+
+Every response is wrapped in `{ data, meta, errors }`. Always access `.data` after checking for errors:
+
+```python
+async def unwrap(response: httpx.Response):
+    response.raise_for_status()
+    body = response.json()
+    if body["errors"]:
+        err = body["errors"][0]
+        raise RuntimeError(
+            f"[{err['code']}] {err['message']}. Suggestion: {err.get('suggestion')}"
+        )
+    return body["data"]
+```
+
+## List Experiments
+
+```python
+import asyncio
+
+async def main():
+    async with client:
+        resp = await client.get("/api/v1/experiments", params={"status": "completed"})
+        experiments = await unwrap(resp)
+        for exp in experiments:
+            print(exp["id"], exp["intent"], exp["status"])
+
+asyncio.run(main())
+```
+
+## Upload a File and Poll for Completion
+
+```python
+import asyncio
+import time
+
+async def upload_and_wait(file_path: str, instrument_type: str | None = None):
+    async with client:
+        # Step 1: Create the upload
+        with open(file_path, "rb") as f:
+            files = {"file": (file_path.split("/")[-1], f)}
+            data = {}
+            if instrument_type:
+                data["instrument_type"] = instrument_type
+            resp = await client.post("/api/v1/uploads", files=files, data=data)
+        upload = await unwrap(resp)
+        upload_id = upload["id"]
+        print(f"Upload created: {upload_id}, status: {upload['status']}")
+
+        # Step 2: Poll until parsed
+        for attempt in range(30):
+            await asyncio.sleep(2)
+            resp = await client.get(f"/api/v1/uploads/{upload_id}")
+            upload = await unwrap(resp)
+            status = upload["status"]
+            print(f"  attempt {attempt + 1}: status={status}")
+            if status == "parsed":
+                return upload_id
+            if status == "parse_failed":
+                raise RuntimeError(f"Parse failed: {upload.get('error_message')}")
+
+        raise TimeoutError("Upload did not parse within 60 seconds")
+
+asyncio.run(upload_and_wait("/data/nanodrop_results.csv", "spectrophotometer"))
+```
+
+## Type-Safe Error Handling
+
+Check `errors` before accessing `data` for robust production code:
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LabLinkError(Exception):
+    code: str
+    message: str
+    suggestion: str | None
+
+async def safe_get(client: httpx.AsyncClient, path: str) -> dict:
+    resp = await client.get(path)
+    resp.raise_for_status()
+    body = resp.json()
+    if body["errors"]:
+        err = body["errors"][0]
+        raise LabLinkError(
+            code=err["code"],
+            message=err["message"],
+            suggestion=err.get("suggestion"),
+        )
+    return body["data"]
+```
+
+## Pagination
+
+List endpoints return `meta.pagination`. Iterate pages like this:
+
+```python
+async def list_all_uploads(client: httpx.AsyncClient) -> list[dict]:
+    all_uploads = []
+    page = 1
+    while True:
+        resp = await client.get("/api/v1/uploads", params={"page": page, "page_size": 100})
+        body = resp.json()
+        all_uploads.extend(body["data"])
+        pagination = body["meta"].get("pagination", {})
+        if not pagination.get("has_more"):
+            break
+        page += 1
+    return all_uploads
+```

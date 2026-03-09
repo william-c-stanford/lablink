@@ -1,0 +1,788 @@
+---
+title: "MCP Toolsets Reference"
+sidebarTitle: "Toolsets"
+description: "Complete reference for all 25 LabLink MCP tools with parameters and response shapes."
+---
+
+## Discovery Tools
+
+These two tools are always available and should be called first in any agent session.
+
+---
+
+### `list_toolsets`
+
+List available toolset categories and their tool counts.
+
+**Parameters**: none
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "explorer": {
+      "tool_count": 8,
+      "description": "Read-only data exploration, search, and export",
+      "tools": ["list_experiments", "get_experiment", ...]
+    },
+    "planner": { "tool_count": 7, "description": "...", "tools": [...] },
+    "ingestor": { "tool_count": 4, "description": "...", "tools": [...] },
+    "admin":    { "tool_count": 4, "description": "...", "tools": [...] }
+  },
+  "meta": { "total_toolsets": 4 }
+}
+```
+
+---
+
+### `get_toolset`
+
+Retrieve tool names and descriptions for a named toolset.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | One of: `explorer`, `planner`, `ingestor`, `admin` |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "toolset": "explorer",
+    "tools": [
+      { "name": "list_experiments", "description": "List experiment summaries..." },
+      { "name": "get_experiment", "description": "Retrieve full details..." }
+    ]
+  },
+  "meta": { "tool_count": 8 }
+}
+```
+
+---
+
+## Explorer Toolset
+
+Eight read-only tools for data exploration, search, and export.
+
+---
+
+### `list_experiments`
+
+List experiment summaries with optional filters. Returns a paginated experiment list ordered newest first.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `status` | string | no | Filter by status: `planned`, `running`, `completed`, `failed`, `cancelled` |
+| `campaign_id` | string | no | Filter by campaign UUID |
+| `created_after` | string | no | ISO-8601 datetime — only return experiments after this date |
+| `instrument_type` | string | no | Filter by linked instrument type (e.g. `hplc`, `pcr`, `spectrophotometer`) |
+| `page` | int | no | Page number, 1-indexed. Default: `1` |
+| `page_size` | int | no | Results per page, 1–100. Default: `20` |
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "intent": "Measure protein concentration at 280 nm",
+      "status": "completed",
+      "campaign_id": "uuid-or-null",
+      "created_at": "2026-03-08T10:00:00Z"
+    }
+  ],
+  "meta": { "total": 142, "page": 1, "page_size": 20 }
+}
+```
+
+---
+
+### `get_experiment`
+
+Retrieve full details for a single experiment by its UUID.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `experiment_id` | string | yes | UUID of the experiment |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "intent": "Measure protein concentration at 280 nm",
+    "hypothesis": "Sample A concentration exceeds 2 mg/mL",
+    "parameters": { "wavelength_nm": 280 },
+    "constraints": {},
+    "status": "completed",
+    "outcome": { "concentration_mg_ml": 2.4 },
+    "design_method": null,
+    "campaign_id": "uuid-or-null",
+    "created_at": "2026-03-08T10:00:00Z",
+    "completed_at": "2026-03-08T11:30:00Z"
+  }
+}
+```
+
+---
+
+### `get_instrument_data`
+
+Retrieve parsed measurement data for an upload by its UUID.
+
+<Warning>
+Only call this after `get_upload` returns `status == "parsed"`. Calling on an unparsed upload returns a `not_found` error because the parsed data record does not exist yet.
+</Warning>
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `upload_id` | string | yes | UUID of the upload |
+
+**Returns** — flat structure with arrays (not nested):
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "upload_id": "uuid",
+      "instrument_type": "spectrophotometer",
+      "measurement_type": "absorbance",
+      "parser_version": "spectrophotometer_v1",
+      "sample_count": 12,
+      "measurements": [
+        {
+          "sample_id": "A1",
+          "sample_name": "BSA_std_1",
+          "value": 0.842,
+          "unit": "A280",
+          "wavelength_nm": 280,
+          "flags": []
+        }
+      ],
+      "instrument_settings": {
+        "wavelength_nm": 280,
+        "blank": "TE buffer",
+        "path_length_mm": 1.0
+      },
+      "data_summary": { "mean": 0.71, "std": 0.12, "min": 0.42, "max": 0.94 },
+      "metadata": { "operator": "J. Smith", "date": "2026-03-08" }
+    }
+  ],
+  "meta": { "record_count": 1 }
+}
+```
+
+The `measurements` array is flat — each element is one sample reading. The `instrument_settings` object is a flat key-value map specific to the instrument type. Neither is nested further.
+
+---
+
+### `search_catalog`
+
+Search the data catalog by free-text query across all indexed data. Returns ranked results with relevance scores and facets.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `query` | string | yes | Free-text query (e.g. `"absorbance > 0.5"`, `"HPLC peak area"`) |
+| `max_results` | int | no | Max results to return, 1–100. Default: `20` |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "hits": [
+      {
+        "upload_id": "uuid",
+        "score": 0.94,
+        "instrument_type": "spectrophotometer",
+        "highlight": "...absorbance at <em>280 nm</em>..."
+      }
+    ],
+    "facets": {
+      "instrument_type": { "spectrophotometer": 12, "hplc": 4 },
+      "measurement_type": { "absorbance": 16 }
+    }
+  },
+  "meta": { "total": 16, "query_time_ms": 23 }
+}
+```
+
+---
+
+### `list_instruments`
+
+List all registered instruments with their status, type, and agent link.
+
+**Parameters**: none
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "NanoDrop 2000 #3",
+      "instrument_type": "spectrophotometer",
+      "manufacturer": "Thermo Fisher",
+      "model": "NanoDrop 2000",
+      "serial_number": "ND2K-12345",
+      "location": "Lab 4B, Bench 2",
+      "agent_id": "uuid-or-null"
+    }
+  ],
+  "meta": { "total": 7 }
+}
+```
+
+---
+
+### `list_uploads`
+
+List uploaded files with optional status and instrument filters. Returns paginated results ordered newest first.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `status` | string | no | Filter by status: `uploaded`, `parsing`, `parsed`, `parse_failed`, `indexed` |
+| `instrument_id` | string | no | Filter by instrument UUID |
+| `created_after` | string | no | ISO-8601 datetime |
+| `page` | int | no | Page number, 1-indexed. Default: `1` |
+| `page_size` | int | no | Results per page, 1–100. Default: `20` |
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "filename": "nanodrop_20260308.csv",
+      "status": "parsed",
+      "file_size_bytes": 4096,
+      "mime_type": "text/csv",
+      "instrument_type_detected": "spectrophotometer",
+      "parser_used": "spectrophotometer_v1",
+      "created_at": "2026-03-08T10:00:00Z",
+      "parsed_at": "2026-03-08T10:00:12Z",
+      "indexed_at": "2026-03-08T10:00:15Z"
+    }
+  ],
+  "meta": { "total": 38, "page": 1, "page_size": 20 }
+}
+```
+
+---
+
+### `get_chart_data`
+
+Retrieve Plotly-compatible chart configuration and raw JSON data arrays for an upload. Returns a ready-to-render Plotly config plus the underlying raw arrays for further analysis.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `upload_id` | string | yes | UUID of the upload |
+
+**Returns** — Plotly config object plus raw arrays:
+
+```json
+{
+  "data": {
+    "plotly_config": {
+      "data": [
+        {
+          "type": "bar",
+          "x": ["BSA_std_1", "BSA_std_2", "Sample_A"],
+          "y": [0.842, 0.651, 1.203],
+          "name": "absorbance"
+        }
+      ],
+      "layout": {
+        "title": "spectrophotometer — absorbance",
+        "xaxis": { "title": "Sample" },
+        "yaxis": { "title": "A280" }
+      }
+    },
+    "raw_values": [0.842, 0.651, 1.203],
+    "labels": ["BSA_std_1", "BSA_std_2", "Sample_A"],
+    "units": ["A280", "A280", "A280"],
+    "measurement_count": 3
+  }
+}
+```
+
+Pass `plotly_config` directly to `Plotly.newPlot()`. Use `raw_values` and `labels` for downstream computation without re-parsing the chart config.
+
+---
+
+### `create_export`
+
+Create a data export in the specified format. In development mode (SQLite, `LABLINK_ENVIRONMENT=development`), the export is synchronous and `download_url` is present immediately. In production mode (PostgreSQL + S3), the export is async — poll for completion via the REST endpoint.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `format` | string | yes | Export format: `csv`, `json`, `xlsx`, `pdf` |
+| `filters` | object | no | Scope the export: `{ instrument_type?, upload_ids?, date_from?, date_to? }` |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "export_id": "uuid",
+    "format": "csv",
+    "status": "completed",
+    "download_url": "https://storage.lablink.io/exports/uuid.csv",
+    "record_count": 142,
+    "file_size_bytes": 18432
+  }
+}
+```
+
+**Dev vs production behavior**:
+- **Dev mode** (`sync` task backend): `status` is `"completed"` and `download_url` is populated immediately.
+- **Production** (Celery + S3): `status` may be `"pending"` and `download_url` may be `null`. Poll `GET /api/v1/exports/{export_id}` until `status == "completed"`.
+
+---
+
+## Planner Toolset
+
+Seven tools for experiment and campaign lifecycle management.
+
+---
+
+### `create_experiment`
+
+Create a new experiment in `PLANNED` status.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `intent` | string | yes | What this experiment aims to achieve |
+| `parameters` | object | no | Experimental conditions as JSON (e.g. `{ "temperature_c": 37.0 }`) |
+| `campaign_id` | string | no | UUID of the campaign to associate with |
+| `predecessor_ids` | array[string] | no | UUIDs of predecessor experiments (forms a DAG) |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "intent": "Measure solubility at 37°C",
+    "status": "planned",
+    "parameters": { "temperature_c": 37.0 },
+    "campaign_id": "uuid-or-null",
+    "created_at": "2026-03-08T10:00:00Z"
+  }
+}
+```
+
+---
+
+### `update_experiment`
+
+Update mutable fields or trigger a status transition on an experiment.
+
+Valid status transitions: `planned → running`, `running → completed`, `running → failed`, `planned → cancelled`, `running → cancelled`.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `experiment_id` | string | yes | UUID of the experiment |
+| `status` | string | no | New status: `planned`, `running`, `completed`, `failed`, `cancelled` |
+| `outcome` | object | no | Outcome data dict (only valid when transitioning to `completed` or `failed`) |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "intent": "Measure solubility at 37°C",
+    "status": "running",
+    "outcome": null,
+    "completed_at": null
+  }
+}
+```
+
+---
+
+### `record_outcome`
+
+Record the outcome of a completed experiment and transition its status in one call. Shorthand for `update_experiment` with status and outcome.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `experiment_id` | string | yes | UUID of the experiment |
+| `results` | object | yes | Outcome data dict with measured values and observations |
+| `success` | bool | yes | `true` → status becomes `completed`; `false` → status becomes `failed` |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "status": "completed",
+    "outcome": { "concentration_mg_ml": 2.4, "yield_pct": 87.3 },
+    "completed_at": "2026-03-08T11:30:00Z"
+  }
+}
+```
+
+---
+
+### `link_upload_to_experiment`
+
+Associate an upload (instrument data file) with an experiment for data linkage.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `experiment_id` | string | yes | UUID of the experiment |
+| `upload_id` | string | yes | UUID of the upload to link |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "experiment_id": "uuid",
+    "upload_id": "uuid",
+    "linked_at": "2026-03-08T10:05:00Z"
+  }
+}
+```
+
+---
+
+### `create_campaign`
+
+Create a new optimization campaign grouping related experiments. The campaign starts in `ACTIVE` status.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `name` | string | yes | Campaign name |
+| `objective` | string | yes | What this campaign aims to achieve |
+| `optimization_method` | string | no | Strategy: `manual`, `bayesian`, `grid_search`, etc. |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "name": "Solubility Screen Q1",
+    "objective": "Identify optimal buffer conditions for protein X",
+    "status": "active",
+    "optimization_method": "bayesian",
+    "created_at": "2026-03-08T10:00:00Z"
+  }
+}
+```
+
+---
+
+### `get_campaign_progress`
+
+Retrieve progress metrics for a campaign by UUID. Returns experiment counts by status and an overall completion rate.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `campaign_id` | string | yes | UUID of the campaign |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "campaign_id": "uuid",
+    "total": 24,
+    "planned": 8,
+    "running": 3,
+    "completed": 12,
+    "failed": 1,
+    "cancelled": 0,
+    "completion_rate": 0.5
+  }
+}
+```
+
+`completion_rate` is `completed / total` as a float between 0.0 and 1.0.
+
+---
+
+### `list_campaigns`
+
+List campaigns with optional status filter, ordered newest first.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `status` | string | no | Filter by status: `active`, `paused`, `completed` |
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "Solubility Screen Q1",
+      "objective": "Identify optimal buffer conditions for protein X",
+      "status": "active",
+      "optimization_method": "bayesian",
+      "created_at": "2026-03-08T10:00:00Z"
+    }
+  ],
+  "meta": { "total": 5 }
+}
+```
+
+---
+
+## Ingestor Toolset
+
+Four tools for file upload, parsing, and reparse.
+
+---
+
+### `create_upload`
+
+Upload a file for parsing by specifying its local filesystem path. Reads the file, stores it in LabLink storage, and kicks off the parsing pipeline asynchronously.
+
+<Warning>
+Returns immediately with `status: "uploaded"`. You must poll `get_upload(upload_id)` until `status == "parsed"` before calling `get_instrument_data`.
+</Warning>
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `file_path` | string | yes | Absolute path to the file on the local filesystem |
+| `instrument_type` | string | no | Parser hint: `hplc`, `pcr`, `spectrophotometer`, `plate_reader`, `balance` |
+| `project_id` | string | no | UUID of the project to associate with |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "filename": "nanodrop_20260308.csv",
+    "status": "uploaded",
+    "file_size_bytes": 4096,
+    "content_hash": "sha256:abc123..."
+  }
+}
+```
+
+---
+
+### `list_parsers`
+
+List all available parsers with their supported formats and instrument types. Call this before uploading to confirm that your file format is supported.
+
+**Parameters**: none
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "name": "spectrophotometer_v1",
+      "instrument_type": "spectrophotometer",
+      "version": "1.0.0",
+      "supported_extensions": [".csv", ".tsv"],
+      "description": "NanoDrop and Cary UV-Vis CSV files"
+    },
+    {
+      "name": "plate_reader_v1",
+      "instrument_type": "plate_reader",
+      "supported_extensions": [".csv"],
+      "description": "SoftMax Pro and Gen5 template-based CSV (96/384-well)"
+    }
+  ],
+  "meta": { "parser_count": 5 }
+}
+```
+
+---
+
+### `get_upload`
+
+Retrieve full upload details including parse status and error message.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `upload_id` | string | yes | UUID of the upload |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "filename": "nanodrop_20260308.csv",
+    "status": "parsed",
+    "file_size_bytes": 4096,
+    "mime_type": "text/csv",
+    "content_hash": "sha256:abc123...",
+    "instrument_type_detected": "spectrophotometer",
+    "parser_used": "spectrophotometer_v1",
+    "error_message": null,
+    "created_at": "2026-03-08T10:00:00Z",
+    "parsed_at": "2026-03-08T10:00:12Z",
+    "indexed_at": "2026-03-08T10:00:15Z"
+  }
+}
+```
+
+If `status == "parse_failed"`, `error_message` contains the parser's error description.
+
+---
+
+### `reparse_upload`
+
+Trigger a re-parse of a previously uploaded file. Resets the upload status and dispatches a new parse task. Useful when parsers have been updated or the initial parse failed.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `upload_id` | string | yes | UUID of the upload to reparse |
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "upload_id": "uuid",
+    "status": "reparse_queued",
+    "message": "Parse task has been dispatched."
+  }
+}
+```
+
+After calling `reparse_upload`, poll `get_upload` until `status == "parsed"` as you would with a new upload.
+
+---
+
+## Admin Toolset
+
+Four tools for usage metrics, agent management, webhook registration, and audit trail access.
+
+---
+
+### `get_usage_stats`
+
+Retrieve storage usage, instrument count, and user counts vs plan limits. Useful for capacity planning and billing checks.
+
+**Parameters**: none
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "total_uploads": 342,
+    "total_storage_bytes": 1073741824,
+    "total_storage_mb": 1024.0,
+    "instrument_count": 7,
+    "agent_count": 3,
+    "user_count": 12
+  }
+}
+```
+
+---
+
+### `list_agents`
+
+List all desktop agents with their connection status and last heartbeat timestamp.
+
+**Parameters**: none
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "name": "lab4b-windows-agent",
+      "platform": "windows",
+      "version": "0.1.0",
+      "status": "active",
+      "last_heartbeat_at": "2026-03-08T11:55:00Z",
+      "instrument_count": 3
+    }
+  ],
+  "meta": { "total": 3 }
+}
+```
+
+Agent status values: `active` (heartbeat within 5 min), `inactive` (heartbeat 5–60 min ago), `offline` (no heartbeat in >60 min).
+
+---
+
+### `create_webhook`
+
+Register a new webhook subscription for event notifications. Returns the webhook record including the auto-generated signing secret.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `url` | string | yes | HTTPS callback URL to receive POST requests |
+| `events` | array[string] | yes | Event types to subscribe to |
+| `secret` | string | no | Shared secret for HMAC-SHA256 signing. Auto-generated if omitted. |
+
+Supported event types: `upload.parsed`, `upload.parse_failed`, `experiment.completed`, `experiment.failed`, `campaign.completed`.
+
+**Returns**:
+
+```json
+{
+  "data": {
+    "id": "uuid",
+    "url": "https://your-server.example.com/lablink-webhook",
+    "events": ["upload.parsed", "experiment.completed"],
+    "is_active": true,
+    "secret": "whsec_abc123...",
+    "created_at": "2026-03-08T10:00:00Z"
+  }
+}
+```
+
+Store the `secret` securely — use it to verify the `X-LabLink-Signature` HMAC-SHA256 header on incoming webhook payloads.
+
+---
+
+### `list_audit_events`
+
+Query the immutable, hash-chained audit trail with optional filters. Returns paginated events ordered newest first.
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `resource_type` | string | no | Filter by resource type: `experiment`, `upload`, `campaign`, `webhook` |
+| `resource_id` | string | no | Filter by specific resource UUID |
+| `created_after` | string | no | ISO-8601 datetime — only return events after this date |
+| `page` | int | no | Page number, 1-indexed. Default: `1` |
+
+**Returns**:
+
+```json
+{
+  "data": [
+    {
+      "id": "uuid",
+      "action": "experiment.status_transitioned",
+      "resource_type": "experiment",
+      "resource_id": "uuid",
+      "actor_id": "uuid",
+      "changes": { "status": { "from": "running", "to": "completed" } },
+      "event_hash": "sha256:...",
+      "created_at": "2026-03-08T11:30:00Z"
+    }
+  ],
+  "meta": { "total": 87, "page": 1 }
+}
+```
+
+The audit trail is append-only and hash-chained. Events are never deleted, even for soft-deleted resources.

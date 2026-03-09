@@ -46,6 +46,7 @@ def celery_settings() -> Settings:
 # 1. get_parser tests
 # ---------------------------------------------------------------------------
 
+
 class TestGetParser:
     """Test parser registry lookup."""
 
@@ -67,6 +68,7 @@ class TestGetParser:
 # ---------------------------------------------------------------------------
 # 2. parse_file_task (sync) tests
 # ---------------------------------------------------------------------------
+
 
 class TestParseFileTask:
     """Test the core parse_file_task function."""
@@ -181,6 +183,7 @@ class TestParseFileTask:
 # 3. dispatch_parse (sync fallback) tests
 # ---------------------------------------------------------------------------
 
+
 class TestDispatchParse:
     """Test the dispatch_parse function with sync fallback."""
 
@@ -235,16 +238,20 @@ class TestDispatchParse:
 # 4. All parsers via dispatch (smoke tests)
 # ---------------------------------------------------------------------------
 
+
 class TestDispatchAllParsers:
     """Smoke test dispatch with all 5 parser types using real fixtures."""
 
-    @pytest.mark.parametrize("parser_name,fixture_path", [
-        ("spectrophotometer", "spectrophotometer/nanodrop_sample.csv"),
-        ("plate_reader", "plate_reader/softmax_pro_96well.csv"),
-        ("hplc", "hplc/agilent_peaks.csv"),
-        ("pcr", "pcr/quantstudio_results.csv"),
-        ("balance", "balance/mettler_toledo.csv"),
-    ])
+    @pytest.mark.parametrize(
+        "parser_name,fixture_path",
+        [
+            ("spectrophotometer", "spectrophotometer/nanodrop_sample.csv"),
+            ("plate_reader", "plate_reader/softmax_pro_96well.csv"),
+            ("hplc", "hplc/agilent_peaks.csv"),
+            ("pcr", "pcr/quantstudio_results.csv"),
+            ("balance", "balance/mettler_toledo.csv"),
+        ],
+    )
     def test_dispatch_parser(self, parser_name, fixture_path, dev_settings):
         fixture = FIXTURES_DIR / fixture_path
         if not fixture.exists():
@@ -271,13 +278,16 @@ class TestDispatchAllParsers:
             assert "error" in result
             assert "suggestion" in result
 
-    @pytest.mark.parametrize("parser_name,fixture_path", [
-        ("spectrophotometer", "spectrophotometer/corrupted.csv"),
-        ("plate_reader", "plate_reader/corrupted.csv"),
-        ("hplc", "hplc/corrupted.csv"),
-        ("pcr", "pcr/corrupted.csv"),
-        ("balance", "balance/corrupted.csv"),
-    ])
+    @pytest.mark.parametrize(
+        "parser_name,fixture_path",
+        [
+            ("spectrophotometer", "spectrophotometer/corrupted.csv"),
+            ("plate_reader", "plate_reader/corrupted.csv"),
+            ("hplc", "hplc/corrupted.csv"),
+            ("pcr", "pcr/corrupted.csv"),
+            ("balance", "balance/corrupted.csv"),
+        ],
+    )
     def test_dispatch_corrupted_files(self, parser_name, fixture_path, dev_settings):
         """All parsers should handle corrupted input gracefully via dispatch."""
         fixture = FIXTURES_DIR / fixture_path

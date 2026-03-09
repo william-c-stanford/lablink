@@ -33,9 +33,8 @@ from __future__ import annotations
 import hashlib
 import logging
 import uuid
-from collections.abc import AsyncIterator, Callable
+from collections.abc import Callable
 from datetime import datetime, timezone
-from typing import Annotated
 
 from jose import JWTError, jwt
 from fastapi import Depends, Header, HTTPException, Request, status
@@ -105,9 +104,7 @@ def _decode_jwt(token: str) -> dict:
         )
 
 
-async def _resolve_api_token(
-    raw_token: str, db: AsyncSession
-) -> tuple[User, uuid.UUID]:
+async def _resolve_api_token(raw_token: str, db: AsyncSession) -> tuple[User, uuid.UUID]:
     """Look up an API token by its SHA-256 hash and return (user, org_id).
 
     Raises :class:`HTTPException` (401) if the token is missing, inactive,
@@ -397,8 +394,7 @@ def require_role(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
-                    f"Role '{membership.role}' insufficient; "
-                    f"requires '{minimum_role}' or higher"
+                    f"Role '{membership.role}' insufficient; requires '{minimum_role}' or higher"
                 ),
             )
 

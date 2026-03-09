@@ -1,14 +1,14 @@
 # models Module Guide
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > Local style guide for the `models` module.
 > Claude Code automatically loads this file when it reads files in this directory.
 
 ## Purpose
 
-SQLAlchemy 2.0 ORM models for LabLink. Defines 16 database entities: organization, user, membership, project, instrument, agent, upload, parsed_data, experiment, experiment_upload, campaign, api_token, audit_event, webhook, webhook_delivery, and instrument_data.
+SQLAlchemy 2.0 ORM models for LabLink. Defines 17 database entities: organization, user, membership, project, instrument, agent, upload, parsed_data, experiment, experiment_upload, experiment_predecessor, campaign, api_token, audit_event, webhook, webhook_delivery, and instrument_data.
 
 This module is the schema of record. Services read from and write to these models. Routers never touch models directly.
 
@@ -17,6 +17,7 @@ This module is the schema of record. Services read from and write to these model
 - `base.py` — Mixins only: `TimestampMixin` (id + timestamps), `SoftDeleteMixin` (deleted_at), `UpdatedAtMixin`. Also re-exports `Base` from `lablink.database` for convenience.
 - One file per entity (singular snake_case): `organization.py`, `user.py`, `upload.py`, etc.
 - No circular imports — models import from `base.py` and `database.py` only. Cross-model relationships use `relationship()` with string class names where needed.
+- **Cross-model type hints use `TYPE_CHECKING`**: For `Mapped["Foo"]` annotations on relationships, import the referenced class under `if TYPE_CHECKING:` so mypy can resolve it without creating a runtime circular import. SQLAlchemy resolves the string at mapper setup time; mypy needs the `TYPE_CHECKING` import to type-check it.
 
 ## Coding Conventions
 
@@ -64,6 +65,7 @@ organization_id: Mapped[str] = mapped_column(String(36), ForeignKey("organizatio
 - `Experiment` (`experiment.py`) — Tracks experiment lifecycle (PLANNED → RUNNING → COMPLETED/FAILED)
 - `AuditEvent` (`audit_event.py`) — Immutable append-only record with SHA-256 hash chain
 - `ExperimentUpload` (`experiment_upload.py`) — Association table linking experiments to uploads (M2M)
+- `ExperimentPredecessor` (`experiment_predecessor.py`) — Association table linking experiments in a predecessor DAG (composite PK)
 
 ## What Belongs Here
 

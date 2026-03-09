@@ -22,7 +22,9 @@ class MeasurementValue(BaseModel):
     value: float
     unit: str  # SI or domain-standard unit
     qudt_uri: Optional[str] = None  # QUDT ontology reference
-    measurement_type: str  # absorbance, fluorescence, concentration, mass, area, retention_time, ct_value
+    measurement_type: (
+        str  # absorbance, fluorescence, concentration, mass, area, retention_time, ct_value
+    )
     channel: Optional[str] = None  # For multi-channel instruments
     wavelength_nm: Optional[float] = None
     timestamp: Optional[datetime] = None
@@ -55,7 +57,9 @@ class ParsedResult(BaseModel):
     measurements: list[MeasurementValue]
     instrument_settings: Optional[InstrumentSettings] = None
     sample_count: int
-    plate_layout: Optional[dict] = None  # For plate readers: { "rows": 8, "cols": 12, "format": "96-well" }
+    plate_layout: Optional[dict] = (
+        None  # For plate readers: { "rows": 8, "cols": 12, "format": "96-well" }
+    )
     run_metadata: dict = Field(default_factory=dict)  # Operator, date, software version, etc.
     raw_headers: Optional[list[str]] = None  # Original column headers for reference
     warnings: list[str] = Field(default_factory=list)  # Non-fatal parser warnings

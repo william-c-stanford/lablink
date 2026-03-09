@@ -159,12 +159,15 @@ class TestListToolsets:
 
 
 class TestGetToolset:
-    @pytest.mark.parametrize("toolset_name,expected_tools", [
-        ("explorer", EXPLORER_TOOLS),
-        ("planner", PLANNER_TOOLS),
-        ("ingestor", INGESTOR_TOOLS),
-        ("admin", ADMIN_TOOLS),
-    ])
+    @pytest.mark.parametrize(
+        "toolset_name,expected_tools",
+        [
+            ("explorer", EXPLORER_TOOLS),
+            ("planner", PLANNER_TOOLS),
+            ("ingestor", INGESTOR_TOOLS),
+            ("admin", ADMIN_TOOLS),
+        ],
+    )
     def test_returns_correct_tools_for_each_toolset(
         self, toolset_name: str, expected_tools: list[str]
     ):
@@ -178,12 +181,15 @@ class TestGetToolset:
             f"missing={set(expected_tools) - returned_names}"
         )
 
-    @pytest.mark.parametrize("toolset_name,expected_count", [
-        ("explorer", 8),
-        ("planner", 7),
-        ("ingestor", 4),
-        ("admin", 4),
-    ])
+    @pytest.mark.parametrize(
+        "toolset_name,expected_count",
+        [
+            ("explorer", 8),
+            ("planner", 7),
+            ("ingestor", 4),
+            ("admin", 4),
+        ],
+    )
     def test_meta_tool_count_matches(self, toolset_name: str, expected_count: int):
         """meta.tool_count in get_toolset response matches actual tool count."""
         result = get_toolset(toolset_name)
@@ -194,9 +200,7 @@ class TestGetToolset:
         for toolset_name in ALL_TOOLSETS:
             result = get_toolset(toolset_name)
             for tool_entry in result["data"]["tools"]:
-                assert "name" in tool_entry, (
-                    f"Tool entry in '{toolset_name}' missing 'name'"
-                )
+                assert "name" in tool_entry, f"Tool entry in '{toolset_name}' missing 'name'"
                 assert "description" in tool_entry, (
                     f"Tool '{tool_entry.get('name')}' in '{toolset_name}' missing 'description'"
                 )

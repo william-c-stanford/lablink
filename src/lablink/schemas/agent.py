@@ -169,9 +169,19 @@ class AgentRead(BaseModel):
         if hasattr(data, "__dict__"):
             d: dict[str, Any] = {}
             for key in (
-                "id", "org_id", "organization_id", "name", "platform",
-                "version", "status", "last_heartbeat_at", "config_json",
-                "config", "api_key_hash", "created_at", "updated_at",
+                "id",
+                "org_id",
+                "organization_id",
+                "name",
+                "platform",
+                "version",
+                "status",
+                "last_heartbeat_at",
+                "config_json",
+                "config",
+                "api_key_hash",
+                "created_at",
+                "updated_at",
             ):
                 val = getattr(data, key, None)
                 if val is not None:
@@ -217,9 +227,7 @@ class AgentRead(BaseModel):
                         heartbeat = heartbeat.replace(tzinfo=timezone.utc)
                     delta = (now - heartbeat).total_seconds()
                     # Online if active and heartbeat within 3 minutes (180s)
-                    data["is_online"] = (
-                        status_enum == AgentStatus.ACTIVE and delta < 180
-                    )
+                    data["is_online"] = status_enum == AgentStatus.ACTIVE and delta < 180
                 except (ValueError, TypeError):
                     data["is_online"] = False
             else:

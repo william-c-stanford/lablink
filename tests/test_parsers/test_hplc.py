@@ -102,7 +102,9 @@ class TestAgilentPeaksParsing:
         ctx = _ctx(FIXTURES / "agilent_peaks.csv")
         result = parser.parse(ctx)
 
-        area_meas = [m for m in result.measurements if m.name.endswith("_area") and "pct" not in m.name]
+        area_meas = [
+            m for m in result.measurements if m.name.endswith("_area") and "pct" not in m.name
+        ]
         assert len(area_meas) == 5
 
         area_values = sorted([m.value for m in area_meas])
@@ -114,7 +116,9 @@ class TestAgilentPeaksParsing:
         ctx = _ctx(FIXTURES / "agilent_peaks.csv")
         result = parser.parse(ctx)
 
-        area_meas = [m for m in result.measurements if m.name.endswith("_area") and "pct" not in m.name]
+        area_meas = [
+            m for m in result.measurements if m.name.endswith("_area") and "pct" not in m.name
+        ]
         for m in area_meas:
             assert m.unit == "mAU*s"
 

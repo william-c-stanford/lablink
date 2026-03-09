@@ -88,7 +88,7 @@ async def list_webhooks(
     org: Organization = Depends(get_current_org),
 ) -> Envelope:
     """List webhook subscriptions for the current organization."""
-    webhooks, total = await _webhook_svc.list(
+    webhooks, total = await _webhook_svc.list_webhooks(
         db, organization_id=org.id, page=page, page_size=page_size
     )
     return success_response(

@@ -13,7 +13,6 @@ from app.mcp_server.context import MCPContext
 from app.mcp_server.server import (
     _TOOL_HANDLERS,
     _TOOL_TOOLSET_MAP,
-    TOOLSET_DESCRIPTIONS,
     create_mcp_server,
 )
 
@@ -158,7 +157,12 @@ def populated_ctx() -> MCPContext:
                 "measurements": [
                     {"name": "peak_area", "value": 1234.5, "sample_id": "s1", "quality": "good"},
                     {"name": "peak_area", "value": 2345.6, "sample_id": "s2", "quality": "good"},
-                    {"name": "retention_time", "value": 3.14, "sample_id": "s1", "quality": "suspect"},
+                    {
+                        "name": "retention_time",
+                        "value": 3.14,
+                        "sample_id": "s1",
+                        "quality": "suspect",
+                    },
                 ],
                 "created_at": "2026-03-01T11:00:00",
             },
@@ -187,6 +191,7 @@ def populated_ctx() -> MCPContext:
 def pipeline_store():
     """Get the pipeline store and ensure it's clean for each test."""
     from app.mcp_server.tools.planner import get_pipeline_store
+
     store = get_pipeline_store()
     store.clear()
     yield store
@@ -237,7 +242,11 @@ def sample_balance_csv() -> bytes:
 def sample_pipeline_steps() -> list[dict]:
     """Sample pipeline step definitions."""
     return [
-        {"step_type": "parse", "config": {"parser": "spectrophotometer"}, "description": "Parse raw data"},
+        {
+            "step_type": "parse",
+            "config": {"parser": "spectrophotometer"},
+            "description": "Parse raw data",
+        },
         {"step_type": "validate", "config": {}, "description": "Validate measurements"},
         {"step_type": "store", "config": {"format": "json"}, "description": "Persist to storage"},
     ]

@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import JSON
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.upload import Upload
 
 
 class ParsedData(Base):
@@ -59,10 +63,14 @@ class ParsedData(Base):
     measurements: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
     units: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
     instrument_settings: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True,
+        JSON,
+        nullable=True,
     )
     metadata_: Mapped[dict[str, Any]] = mapped_column(
-        "metadata", JSON, nullable=False, default=dict,
+        "metadata",
+        JSON,
+        nullable=False,
+        default=dict,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

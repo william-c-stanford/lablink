@@ -7,16 +7,13 @@ Tools:
     list_parsers      — List all available instrument parsers with metadata.
 """
 
-from __future__ import annotations
-
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.models.ingestion import FileStatus
 from app.parsers import PARSER_REGISTRY
 from app.parsers.base import BaseParser, FileContext, ParseError
-
 
 # ---------------------------------------------------------------------------
 # In-memory ingest job tracking (dev/test — production uses Celery + Redis)
@@ -154,7 +151,7 @@ async def ingest_file(
             "warning_count": len(result.warnings),
             "warnings": result.warnings,
             "instrument_type": result.instrument_type,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
             "parsed_result": result.model_dump(mode="json"),
         }
         _ingest_jobs[job_id] = job_record
@@ -184,7 +181,7 @@ async def ingest_file(
             "file_name": file_name,
             "error": str(exc),
             "suggestion": exc.suggestion,
-            "created_at": datetime.now(timezone.utc).isoformat(),
+            "created_at": datetime.now(UTC).isoformat(),
         }
         _ingest_jobs[job_id] = job_record
 
@@ -301,7 +298,7 @@ async def retry_ingest(
     # Mark as re-queued
     job["status"] = FileStatus.QUEUED.value
     job["parser_name"] = new_parser
-    job["retry_requested_at"] = datetime.now(timezone.utc).isoformat()
+    job["retry_requested_at"] = datetime.now(UTC).isoformat()
 
     return {
         "job_id": job_id,

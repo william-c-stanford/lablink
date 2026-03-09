@@ -140,13 +140,12 @@ class TestAutoDetection:
         """Spectrophotometer file is detected by the right parser."""
         from pathlib import Path
 
-        fixture = Path(__file__).parent.parent / "fixtures" / "spectrophotometer" / "nanodrop_sample.csv"
+        fixture = (
+            Path(__file__).parent.parent / "fixtures" / "spectrophotometer" / "nanodrop_sample.csv"
+        )
         ctx = FileContext(file_name=fixture.name, file_bytes=fixture.read_bytes())
 
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [(key, p) for key, p in matching if p.can_handle(ctx)]
         keys = [key for key, _ in detected]
         assert "spectrophotometer" in keys
@@ -158,10 +157,7 @@ class TestAutoDetection:
         fixture = Path(__file__).parent.parent / "fixtures" / "hplc" / "agilent_peaks.csv"
         ctx = FileContext(file_name=fixture.name, file_bytes=fixture.read_bytes())
 
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [(key, p) for key, p in matching if p.can_handle(ctx)]
         keys = [key for key, _ in detected]
         assert "hplc" in keys
@@ -173,10 +169,7 @@ class TestAutoDetection:
         fixture = Path(__file__).parent.parent / "fixtures" / "pcr" / "quantstudio_results.csv"
         ctx = FileContext(file_name=fixture.name, file_bytes=fixture.read_bytes())
 
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [(key, p) for key, p in matching if p.can_handle(ctx)]
         keys = [key for key, _ in detected]
         assert "pcr" in keys
@@ -188,10 +181,7 @@ class TestAutoDetection:
         fixture = Path(__file__).parent.parent / "fixtures" / "balance" / "mettler_toledo.csv"
         ctx = FileContext(file_name=fixture.name, file_bytes=fixture.read_bytes())
 
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [(key, p) for key, p in matching if p.can_handle(ctx)]
         keys = [key for key, _ in detected]
         assert "balance" in keys
@@ -203,20 +193,14 @@ class TestAutoDetection:
             file_bytes=b"some data",
             instrument_type_hint="balance",
         )
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [key for key, p in matching if p.can_handle(ctx)]
         assert detected == ["balance"]
 
     def test_unknown_file_not_detected(self):
         """Unknown file format is not detected by any parser."""
         ctx = FileContext(file_name="data.xyz", file_bytes=b"completely random data")
-        matching = [
-            (key, PARSER_REGISTRY[key]())
-            for key in PARSER_REGISTRY
-        ]
+        matching = [(key, PARSER_REGISTRY[key]()) for key in PARSER_REGISTRY]
         detected = [key for key, p in matching if p.can_handle(ctx)]
         assert len(detected) == 0
 

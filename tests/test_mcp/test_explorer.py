@@ -8,8 +8,6 @@ Tests verify:
   - Not-found error paths
 """
 
-import pytest
-
 from app.mcp_server.context import MCPContext
 from app.mcp_server.tools.explorer import (
     EXPLORER_TOOLS,
@@ -50,9 +48,7 @@ class TestExplorerToolRegistration:
         import inspect
 
         for name, func in EXPLORER_TOOLS.items():
-            assert not inspect.iscoroutinefunction(func), (
-                f"Explorer tool '{name}' should be sync"
-            )
+            assert not inspect.iscoroutinefunction(func), f"Explorer tool '{name}' should be sync"
 
     def test_all_tools_take_ctx_as_first_param(self):
         """All explorer tools take MCPContext as first parameter."""

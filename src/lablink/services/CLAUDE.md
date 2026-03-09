@@ -1,7 +1,7 @@
 # services Module Guide
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > Local style guide for the `services` module.
 > Claude Code automatically loads this file when it reads files in this directory.
@@ -65,8 +65,8 @@ uploads = result.scalars().all()
 **State machine transitions** (experiment_service.py):
 ```python
 VALID_TRANSITIONS = {
-    ExperimentStatus.PLANNED: [ExperimentStatus.RUNNING],
-    ExperimentStatus.RUNNING: [ExperimentStatus.COMPLETED, ExperimentStatus.FAILED],
+    ExperimentStatus.planned: [ExperimentStatus.running, ExperimentStatus.cancelled],
+    ExperimentStatus.running: [ExperimentStatus.completed, ExperimentStatus.failed, ExperimentStatus.cancelled],
 }
 if target not in VALID_TRANSITIONS.get(current, []):
     raise StateTransitionError(f"Cannot transition {current} → {target}", suggestion="...")

@@ -5,12 +5,16 @@ from __future__ import annotations
 import uuid
 from datetime import datetime, timezone
 from enum import Enum as PyEnum
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import DateTime, ForeignKey, Index, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from lablink.database import Base
+
+
+if TYPE_CHECKING:
+    from lablink.models.experiment import Experiment
 
 
 class CampaignStatus(str, PyEnum):
@@ -36,9 +40,7 @@ class Campaign(Base):
     """
 
     __tablename__ = "campaigns"
-    __table_args__ = (
-        Index("ix_campaigns_org_status", "organization_id", "status"),
-    )
+    __table_args__ = (Index("ix_campaigns_org_status", "organization_id", "status"),)
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -66,7 +68,8 @@ class Campaign(Base):
         index=True,
     )
     optimization_method: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True,
+        String(100),
+        nullable=True,
     )
     created_by: Mapped[Optional[str]] = mapped_column(
         String(36),

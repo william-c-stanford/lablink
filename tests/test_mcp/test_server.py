@@ -1,7 +1,5 @@
 """Tests for MCP server structure, registration, and constraints."""
 
-import pytest
-
 from app.mcp_server.context import MCPContext
 from app.mcp_server.server import (
     TOOLSET_DESCRIPTIONS,
@@ -84,10 +82,7 @@ class TestToolsetCountInvariants:
         assert len(tool_handlers) == 25
 
     def test_explorer_has_expected_tools(self, tool_toolset_map):
-        explorer_tools = {
-            k for k, v in tool_toolset_map.items()
-            if v == "explorer"
-        }
+        explorer_tools = {k for k, v in tool_toolset_map.items() if v == "explorer"}
         expected = {
             "search_files",
             "list_experiments",
@@ -101,9 +96,6 @@ class TestToolsetCountInvariants:
         assert explorer_tools == expected
 
     def test_discovery_has_expected_tools(self, tool_toolset_map):
-        discovery_tools = {
-            k for k, v in tool_toolset_map.items()
-            if v == "discovery"
-        }
+        discovery_tools = {k for k, v in tool_toolset_map.items() if v == "discovery"}
         expected = {"list_toolsets", "get_tool_help"}
         assert discovery_tools == expected

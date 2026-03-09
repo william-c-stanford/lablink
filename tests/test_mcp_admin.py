@@ -184,10 +184,20 @@ class TestGetAuditLog:
     @pytest.mark.asyncio
     async def test_audit_log_with_entries(self):
         """Audit log returns entries in reverse chronological order."""
-        _mock_audit_entries.extend([
-            {"action": "CREATE", "resource_type": "experiment", "timestamp": "2024-01-01T10:00:00Z"},
-            {"action": "UPDATE", "resource_type": "experiment", "timestamp": "2024-01-02T10:00:00Z"},
-        ])
+        _mock_audit_entries.extend(
+            [
+                {
+                    "action": "CREATE",
+                    "resource_type": "experiment",
+                    "timestamp": "2024-01-01T10:00:00Z",
+                },
+                {
+                    "action": "UPDATE",
+                    "resource_type": "experiment",
+                    "timestamp": "2024-01-02T10:00:00Z",
+                },
+            ]
+        )
 
         result = await get_audit_log()
         assert result["total"] == 2
@@ -198,10 +208,16 @@ class TestGetAuditLog:
     @pytest.mark.asyncio
     async def test_audit_log_filter_by_resource_type(self):
         """Filter audit entries by resource_type."""
-        _mock_audit_entries.extend([
-            {"action": "CREATE", "resource_type": "experiment", "timestamp": "2024-01-01T10:00:00Z"},
-            {"action": "UPLOAD", "resource_type": "file", "timestamp": "2024-01-02T10:00:00Z"},
-        ])
+        _mock_audit_entries.extend(
+            [
+                {
+                    "action": "CREATE",
+                    "resource_type": "experiment",
+                    "timestamp": "2024-01-01T10:00:00Z",
+                },
+                {"action": "UPLOAD", "resource_type": "file", "timestamp": "2024-01-02T10:00:00Z"},
+            ]
+        )
 
         result = await get_audit_log(resource_type="experiment")
         assert result["total"] == 1
@@ -210,10 +226,20 @@ class TestGetAuditLog:
     @pytest.mark.asyncio
     async def test_audit_log_filter_by_action(self):
         """Filter audit entries by action."""
-        _mock_audit_entries.extend([
-            {"action": "CREATE", "resource_type": "experiment", "timestamp": "2024-01-01T10:00:00Z"},
-            {"action": "DELETE", "resource_type": "experiment", "timestamp": "2024-01-02T10:00:00Z"},
-        ])
+        _mock_audit_entries.extend(
+            [
+                {
+                    "action": "CREATE",
+                    "resource_type": "experiment",
+                    "timestamp": "2024-01-01T10:00:00Z",
+                },
+                {
+                    "action": "DELETE",
+                    "resource_type": "experiment",
+                    "timestamp": "2024-01-02T10:00:00Z",
+                },
+            ]
+        )
 
         result = await get_audit_log(action="CREATE")
         assert result["total"] == 1
@@ -222,11 +248,13 @@ class TestGetAuditLog:
     async def test_audit_log_pagination(self):
         """Audit log respects pagination parameters."""
         for i in range(10):
-            _mock_audit_entries.append({
-                "action": "CREATE",
-                "resource_type": "experiment",
-                "timestamp": f"2024-01-{i+1:02d}T10:00:00Z",
-            })
+            _mock_audit_entries.append(
+                {
+                    "action": "CREATE",
+                    "resource_type": "experiment",
+                    "timestamp": f"2024-01-{i + 1:02d}T10:00:00Z",
+                }
+            )
 
         result = await get_audit_log(page=2, page_size=3)
         assert result["total"] == 10
@@ -293,10 +321,7 @@ class TestUpdateSettings:
         assert "suggestion" in result
 
         # Verify audit entry was created
-        assert any(
-            e.get("resource_id") == "parsers.auto_detect"
-            for e in _mock_audit_entries
-        )
+        assert any(e.get("resource_id") == "parsers.auto_detect" for e in _mock_audit_entries)
 
     @pytest.mark.asyncio
     async def test_set_new_setting(self):

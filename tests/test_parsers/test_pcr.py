@@ -157,7 +157,9 @@ class TestQuantStudioParsing:
 
         assert result.instrument_settings is not None
         # Metadata from * key = value lines
-        assert "Chemistry" in result.raw_metadata or result.instrument_settings.parameters.get("chemistry")
+        assert "Chemistry" in result.raw_metadata or result.instrument_settings.parameters.get(
+            "chemistry"
+        )
 
     def test_measurement_name_includes_target_and_well(self, parser: PCRParser):
         """Measurement names follow ct_target_well pattern."""
@@ -220,7 +222,11 @@ class TestBioRadCFXParsing:
         ctx = _ctx(FIXTURES / "biorad_cfx.csv")
         result = parser.parse(ctx)
 
-        targets = {m.metadata.get("target_name") for m in result.measurements if m.metadata.get("target_name")}
+        targets = {
+            m.metadata.get("target_name")
+            for m in result.measurements
+            if m.metadata.get("target_name")
+        }
         assert "IL6" in targets
         assert "TNF" in targets
 
@@ -229,7 +235,11 @@ class TestBioRadCFXParsing:
         ctx = _ctx(FIXTURES / "biorad_cfx.csv")
         result = parser.parse(ctx)
 
-        reporters = {m.metadata.get("reporter_dye") for m in result.measurements if m.metadata.get("reporter_dye")}
+        reporters = {
+            m.metadata.get("reporter_dye")
+            for m in result.measurements
+            if m.metadata.get("reporter_dye")
+        }
         assert "SYBR" in reporters
 
     def test_warnings_for_high_ct(self, parser: PCRParser):

@@ -127,7 +127,7 @@ def error_response(
     Returns:
         JSONResponse containing an Envelope with the error details.
     """
-    envelope = Envelope(
+    envelope: Envelope[None] = Envelope(
         data=None,
         errors=[
             ErrorDetail(
