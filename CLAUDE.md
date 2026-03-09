@@ -121,7 +121,7 @@ Every endpoint returns:
 - `make format` — Auto-format with ruff
 
 ## Key References
-- `plans/lablink-product-roadmap.md` — Full 2-year roadmap + MVP spec
+- `docs/product-specs/lablink-product-roadmap.md` — Full 2-year roadmap + MVP spec
 - `RESEARCH/` — Market analysis, competitive landscape, agent-native API design, SDL trends
 
 ## Module Guides

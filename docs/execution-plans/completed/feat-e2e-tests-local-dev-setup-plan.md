@@ -1,7 +1,7 @@
 ---
 title: "feat: E2E Test Suite + Local-First Development Setup"
 type: feat
-status: active
+status: completed
 date: 2026-03-09
 deepened: 2026-03-09
 ---

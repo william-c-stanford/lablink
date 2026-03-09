@@ -1,5 +1,24 @@
 # Documentation Gardening Log
 
+## 2026-03-09 — Garden Run (11) — todos/ Migration
+
+- **Created:** `docs/execution-plans/active/chore-e2e-ci-reliability-improvements.md` — aggregated todos 001-006, 008 (E2E fixed sleeps, env isolation, port conflicts, PR CI coverage, screenshot naming, Playwright cache)
+- **Created:** `docs/execution-plans/active/chore-mcp-planner-test-coverage.md` — aggregated todo 007 (MCP planner tests exercise wrong module)
+- **Updated:** `docs/PLANS.md` — added both new chore plans to Active section
+- **Deleted:** `todos/` directory (8 files) — all content migrated to execution plans
+
+## 2026-03-09 — Garden Run (10) — Plan Migration
+
+- **Migrated:** `docs/plans/2026-03-09-feat-e2e-tests-local-dev-setup-plan.md` → `docs/execution-plans/completed/feat-e2e-tests-local-dev-setup-plan.md` — moved from non-standard `docs/plans/` to canonical location; updated frontmatter `status: active → completed`
+- **Deleted:** `docs/plans/` directory — now empty after migration
+- **Deleted:** `plans/feat-complete-weeks-5-6-tests-and-ci.md` — forwarding stub, destination already exists in `docs/execution-plans/completed/`
+- **Deleted:** `plans/feat-replace-custom-parsers-with-allotropy.md` — forwarding stub, destination already exists
+- **Deleted:** `plans/lablink-product-roadmap.md` — forwarding stub, destination already exists in `docs/product-specs/`
+- **Deleted:** `plans/` directory — now empty after removing stubs
+- **Updated:** `docs/PLANS.md` — fixed E2E plan link from `plans/2026-03-09-...` to `execution-plans/completed/feat-e2e-tests-local-dev-setup-plan.md`
+- **Updated:** `CLAUDE.md` — corrected Key References: `plans/lablink-product-roadmap.md` → `docs/product-specs/lablink-product-roadmap.md`
+- **Noted:** `decision_history.md` at root — Ouroboros interview artifact, not a plan; flagged for user decision
+
 ## 2026-03-09 — Garden Run (9)
 
 - **Skipped:** all candidates — only doc-only commits since run 8 (PLANS.md catalogue entry, gardening log); no source changes
