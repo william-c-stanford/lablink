@@ -1,7 +1,7 @@
 # mcp_server Module Guide
 
 <!-- garden-managed: auto -->
-<!-- last-reviewed: 2026-03-08 -->
+<!-- last-reviewed: 2026-03-09 -->
 
 > Local style guide for the `mcp_server` module (backend/app alternative structure).
 > Claude Code automatically loads this file when it reads files in this directory.
@@ -66,6 +66,7 @@ MCP tools are tested by calling handler functions directly with a mock `MCPConte
 - This is the `backend/app` version. The primary MCP server is `src/lablink/mcp/server.py`.
 - Tool names must be globally unique across toolsets — duplicates cause registration conflicts.
 - FastMCP wraps both sync and async handlers — the `inspect.iscoroutinefunction()` check in `server.py` handles this.
+- **Do not use `from __future__ import annotations` in MCP tool files.** FastMCP calls `pydantic.TypeAdapter` at decoration time to introspect function signatures. PEP 563 lazy annotations turn `dict[str, Any]` into a string `"dict[str, Any]"` that pydantic evaluates — if `Any` (or other names) are not in the resolved namespace, it raises `NameError` at import time. Use concrete Python 3.9+ generics and, for self-referential class return types, use explicit string literals (e.g. `-> "ToolResult"`).
 
 ## Related Docs
 

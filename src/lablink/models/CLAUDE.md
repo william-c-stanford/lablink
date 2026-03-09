@@ -17,6 +17,7 @@ This module is the schema of record. Services read from and write to these model
 - `base.py` — Mixins only: `TimestampMixin` (id + timestamps), `SoftDeleteMixin` (deleted_at), `UpdatedAtMixin`. Also re-exports `Base` from `lablink.database` for convenience.
 - One file per entity (singular snake_case): `organization.py`, `user.py`, `upload.py`, etc.
 - No circular imports — models import from `base.py` and `database.py` only. Cross-model relationships use `relationship()` with string class names where needed.
+- **Cross-model type hints use `TYPE_CHECKING`**: For `Mapped["Foo"]` annotations on relationships, import the referenced class under `if TYPE_CHECKING:` so mypy can resolve it without creating a runtime circular import. SQLAlchemy resolves the string at mapper setup time; mypy needs the `TYPE_CHECKING` import to type-check it.
 
 ## Coding Conventions
 
