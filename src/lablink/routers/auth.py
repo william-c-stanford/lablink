@@ -94,9 +94,7 @@ async def login(
     db: AsyncSession = Depends(get_db),
 ) -> Envelope:
     """Authenticate a user and return JWT tokens."""
-    user, token, expires_in = await authenticate_user(
-        db, email=body.email, password=body.password
-    )
+    user, token, expires_in = await authenticate_user(db, email=body.email, password=body.password)
     return success_response(
         data={
             "user": UserResponse.model_validate(user).model_dump(mode="json"),

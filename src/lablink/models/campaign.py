@@ -36,9 +36,7 @@ class Campaign(Base):
     """
 
     __tablename__ = "campaigns"
-    __table_args__ = (
-        Index("ix_campaigns_org_status", "organization_id", "status"),
-    )
+    __table_args__ = (Index("ix_campaigns_org_status", "organization_id", "status"),)
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -66,7 +64,8 @@ class Campaign(Base):
         index=True,
     )
     optimization_method: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True,
+        String(100),
+        nullable=True,
     )
     created_by: Mapped[Optional[str]] = mapped_column(
         String(36),

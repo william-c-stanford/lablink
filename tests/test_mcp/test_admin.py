@@ -259,7 +259,14 @@ class TestGetSystemHealth:
         """Health check covers all subsystems."""
         result = await get_system_health()
         checks = result["checks"]
-        expected_systems = {"database", "storage", "task_queue", "elasticsearch", "redis", "parsers"}
+        expected_systems = {
+            "database",
+            "storage",
+            "task_queue",
+            "elasticsearch",
+            "redis",
+            "parsers",
+        }
         assert set(checks.keys()) == expected_systems
 
     @pytest.mark.asyncio

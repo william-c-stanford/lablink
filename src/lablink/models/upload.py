@@ -85,7 +85,9 @@ class Upload(Base):
     # File metadata
     filename: Mapped[str] = mapped_column(String(500), nullable=False)
     content_hash: Mapped[str] = mapped_column(
-        String(64), nullable=False, doc="SHA-256 hash for deduplication",
+        String(64),
+        nullable=False,
+        doc="SHA-256 hash for deduplication",
     )
     file_size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     s3_key: Mapped[str] = mapped_column(String(500), nullable=False)
@@ -99,7 +101,8 @@ class Upload(Base):
     )
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     instrument_type_detected: Mapped[Optional[str]] = mapped_column(
-        String(100), nullable=True,
+        String(100),
+        nullable=True,
     )
     parser_used: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
 
@@ -111,10 +114,12 @@ class Upload(Base):
         nullable=False,
     )
     parsed_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
     indexed_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
 
     # -- relationships -------------------------------------------------------
@@ -125,7 +130,4 @@ class Upload(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Upload id={self.id!s:.8} filename={self.filename!r} "
-            f"status={self.status!r}>"
-        )
+        return f"<Upload id={self.id!s:.8} filename={self.filename!r} status={self.status!r}>"

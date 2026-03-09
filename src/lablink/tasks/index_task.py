@@ -48,9 +48,7 @@ async def _index_parsed_data_async(upload_id_str: str) -> dict[str, Any]:
             parsed_records = result.scalars().all()
 
             if not parsed_records:
-                logger.warning(
-                    "No parsed data for upload %s — skipping indexing", upload_id
-                )
+                logger.warning("No parsed data for upload %s — skipping indexing", upload_id)
                 return {
                     "status": "skipped",
                     "detail": "No parsed data found",
@@ -141,9 +139,7 @@ def index_parsed_data(upload_id_str: str) -> dict[str, Any]:
         import concurrent.futures
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            result = pool.submit(
-                asyncio.run, _index_parsed_data_async(upload_id_str)
-            ).result()
+            result = pool.submit(asyncio.run, _index_parsed_data_async(upload_id_str)).result()
         return result
     else:
         return asyncio.run(_index_parsed_data_async(upload_id_str))

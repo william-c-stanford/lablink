@@ -112,9 +112,7 @@ class S3StorageBackend(StorageBackend):
         extra: dict[str, str] = {}
         if content_type:
             extra["ContentType"] = content_type
-        self._client.put_object(
-            Bucket=self._bucket, Key=key, Body=data, **extra
-        )
+        self._client.put_object(Bucket=self._bucket, Key=key, Body=data, **extra)
         return key
 
     async def get(self, key: str) -> bytes:

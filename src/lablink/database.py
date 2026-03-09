@@ -95,9 +95,7 @@ def get_engine(settings: Settings | None = None) -> AsyncEngine:
         )
         # Attach SQLite pragmas if needed
         if settings.is_sqlite:
-            event.listen(
-                _engine.sync_engine, "connect", _enable_sqlite_wal
-            )
+            event.listen(_engine.sync_engine, "connect", _enable_sqlite_wal)
     return _engine
 
 

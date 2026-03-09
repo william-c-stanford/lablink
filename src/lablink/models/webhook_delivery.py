@@ -52,7 +52,8 @@ class WebhookDelivery(Base):
     )
     attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     last_attempt_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
     response_status: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     response_body: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -81,7 +82,4 @@ class WebhookDelivery(Base):
     @property
     def can_retry(self) -> bool:
         """Whether this delivery can be retried."""
-        return (
-            self.status == DeliveryStatus.failed.value
-            and self.attempts < self.MAX_ATTEMPTS
-        )
+        return self.status == DeliveryStatus.failed.value and self.attempts < self.MAX_ATTEMPTS

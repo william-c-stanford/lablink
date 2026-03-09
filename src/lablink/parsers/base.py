@@ -29,7 +29,9 @@ class ParseError(Exception):
     ) -> None:
         self.parser_name = parser_name
         self.message = message
-        self.suggestion = suggestion or "Check file format. Use list_parsers to see supported formats."
+        self.suggestion = (
+            suggestion or "Check file format. Use list_parsers to see supported formats."
+        )
         super().__init__(message)
 
 

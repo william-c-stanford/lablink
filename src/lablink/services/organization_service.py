@@ -62,9 +62,7 @@ async def create_organization(
         DuplicateError: If the slug is already taken.
     """
     # Check slug uniqueness
-    existing = await session.execute(
-        select(Organization).where(Organization.slug == data.slug)
-    )
+    existing = await session.execute(select(Organization).where(Organization.slug == data.slug))
     if existing.scalar_one_or_none() is not None:
         raise DuplicateError(
             message=f"Organization with slug '{data.slug}' already exists",
@@ -93,9 +91,7 @@ async def create_organization(
     return OrganizationRead.model_validate(org)
 
 
-async def get_organization(
-    session: AsyncSession, org_id: uuid.UUID
-) -> OrganizationRead | None:
+async def get_organization(session: AsyncSession, org_id: uuid.UUID) -> OrganizationRead | None:
     """Fetch an organization by ID, returning None if not found or deleted."""
     result = await session.execute(
         select(Organization).where(
@@ -109,9 +105,7 @@ async def get_organization(
     return OrganizationRead.model_validate(org)
 
 
-async def get_organization_by_slug(
-    session: AsyncSession, slug: str
-) -> OrganizationRead | None:
+async def get_organization_by_slug(session: AsyncSession, slug: str) -> OrganizationRead | None:
     """Fetch an organization by slug."""
     result = await session.execute(
         select(Organization).where(
@@ -140,9 +134,7 @@ async def list_organizations(
         Tuple of (organizations, total_count).
     """
     base_query = select(Organization).where(Organization.deleted_at.is_(None))
-    count_query = select(func.count(Organization.id)).where(
-        Organization.deleted_at.is_(None)
-    )
+    count_query = select(func.count(Organization.id)).where(Organization.deleted_at.is_(None))
 
     if user_id is not None:
         base_query = base_query.join(
@@ -157,12 +149,7 @@ async def list_organizations(
 
     # Get page
     offset = (page - 1) * page_size
-    stmt = (
-        base_query
-        .order_by(Organization.created_at.desc())
-        .offset(offset)
-        .limit(page_size)
-    )
+    stmt = base_query.order_by(Organization.created_at.desc()).offset(offset).limit(page_size)
     result = await session.execute(stmt)
     orgs = [OrganizationRead.model_validate(o) for o in result.scalars().all()]
 
@@ -220,9 +207,7 @@ async def update_organization(
     return OrganizationRead.model_validate(org)
 
 
-async def soft_delete_organization(
-    session: AsyncSession, org_id: uuid.UUID
-) -> None:
+async def soft_delete_organization(session: AsyncSession, org_id: uuid.UUID) -> None:
     """Soft-delete an organization (90-day retention before hard delete).
 
     Raises:
@@ -279,9 +264,7 @@ async def add_member(
         )
 
     # Verify user exists
-    user_result = await session.execute(
-        select(User).where(User.id == user_id)
-    )
+    user_result = await session.execute(select(User).where(User.id == user_id))
     user = user_result.scalar_one_or_none()
     if user is None:
         raise NotFoundError(
@@ -305,9 +288,7 @@ async def add_member(
     # Check user limit
     member_count = (
         await session.execute(
-            select(func.count(Membership.id)).where(
-                Membership.organization_id == organization_id
-            )
+            select(func.count(Membership.id)).where(Membership.organization_id == organization_id)
         )
     ).scalar_one()
     if member_count >= org.user_limit:
@@ -399,10 +380,7 @@ async def update_member_role(
         )
 
     # Prevent demoting the last admin
-    if (
-        membership.role == MemberRole.admin.value
-        and new_role != MemberRole.admin.value
-    ):
+    if membership.role == MemberRole.admin.value and new_role != MemberRole.admin.value:
         admin_count = (
             await session.execute(
                 select(func.count(Membership.id)).where(

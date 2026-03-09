@@ -90,10 +90,7 @@ async def list_instruments(
     total = (await db.execute(count_stmt)).scalar_one()
 
     stmt = (
-        base
-        .order_by(Instrument.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
+        base.order_by(Instrument.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
     )
     result = await db.execute(stmt)
     instruments = [InstrumentResponse.model_validate(i) for i in result.scalars().all()]

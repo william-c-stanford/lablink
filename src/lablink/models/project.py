@@ -19,9 +19,7 @@ class Project(Base):
     """
 
     __tablename__ = "projects"
-    __table_args__ = (
-        Index("ix_projects_org_name", "organization_id", "name"),
-    )
+    __table_args__ = (Index("ix_projects_org_name", "organization_id", "name"),)
 
     id: Mapped[str] = mapped_column(
         String(36),

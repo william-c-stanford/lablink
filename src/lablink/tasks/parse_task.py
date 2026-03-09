@@ -163,9 +163,7 @@ def parse_upload_file(upload_id_str: str) -> dict[str, Any]:
         import concurrent.futures
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
-            result = pool.submit(
-                asyncio.run, _parse_upload_async(upload_id_str)
-            ).result()
+            result = pool.submit(asyncio.run, _parse_upload_async(upload_id_str)).result()
         return result
     else:
         return asyncio.run(_parse_upload_async(upload_id_str))

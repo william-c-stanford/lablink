@@ -42,7 +42,9 @@ def test_asm_mapper_returns_parsed_result_from_cfx_asm() -> None:
     data = (FIXTURES / "pcr" / "biorad_cfx.csv").read_bytes()
     asm = allotrope_from_io(io.BytesIO(data), "biorad_cfx.csv", Vendor.CFXMAESTRO)
 
-    result = asm_to_parsed_result(asm, parser_name="pcr", parser_version="1.0.0", instrument_type="pcr")
+    result = asm_to_parsed_result(
+        asm, parser_name="pcr", parser_version="1.0.0", instrument_type="pcr"
+    )
 
     assert isinstance(result, ParsedResult)
     assert result.parser_name == "pcr"

@@ -109,8 +109,10 @@ class TestEnvelope:
 
     def test_single_error_factory(self) -> None:
         env = Envelope.single_error(
-            "not_found", "Not found",
-            suggestion="Check ID", field="id",
+            "not_found",
+            "Not found",
+            suggestion="Check ID",
+            field="id",
         )
         assert env.data is None
         assert len(env.errors) == 1
@@ -163,21 +165,30 @@ class TestUserRegisterRequest:
     def test_password_too_short(self) -> None:
         with pytest.raises(ValidationError):
             UserRegisterRequest(
-                email="a@b.com", password="short",
-                display_name="X", org_name="Lab", org_slug="lab",
+                email="a@b.com",
+                password="short",
+                display_name="X",
+                org_name="Lab",
+                org_slug="lab",
             )
 
     def test_org_slug_pattern(self) -> None:
         # Valid slugs
         UserRegisterRequest(
-            email="a@b.com", password="12345678",
-            display_name="X", org_name="Lab", org_slug="my-lab-123",
+            email="a@b.com",
+            password="12345678",
+            display_name="X",
+            org_name="Lab",
+            org_slug="my-lab-123",
         )
         # Invalid slug (uppercase)
         with pytest.raises(ValidationError):
             UserRegisterRequest(
-                email="a@b.com", password="12345678",
-                display_name="X", org_name="Lab", org_slug="MyLab",
+                email="a@b.com",
+                password="12345678",
+                display_name="X",
+                org_name="Lab",
+                org_slug="MyLab",
             )
 
 
@@ -198,8 +209,12 @@ class TestUserResponse:
     def test_from_dict(self) -> None:
         now = datetime.now(timezone.utc)
         resp = UserResponse(
-            id="u1", email="a@b.com", display_name="A",
-            org_id="o1", is_active=True, is_service_account=False,
+            id="u1",
+            email="a@b.com",
+            display_name="A",
+            org_id="o1",
+            is_active=True,
+            is_service_account=False,
             created_at=now,
         )
         assert resp.last_login_at is None
@@ -243,9 +258,12 @@ class TestAuditEventRead:
     def test_from_dict(self) -> None:
         now = datetime.now(timezone.utc)
         read = AuditEventRead(
-            id="ae1", sequence=1, action="CREATE",
+            id="ae1",
+            sequence=1,
+            action="CREATE",
             resource_type="experiment",
-            actor_id="u1", actor_type="user",
+            actor_id="u1",
+            actor_type="user",
             summary="Created",
             entry_hash="abc123",
             timestamp=now,
@@ -256,9 +274,13 @@ class TestAuditEventRead:
     def test_parsed_metadata(self) -> None:
         now = datetime.now(timezone.utc)
         read = AuditEventRead(
-            id="ae1", sequence=1, action="CREATE",
-            resource_type="test", actor_type="user",
-            summary="test", entry_hash="h",
+            id="ae1",
+            sequence=1,
+            action="CREATE",
+            resource_type="test",
+            actor_type="user",
+            summary="test",
+            entry_hash="h",
             metadata_json='{"key": "value"}',
             timestamp=now,
         )
@@ -267,9 +289,14 @@ class TestAuditEventRead:
     def test_parsed_metadata_none(self) -> None:
         now = datetime.now(timezone.utc)
         read = AuditEventRead(
-            id="ae1", sequence=1, action="CREATE",
-            resource_type="test", actor_type="user",
-            summary="test", entry_hash="h", timestamp=now,
+            id="ae1",
+            sequence=1,
+            action="CREATE",
+            resource_type="test",
+            actor_type="user",
+            summary="test",
+            entry_hash="h",
+            timestamp=now,
         )
         assert read.parsed_metadata is None
 
@@ -277,7 +304,9 @@ class TestAuditEventRead:
 class TestAuditChainVerification:
     def test_valid_chain(self) -> None:
         v = AuditChainVerification(
-            valid=True, total_entries=10, invalid_entries=0,
+            valid=True,
+            total_entries=10,
+            invalid_entries=0,
             checked_range=[1, 10],
         )
         assert v.suggestion is None
@@ -285,7 +314,9 @@ class TestAuditChainVerification:
 
     def test_broken_chain(self) -> None:
         v = AuditChainVerification(
-            valid=False, total_entries=10, invalid_entries=1,
+            valid=False,
+            total_entries=10,
+            invalid_entries=1,
             first_invalid_sequence=5,
             checked_range=[1, 10],
             suggestion="Chain broken at seq 5",
@@ -373,22 +404,26 @@ class TestExperimentRead:
     def test_from_dict(self) -> None:
         now = datetime.now(timezone.utc)
         er = ExperimentRead(
-            id="exp-1", org_id="o1", name="Exp",
+            id="exp-1",
+            org_id="o1",
+            name="Exp",
             status=ExperimentStatus.DRAFT,
-            created_at=now, updated_at=now,
+            created_at=now,
+            updated_at=now,
         )
         assert er.status == ExperimentStatus.DRAFT
         assert er.is_terminal is False
-        assert ExperimentStatus.RUNNING in [
-            ExperimentStatus(v) for v in er.valid_transitions
-        ]
+        assert ExperimentStatus.RUNNING in [ExperimentStatus(v) for v in er.valid_transitions]
 
     def test_terminal_state_no_transitions(self) -> None:
         now = datetime.now(timezone.utc)
         er = ExperimentRead(
-            id="exp-1", org_id="o1", name="Exp",
+            id="exp-1",
+            org_id="o1",
+            name="Exp",
             status=ExperimentStatus.COMPLETED,
-            created_at=now, updated_at=now,
+            created_at=now,
+            updated_at=now,
         )
         assert er.is_terminal is True
         assert er.valid_transitions == []
@@ -397,8 +432,12 @@ class TestExperimentRead:
         """Validate the model_validator handles parameters_json -> parameters."""
         now = datetime.now(timezone.utc)
         data = {
-            "id": "exp-1", "org_id": "o1", "name": "Exp",
-            "status": "draft", "created_at": now, "updated_at": now,
+            "id": "exp-1",
+            "org_id": "o1",
+            "name": "Exp",
+            "status": "draft",
+            "created_at": now,
+            "updated_at": now,
             "parameters_json": '{"temp": 37}',
             "outcome_json": '{"result": "pass"}',
         }
@@ -470,14 +509,20 @@ class TestExperimentListResponse:
         now = datetime.now(timezone.utc)
         items = [
             ExperimentRead(
-                id=f"exp-{i}", org_id="o1", name=f"Exp {i}",
+                id=f"exp-{i}",
+                org_id="o1",
+                name=f"Exp {i}",
                 status=ExperimentStatus.DRAFT,
-                created_at=now, updated_at=now,
+                created_at=now,
+                updated_at=now,
             )
             for i in range(3)
         ]
         resp = ExperimentListResponse(
-            items=items, total=100, page=1, page_size=20,
+            items=items,
+            total=100,
+            page=1,
+            page_size=20,
         )
         assert len(resp.items) == 3
         assert resp.total == 100
@@ -527,8 +572,10 @@ class TestFileUploadResponse:
 class TestQualityFlag:
     def test_all_values(self) -> None:
         assert set(QualityFlag) == {
-            QualityFlag.GOOD, QualityFlag.SUSPECT,
-            QualityFlag.BAD, QualityFlag.MISSING,
+            QualityFlag.GOOD,
+            QualityFlag.SUSPECT,
+            QualityFlag.BAD,
+            QualityFlag.MISSING,
         }
 
     def test_is_str(self) -> None:
@@ -545,8 +592,11 @@ class TestMeasurementValue:
 
     def test_with_all_fields(self) -> None:
         mv = MeasurementValue(
-            name="ct_value", value=25.3, unit="cycles",
-            sample_id="S001", well_position="A1",
+            name="ct_value",
+            value=25.3,
+            unit="cycles",
+            sample_id="S001",
+            well_position="A1",
             cycle_number=35,
             quality=QualityFlag.SUSPECT,
             metadata={"threshold": 0.1},
@@ -593,12 +643,18 @@ class TestParsedResult:
     def test_with_measurements(self) -> None:
         measurements = [
             MeasurementValue(
-                name="absorbance", value=0.5, unit="AU",
-                sample_id="S1", wavelength_nm=280.0,
+                name="absorbance",
+                value=0.5,
+                unit="AU",
+                sample_id="S1",
+                wavelength_nm=280.0,
             ),
             MeasurementValue(
-                name="absorbance", value=0.7, unit="AU",
-                sample_id="S2", wavelength_nm=280.0,
+                name="absorbance",
+                value=0.7,
+                unit="AU",
+                sample_id="S2",
+                wavelength_nm=280.0,
             ),
         ]
         pr = ParsedResult(
@@ -649,7 +705,9 @@ class TestParsedResult:
             file_name="amplification.csv",
             measurements=[
                 MeasurementValue(
-                    name="ct_value", value=25.0, unit="cycles",
+                    name="ct_value",
+                    value=25.0,
+                    unit="cycles",
                     sample_id="S1",
                 ),
             ],

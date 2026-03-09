@@ -37,6 +37,7 @@ from app.services.audit import (
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def test_settings() -> Settings:
     return Settings(
@@ -63,7 +64,9 @@ async def engine(test_settings):
 @pytest_asyncio.fixture
 async def session(engine):
     factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False,
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
     async with factory() as sess:
         yield sess
@@ -74,7 +77,9 @@ async def app(test_settings, engine):
     application = create_app(settings=test_settings)
 
     factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False,
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
 
     async def override_session():
@@ -101,6 +106,7 @@ async def client(app):
 # ---------------------------------------------------------------------------
 # Schema tests
 # ---------------------------------------------------------------------------
+
 
 class TestAuditEventCreateSchema:
     """Tests for AuditEventCreate Pydantic schema."""
@@ -242,6 +248,7 @@ class TestAuditChainVerificationSchema:
 # Service tests
 # ---------------------------------------------------------------------------
 
+
 class TestAuditService:
     """Tests for the audit service layer."""
 
@@ -310,13 +317,17 @@ class TestAuditService:
         await session.commit()
 
         events, total = await list_audit_events(
-            session, page=1, page_size=3,
+            session,
+            page=1,
+            page_size=3,
         )
         assert total == 5
         assert len(events) == 3
 
         events2, _ = await list_audit_events(
-            session, page=2, page_size=3,
+            session,
+            page=2,
+            page_size=3,
         )
         assert len(events2) == 2
 
@@ -338,7 +349,8 @@ class TestAuditService:
         await session.commit()
 
         events, total = await list_audit_events(
-            session, resource_type="file",
+            session,
+            resource_type="file",
         )
         assert total == 1
         assert events[0].resource_type == "file"
@@ -361,7 +373,8 @@ class TestAuditService:
         await session.commit()
 
         events, total = await list_audit_events(
-            session, action="DELETE",
+            session,
+            action="DELETE",
         )
         assert total == 1
         assert events[0].action == "DELETE"
@@ -463,7 +476,9 @@ class TestAuditService:
         await session.commit()
 
         result = await verify_audit_chain(
-            session, start_sequence=2, end_sequence=4,
+            session,
+            start_sequence=2,
+            end_sequence=4,
         )
         assert result.total_entries == 3
         assert result.checked_range == [2, 4]
@@ -489,6 +504,7 @@ class TestAuditService:
 # ---------------------------------------------------------------------------
 # API endpoint tests
 # ---------------------------------------------------------------------------
+
 
 class TestAuditEndpoints:
     """Tests for audit API endpoints."""

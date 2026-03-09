@@ -27,6 +27,7 @@ from app.services.experiment import (
 # Helper to seed an org (required FK for experiments)
 # ---------------------------------------------------------------------------
 
+
 async def _seed_org(session: AsyncSession, org_id: str = "org-1") -> Organization:
     org = Organization(id=org_id, name="Test Lab", slug=f"test-lab-{org_id}")
     session.add(org)
@@ -43,7 +44,9 @@ class TestCreateExperiment:
     async def test_creates_in_draft(self, session: AsyncSession) -> None:
         await _seed_org(session)
         exp = await create_experiment(
-            session, org_id="org-1", name="My Experiment",
+            session,
+            org_id="org-1",
+            name="My Experiment",
         )
         assert exp.id is not None
         assert exp.status == ExperimentStatus.DRAFT.value
@@ -153,7 +156,8 @@ class TestListExperiments:
         await transition_experiment(session, exp2.id, ExperimentStatus.RUNNING)
 
         drafts, total = await list_experiments(
-            session, status=ExperimentStatus.DRAFT,
+            session,
+            status=ExperimentStatus.DRAFT,
         )
         assert total == 1
         assert drafts[0].name == "Draft"
@@ -221,7 +225,8 @@ class TestUpdateExperiment:
         await _seed_org(session)
         exp = await create_experiment(session, org_id="org-1", name="Exp")
         updated = await update_experiment(
-            session, exp.id,
+            session,
+            exp.id,
             name="Updated",
             description="New description",
             hypothesis="New hypothesis",
@@ -242,7 +247,10 @@ class TestUpdateExperiment:
 
         with pytest.raises(ValidationError) as exc_info:
             await update_experiment(session, exp.id, name="Can't change")
-        assert "terminal" in exc_info.value.message.lower() or "completed" in exc_info.value.message.lower()
+        assert (
+            "terminal" in exc_info.value.message.lower()
+            or "completed" in exc_info.value.message.lower()
+        )
         assert exc_info.value.suggestion is not None
 
     async def test_update_ignores_non_updatable_fields(self, session: AsyncSession) -> None:
@@ -286,7 +294,9 @@ class TestSoftDeleteExperiment:
         """Soft delete should NOT erase the record's data."""
         await _seed_org(session)
         exp = await create_experiment(
-            session, org_id="org-1", name="Preserved",
+            session,
+            org_id="org-1",
+            name="Preserved",
             description="Important data",
         )
         await soft_delete_experiment(session, exp.id)
@@ -314,7 +324,9 @@ class TestTransitionExperiment:
         exp = await create_experiment(session, org_id="org-1", name="Exp")
         await transition_experiment(session, exp.id, ExperimentStatus.RUNNING)
         updated = await transition_experiment(
-            session, exp.id, ExperimentStatus.COMPLETED,
+            session,
+            exp.id,
+            ExperimentStatus.COMPLETED,
             outcome_summary="Success",
             success=True,
         )
@@ -328,7 +340,9 @@ class TestTransitionExperiment:
         exp = await create_experiment(session, org_id="org-1", name="Exp")
         await transition_experiment(session, exp.id, ExperimentStatus.RUNNING)
         updated = await transition_experiment(
-            session, exp.id, ExperimentStatus.FAILED,
+            session,
+            exp.id,
+            ExperimentStatus.FAILED,
             outcome_summary="Equipment malfunction",
             success=False,
         )
@@ -383,7 +397,9 @@ class TestTransitionExperiment:
         await transition_experiment(session, exp.id, ExperimentStatus.RUNNING)
         outcome = json.dumps({"yield_pct": 95.2})
         updated = await transition_experiment(
-            session, exp.id, ExperimentStatus.COMPLETED,
+            session,
+            exp.id,
+            ExperimentStatus.COMPLETED,
             outcome_json=outcome,
         )
         assert json.loads(updated.outcome_json) == {"yield_pct": 95.2}

@@ -52,8 +52,7 @@ class OrganizationCreate(BaseModel):
         v = v.strip().lower()
         if not _SLUG_RE.match(v):
             raise ValueError(
-                "Slug must be lowercase alphanumeric with hyphens only "
-                "(e.g. 'acme-labs')"
+                "Slug must be lowercase alphanumeric with hyphens only (e.g. 'acme-labs')"
             )
         return v
 

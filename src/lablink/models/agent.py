@@ -22,9 +22,7 @@ class Agent(Base):
     """
 
     __tablename__ = "agents"
-    __table_args__ = (
-        Index("ix_agents_org_status", "organization_id", "status"),
-    )
+    __table_args__ = (Index("ix_agents_org_status", "organization_id", "status"),)
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -40,17 +38,23 @@ class Agent(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     api_key_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     platform: Mapped[Optional[str]] = mapped_column(
-        String(20), nullable=True,
+        String(20),
+        nullable=True,
     )  # windows, macos, linux
     version: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     last_heartbeat_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True,
+        DateTime(timezone=True),
+        nullable=True,
     )
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="active",
+        String(20),
+        nullable=False,
+        default="active",
     )
     config: Mapped[Optional[dict]] = mapped_column(
-        JSON, default=dict, nullable=True,
+        JSON,
+        default=dict,
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

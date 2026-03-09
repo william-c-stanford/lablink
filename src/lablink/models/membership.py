@@ -30,7 +30,9 @@ class Membership(Base):
     __tablename__ = "memberships"
     __table_args__ = (
         UniqueConstraint(
-            "user_id", "organization_id", name="uq_membership_user_org",
+            "user_id",
+            "organization_id",
+            name="uq_membership_user_org",
         ),
     )
 
@@ -67,7 +69,8 @@ class Membership(Base):
     # -- relationships -------------------------------------------------------
     user: Mapped["User"] = relationship("User", back_populates="memberships")  # noqa: F821
     organization: Mapped["Organization"] = relationship(  # noqa: F821
-        "Organization", back_populates="memberships",
+        "Organization",
+        back_populates="memberships",
     )
 
     def __repr__(self) -> str:

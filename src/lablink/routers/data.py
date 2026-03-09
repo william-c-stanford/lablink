@@ -54,7 +54,9 @@ class ExportCreateRequest(BaseModel):
 
     format: str = Field(..., description="Export format: csv, json, xlsx, pdf")
     upload_ids: list[str] = Field(default_factory=list, description="Specific upload IDs to export")
-    filters: dict[str, Any] = Field(default_factory=dict, description="Filter criteria for the export")
+    filters: dict[str, Any] = Field(
+        default_factory=dict, description="Filter criteria for the export"
+    )
 
 
 class ParsedDataResponse(BaseModel):
@@ -193,13 +195,15 @@ async def get_chart_data(
                 y_vals.append(measurement.get("value", 0))
                 labels.append(measurement.get("measurement_type", ""))
 
-        traces.append({
-            "x": x_vals,
-            "y": y_vals,
-            "type": "scatter",
-            "mode": "lines+markers",
-            "name": parsed.measurement_type or parsed.instrument_type,
-        })
+        traces.append(
+            {
+                "x": x_vals,
+                "y": y_vals,
+                "type": "scatter",
+                "mode": "lines+markers",
+                "name": parsed.measurement_type or parsed.instrument_type,
+            }
+        )
 
     layout = {
         "title": f"{upload.filename} - {parsed_list[0].instrument_type}",

@@ -29,6 +29,7 @@ try:
     from allotropy.parser_factory import Vendor as _Vendor
     from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
     from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+
     _ALLOTROPY_AVAILABLE = True
 except ImportError:
     _ALLOTROPY_AVAILABLE = False
@@ -259,7 +260,9 @@ class PCRParser(BaseParser):
 
         # Build instrument settings
         cycle_count_str = instrument_meta.get("Cycle Count", instrument_meta.get("cycle_count"))
-        cycle_count = int(cycle_count_str) if cycle_count_str and cycle_count_str.isdigit() else None
+        cycle_count = (
+            int(cycle_count_str) if cycle_count_str and cycle_count_str.isdigit() else None
+        )
 
         settings = InstrumentSettings(
             method_name=instrument_meta.get("Experiment Name", "QuantStudio qPCR"),

@@ -17,9 +17,7 @@ class ExperimentPredecessor(Base):
 
     __tablename__ = "experiment_predecessors"
     __table_args__ = (
-        UniqueConstraint(
-            "experiment_id", "predecessor_id", name="uq_experiment_predecessor"
-        ),
+        UniqueConstraint("experiment_id", "predecessor_id", name="uq_experiment_predecessor"),
     )
 
     experiment_id: Mapped[str] = mapped_column(

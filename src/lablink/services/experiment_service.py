@@ -219,10 +219,7 @@ async def list_experiments(
 
     # Data query
     data_stmt = (
-        select(Experiment)
-        .order_by(Experiment.created_at.desc())
-        .offset(offset)
-        .limit(page_size)
+        select(Experiment).order_by(Experiment.created_at.desc()).offset(offset).limit(page_size)
     )
     for cond in conditions:
         data_stmt = data_stmt.where(cond)
@@ -254,9 +251,7 @@ async def update_experiment(
         NotFoundError: If the experiment does not exist.
         ValidationError: If the experiment is in a terminal state.
     """
-    experiment = await get_experiment(
-        session, experiment_id, organization_id=organization_id
-    )
+    experiment = await get_experiment(session, experiment_id, organization_id=organization_id)
 
     # Block updates on terminal experiments
     current_status = ExperimentStatus(experiment.status)
@@ -350,9 +345,7 @@ async def transition_experiment(
         NotFoundError: If the experiment does not exist.
         StateTransitionError: If the transition is invalid.
     """
-    experiment = await get_experiment(
-        session, experiment_id, organization_id=organization_id
-    )
+    experiment = await get_experiment(session, experiment_id, organization_id=organization_id)
 
     current_status = ExperimentStatus(experiment.status)
 
@@ -374,10 +367,7 @@ async def transition_experiment(
     if new_status not in valid:
         valid_names = sorted(s.value for s in valid)
         raise StateTransitionError(
-            message=(
-                f"Cannot transition from '{current_status.value}' to "
-                f"'{new_status.value}'."
-            ),
+            message=(f"Cannot transition from '{current_status.value}' to '{new_status.value}'."),
             suggestion=(
                 f"Valid transitions from '{current_status.value}': "
                 f"{valid_names}. Use one of these statuses."
@@ -447,10 +437,7 @@ async def link_upload(
     existing = (await session.execute(stmt)).scalar_one_or_none()
     if existing is not None:
         raise ValidationError(
-            message=(
-                f"Upload '{upload_id}' is already linked to "
-                f"experiment '{experiment_id}'."
-            ),
+            message=(f"Upload '{upload_id}' is already linked to experiment '{experiment_id}'."),
             suggestion="Use unlink_upload to remove the existing link first.",
         )
 
@@ -482,10 +469,7 @@ async def unlink_upload(
     link = (await session.execute(stmt)).scalar_one_or_none()
     if link is None:
         raise NotFoundError(
-            message=(
-                f"No link between upload '{upload_id}' and "
-                f"experiment '{experiment_id}'."
-            ),
+            message=(f"No link between upload '{upload_id}' and experiment '{experiment_id}'."),
             suggestion="Use get_experiment to see current upload links.",
         )
 
@@ -528,8 +512,7 @@ async def add_predecessor(
     if existing is not None:
         raise ValidationError(
             message=(
-                f"Experiment '{predecessor_id}' is already a predecessor "
-                f"of '{experiment_id}'."
+                f"Experiment '{predecessor_id}' is already a predecessor of '{experiment_id}'."
             ),
             suggestion="Use the experiment DAG endpoint to view existing links.",
         )

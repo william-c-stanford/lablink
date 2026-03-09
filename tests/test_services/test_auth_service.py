@@ -48,7 +48,9 @@ class TestPasswordHashing:
 class TestTokenCreation:
     def test_create_and_decode(self, test_settings: Settings) -> None:
         token, expires_in = create_access_token(
-            user_id="user-1", email="a@b.com", org_id="org-1",
+            user_id="user-1",
+            email="a@b.com",
+            org_id="org-1",
             settings=test_settings,
         )
         assert isinstance(token, str)
@@ -65,7 +67,9 @@ class TestTokenCreation:
 
     def test_expires_in_matches_settings(self, test_settings: Settings) -> None:
         _, expires_in = create_access_token(
-            user_id="u1", email="a@b.com", org_id="o1",
+            user_id="u1",
+            email="a@b.com",
+            org_id="o1",
             settings=test_settings,
         )
         assert expires_in == test_settings.jwt_expire_minutes * 60
@@ -78,7 +82,9 @@ class TestTokenCreation:
 
 class TestRegisterUser:
     async def test_register_creates_user_org_role(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, org, token, expires_in = await register_user(
             session,
@@ -104,18 +110,23 @@ class TestRegisterUser:
         # Verify role was created
         from sqlalchemy import select
         from app.models.identity import Role
+
         stmt = select(Role).where(Role.user_id == user.id)
         result = await session.execute(stmt)
         role = result.scalar_one()
         assert role.role_name == RoleName.owner.value
 
     async def test_register_duplicate_email_raises(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         await register_user(
             session,
-            email="dup@lab.com", password="password123",
-            display_name="User 1", org_name="Lab 1",
+            email="dup@lab.com",
+            password="password123",
+            display_name="User 1",
+            org_name="Lab 1",
             settings=test_settings,
         )
         await session.flush()
@@ -123,19 +134,25 @@ class TestRegisterUser:
         with pytest.raises(ConflictError) as exc_info:
             await register_user(
                 session,
-                email="dup@lab.com", password="password456",
-                display_name="User 2", org_name="Lab 2",
+                email="dup@lab.com",
+                password="password456",
+                display_name="User 2",
+                org_name="Lab 2",
                 settings=test_settings,
             )
         assert "already exists" in exc_info.value.message
 
     async def test_register_auto_generates_slug(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, org, _, _ = await register_user(
             session,
-            email="auto@lab.com", password="password123",
-            display_name="Auto User", org_name="Auto Lab",
+            email="auto@lab.com",
+            password="password123",
+            display_name="Auto User",
+            org_name="Auto Lab",
             settings=test_settings,
         )
         assert org.slug.startswith("org-")
@@ -148,18 +165,24 @@ class TestRegisterUser:
 
 class TestAuthenticateUser:
     async def test_authenticate_success(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         await register_user(
             session,
-            email="auth@lab.com", password="correct-password",
-            display_name="Auth User", org_name="Auth Lab",
+            email="auth@lab.com",
+            password="correct-password",
+            display_name="Auth User",
+            org_name="Auth Lab",
             settings=test_settings,
         )
         await session.flush()
 
         user, token, expires_in = await authenticate_user(
-            session, email="auth@lab.com", password="correct-password",
+            session,
+            email="auth@lab.com",
+            password="correct-password",
             settings=test_settings,
         )
         assert user.email == "auth@lab.com"
@@ -167,39 +190,53 @@ class TestAuthenticateUser:
         assert isinstance(token, str)
 
     async def test_authenticate_wrong_password(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         await register_user(
             session,
-            email="wrong@lab.com", password="correct-password",
-            display_name="Wrong User", org_name="Lab",
+            email="wrong@lab.com",
+            password="correct-password",
+            display_name="Wrong User",
+            org_name="Lab",
             settings=test_settings,
         )
         await session.flush()
 
         with pytest.raises(AuthenticationError) as exc_info:
             await authenticate_user(
-                session, email="wrong@lab.com", password="wrong-password",
+                session,
+                email="wrong@lab.com",
+                password="wrong-password",
                 settings=test_settings,
             )
         assert exc_info.value.suggestion is not None
 
     async def test_authenticate_nonexistent_email(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         with pytest.raises(AuthenticationError):
             await authenticate_user(
-                session, email="nobody@lab.com", password="anything",
+                session,
+                email="nobody@lab.com",
+                password="anything",
                 settings=test_settings,
             )
 
     async def test_authenticate_inactive_user(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, _, _, _ = await register_user(
             session,
-            email="inactive@lab.com", password="password123",
-            display_name="Inactive", org_name="Lab",
+            email="inactive@lab.com",
+            password="password123",
+            display_name="Inactive",
+            org_name="Lab",
             settings=test_settings,
         )
         user.is_active = False
@@ -207,13 +244,17 @@ class TestAuthenticateUser:
 
         with pytest.raises(AuthenticationError) as exc_info:
             await authenticate_user(
-                session, email="inactive@lab.com", password="password123",
+                session,
+                email="inactive@lab.com",
+                password="password123",
                 settings=test_settings,
             )
         assert "disabled" in exc_info.value.message.lower()
 
     async def test_authenticate_sso_user_no_password(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         """User with hashed_password=None (SSO) cannot use password login."""
         # Create user directly without password
@@ -222,7 +263,8 @@ class TestAuthenticateUser:
         await session.flush()
 
         user = User(
-            org_id="o1", email="sso@lab.com",
+            org_id="o1",
+            email="sso@lab.com",
             display_name="SSO User",
             hashed_password=None,
         )
@@ -231,7 +273,9 @@ class TestAuthenticateUser:
 
         with pytest.raises(AuthenticationError) as exc_info:
             await authenticate_user(
-                session, email="sso@lab.com", password="any",
+                session,
+                email="sso@lab.com",
+                password="any",
                 settings=test_settings,
             )
         assert "sso" in exc_info.value.message.lower()
@@ -244,18 +288,24 @@ class TestAuthenticateUser:
 
 class TestLoginUser:
     async def test_login_returns_schemas(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         await register_user(
             session,
-            email="login@lab.com", password="password123",
-            display_name="Login User", org_name="Lab",
+            email="login@lab.com",
+            password="password123",
+            display_name="Login User",
+            org_name="Lab",
             settings=test_settings,
         )
         await session.flush()
 
         user_resp, token_resp = await login_user(
-            session, email="login@lab.com", password="password123",
+            session,
+            email="login@lab.com",
+            password="password123",
             settings=test_settings,
         )
         assert user_resp.email == "login@lab.com"
@@ -270,12 +320,16 @@ class TestLoginUser:
 
 class TestGetUserById:
     async def test_found(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, _, _, _ = await register_user(
             session,
-            email="find@lab.com", password="password123",
-            display_name="Find Me", org_name="Lab",
+            email="find@lab.com",
+            password="password123",
+            display_name="Find Me",
+            org_name="Lab",
             settings=test_settings,
         )
         await session.flush()
@@ -296,38 +350,53 @@ class TestGetUserById:
 
 class TestGetCurrentUserFromToken:
     async def test_valid_token_returns_user(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, _, token, _ = await register_user(
             session,
-            email="current@lab.com", password="password123",
-            display_name="Current User", org_name="Lab",
+            email="current@lab.com",
+            password="password123",
+            display_name="Current User",
+            org_name="Lab",
             settings=test_settings,
         )
         await session.flush()
 
         result = await get_current_user_from_token(
-            session, token, settings=test_settings,
+            session,
+            token,
+            settings=test_settings,
         )
         assert result.email == "current@lab.com"
         assert result.id == user.id
 
     async def test_invalid_token_raises(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         with pytest.raises(AuthenticationError):
             await get_current_user_from_token(
-                session, "bad.token.here", settings=test_settings,
+                session,
+                "bad.token.here",
+                settings=test_settings,
             )
 
     async def test_deleted_user_raises(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         from datetime import datetime, timezone
+
         user, _, token, _ = await register_user(
             session,
-            email="deleted@lab.com", password="password123",
-            display_name="Deleted", org_name="Lab",
+            email="deleted@lab.com",
+            password="password123",
+            display_name="Deleted",
+            org_name="Lab",
             settings=test_settings,
         )
         user.deleted_at = datetime.now(timezone.utc)
@@ -335,17 +404,23 @@ class TestGetCurrentUserFromToken:
 
         with pytest.raises(AuthenticationError) as exc_info:
             await get_current_user_from_token(
-                session, token, settings=test_settings,
+                session,
+                token,
+                settings=test_settings,
             )
         assert "deleted" in exc_info.value.message.lower()
 
     async def test_inactive_user_raises(
-        self, session: AsyncSession, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        test_settings: Settings,
     ) -> None:
         user, _, token, _ = await register_user(
             session,
-            email="disabled@lab.com", password="password123",
-            display_name="Disabled", org_name="Lab",
+            email="disabled@lab.com",
+            password="password123",
+            display_name="Disabled",
+            org_name="Lab",
             settings=test_settings,
         )
         user.is_active = False
@@ -353,6 +428,8 @@ class TestGetCurrentUserFromToken:
 
         with pytest.raises(AuthenticationError) as exc_info:
             await get_current_user_from_token(
-                session, token, settings=test_settings,
+                session,
+                token,
+                settings=test_settings,
             )
         assert "disabled" in exc_info.value.message.lower()

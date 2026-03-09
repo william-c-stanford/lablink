@@ -27,6 +27,7 @@ try:
     from allotropy.parser_factory import Vendor as _Vendor
     from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
     from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+
     _ALLOTROPY_AVAILABLE = True
 except ImportError:
     _ALLOTROPY_AVAILABLE = False
@@ -115,6 +116,7 @@ class SpectrophotometerParser(BaseParser):
             return None
         try:
             import io as _io
+
             vendor = getattr(_Vendor, vendor_name)
             asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
             return _asm_to_parsed_result(
@@ -138,9 +140,7 @@ class SpectrophotometerParser(BaseParser):
             return ";"
         return ","
 
-    def _parse_nanodrop(
-        self, text: str, delimiter: str, metadata: dict
-    ) -> ParsedResult:
+    def _parse_nanodrop(self, text: str, delimiter: str, metadata: dict) -> ParsedResult:
         """Parse NanoDrop-style tabular CSV."""
         reader = csv.DictReader(io.StringIO(text), delimiter=delimiter)
         headers = reader.fieldnames
@@ -169,7 +169,11 @@ class SpectrophotometerParser(BaseParser):
         row_count = 0
         for row_idx, row in enumerate(reader):
             try:
-                sample_name = row.get(sample_col, f"Sample_{row_idx + 1}") if sample_col else f"Sample_{row_idx + 1}"
+                sample_name = (
+                    row.get(sample_col, f"Sample_{row_idx + 1}")
+                    if sample_col
+                    else f"Sample_{row_idx + 1}"
+                )
                 sample_name = sample_name.strip() if sample_name else f"Sample_{row_idx + 1}"
                 sample_names.add(sample_name)
 
@@ -270,9 +274,7 @@ class SpectrophotometerParser(BaseParser):
             warnings=warnings,
         )
 
-    def _parse_cary(
-        self, text: str, delimiter: str, metadata: dict
-    ) -> ParsedResult:
+    def _parse_cary(self, text: str, delimiter: str, metadata: dict) -> ParsedResult:
         """Parse Cary UV-Vis wavelength scan CSV."""
         reader = csv.reader(io.StringIO(text), delimiter=delimiter)
         rows = list(reader)
@@ -386,9 +388,7 @@ class SpectrophotometerParser(BaseParser):
             warnings=warnings,
         )
 
-    def _parse_generic(
-        self, text: str, delimiter: str, metadata: dict
-    ) -> ParsedResult:
+    def _parse_generic(self, text: str, delimiter: str, metadata: dict) -> ParsedResult:
         """Parse generic spectrophotometer CSV with best-effort column detection."""
         try:
             reader = csv.reader(io.StringIO(text), delimiter=delimiter)

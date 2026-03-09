@@ -93,12 +93,7 @@ async def list_agents(
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await db.execute(count_stmt)).scalar_one()
 
-    stmt = (
-        base
-        .order_by(Agent.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-    )
+    stmt = base.order_by(Agent.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(stmt)
     agents = [AgentResponse.model_validate(a) for a in result.scalars().all()]
 

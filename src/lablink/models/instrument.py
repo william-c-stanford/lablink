@@ -23,9 +23,7 @@ class Instrument(Base):
     """
 
     __tablename__ = "instruments"
-    __table_args__ = (
-        Index("ix_instruments_org_type", "organization_id", "instrument_type"),
-    )
+    __table_args__ = (Index("ix_instruments_org_type", "organization_id", "instrument_type"),)
 
     id: Mapped[str] = mapped_column(
         String(36),
@@ -51,7 +49,10 @@ class Instrument(Base):
         index=True,
     )
     metadata_: Mapped[Optional[dict]] = mapped_column(
-        "metadata", JSON, default=dict, nullable=True,
+        "metadata",
+        JSON,
+        default=dict,
+        nullable=True,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

@@ -35,15 +35,19 @@ class Webhook(Base):
     )
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
     secret: Mapped[str] = mapped_column(
-        String(255), nullable=False,
+        String(255),
+        nullable=False,
         doc="HMAC-SHA256 signing secret",
     )
     events: Mapped[list[str]] = mapped_column(
-        JSON, nullable=False,
+        JSON,
+        nullable=False,
         doc='Event types, e.g. ["upload.completed", "parsing.completed"]',
     )
     is_active: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, default=True,
+        Boolean,
+        nullable=False,
+        default=True,
     )
     created_by: Mapped[str] = mapped_column(
         String(36),

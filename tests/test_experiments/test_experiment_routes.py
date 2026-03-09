@@ -21,6 +21,7 @@ from httpx import AsyncClient
 # Helper
 # ---------------------------------------------------------------------------
 
+
 async def _create_experiment(client: AsyncClient, **overrides) -> dict:
     """Helper to create an experiment and return the response data."""
     payload = {
@@ -46,6 +47,7 @@ async def _transition(client: AsyncClient, exp_id: str, target: str, **kwargs) -
 # ---------------------------------------------------------------------------
 # POST /experiments — Create
 # ---------------------------------------------------------------------------
+
 
 class TestCreateRoutes:
     @pytest.mark.asyncio
@@ -105,6 +107,7 @@ class TestCreateRoutes:
 # ---------------------------------------------------------------------------
 # GET /experiments — List
 # ---------------------------------------------------------------------------
+
 
 class TestListRoutes:
     @pytest.mark.asyncio
@@ -168,6 +171,7 @@ class TestListRoutes:
 # GET /experiments/{id} — Get single
 # ---------------------------------------------------------------------------
 
+
 class TestGetRoutes:
     @pytest.mark.asyncio
     async def test_get_success(self, client: AsyncClient):
@@ -207,6 +211,7 @@ class TestGetRoutes:
 # ---------------------------------------------------------------------------
 # PATCH /experiments/{id} — Update
 # ---------------------------------------------------------------------------
+
 
 class TestUpdateRoutes:
     @pytest.mark.asyncio
@@ -251,8 +256,11 @@ class TestUpdateRoutes:
         created = await _create_experiment(client)
         await _transition(client, created["id"], "running")
         await _transition(
-            client, created["id"], "completed",
-            success=True, outcome_summary="Done",
+            client,
+            created["id"],
+            "completed",
+            success=True,
+            outcome_summary="Done",
         )
         resp = await client.patch(
             f"/api/v1/experiments/{created['id']}",
@@ -276,6 +284,7 @@ class TestUpdateRoutes:
 # ---------------------------------------------------------------------------
 # DELETE /experiments/{id} — Soft delete
 # ---------------------------------------------------------------------------
+
 
 class TestDeleteRoutes:
     @pytest.mark.asyncio
@@ -316,6 +325,7 @@ class TestDeleteRoutes:
 # POST /experiments/{id}/transition — State transitions
 # ---------------------------------------------------------------------------
 
+
 class TestTransitionRoutes:
     @pytest.mark.asyncio
     async def test_planned_to_running(self, client: AsyncClient):
@@ -344,7 +354,9 @@ class TestTransitionRoutes:
         created = await _create_experiment(client)
         await _transition(client, created["id"], "running")
         resp = await _transition(
-            client, created["id"], "completed",
+            client,
+            created["id"],
+            "completed",
             outcome_summary="All measurements within tolerance",
             outcome={"yield": 95.0},
             success=True,
@@ -364,7 +376,9 @@ class TestTransitionRoutes:
         created = await _create_experiment(client)
         await _transition(client, created["id"], "running")
         resp = await _transition(
-            client, created["id"], "failed",
+            client,
+            created["id"],
+            "failed",
             outcome_summary="Contamination detected",
             success=False,
         )
@@ -452,6 +466,7 @@ class TestTransitionRoutes:
 # ---------------------------------------------------------------------------
 # Envelope structure tests
 # ---------------------------------------------------------------------------
+
 
 class TestEnvelopeStructure:
     @pytest.mark.asyncio

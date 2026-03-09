@@ -30,7 +30,9 @@ class Organization(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "organizations"
 
     name: Mapped[str] = mapped_column(
-        String(255), nullable=False, doc="Display name",
+        String(255),
+        nullable=False,
+        doc="Display name",
     )
     slug: Mapped[str] = mapped_column(
         String(100),

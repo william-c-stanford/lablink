@@ -124,7 +124,7 @@ async def _deliver_webhook_async(
 
                 # Backoff before retry (skip on last attempt)
                 if attempt < MAX_ATTEMPTS:
-                    backoff = BACKOFF_BASE_SECONDS ** attempt
+                    backoff = BACKOFF_BASE_SECONDS**attempt
                     logger.debug(
                         "Retrying webhook %s in %ds (attempt %d/%d)",
                         webhook_id,
@@ -175,9 +175,7 @@ def deliver_webhook(
     dict
         Delivery result with status, attempts count, and response details.
     """
-    logger.info(
-        "Delivering webhook %s for event %s", webhook_id_str, event_type
-    )
+    logger.info("Delivering webhook %s for event %s", webhook_id_str, event_type)
 
     try:
         loop = asyncio.get_running_loop()
@@ -194,9 +192,7 @@ def deliver_webhook(
             ).result()
         return result
     else:
-        return asyncio.run(
-            _deliver_webhook_async(webhook_id_str, event_type, payload)
-        )
+        return asyncio.run(_deliver_webhook_async(webhook_id_str, event_type, payload))
 
 
 # ── Celery task registration ──────────────────────────────────────────────

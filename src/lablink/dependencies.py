@@ -104,9 +104,7 @@ def _decode_jwt(token: str) -> dict:
         )
 
 
-async def _resolve_api_token(
-    raw_token: str, db: AsyncSession
-) -> tuple[User, uuid.UUID]:
+async def _resolve_api_token(raw_token: str, db: AsyncSession) -> tuple[User, uuid.UUID]:
     """Look up an API token by its SHA-256 hash and return (user, org_id).
 
     Raises :class:`HTTPException` (401) if the token is missing, inactive,
@@ -396,8 +394,7 @@ def require_role(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
-                    f"Role '{membership.role}' insufficient; "
-                    f"requires '{minimum_role}' or higher"
+                    f"Role '{membership.role}' insufficient; requires '{minimum_role}' or higher"
                 ),
             )
 

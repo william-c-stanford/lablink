@@ -17,31 +17,40 @@ class AuditEventCreate(BaseModel):
 
     organization_id: str = Field(..., description="Organization scope for the event")
     actor_type: str = Field(
-        "user", max_length=20,
+        "user",
+        max_length=20,
         description="Category of actor: 'user', 'agent', or 'system'",
     )
     actor_id: Optional[str] = Field(
-        None, description="UUID of the acting user or agent",
+        None,
+        description="UUID of the acting user or agent",
     )
     action: str = Field(
-        ..., max_length=100,
+        ...,
+        max_length=100,
         description="Action verb, e.g. 'upload.created', 'experiment.status_changed'",
     )
     resource_type: str = Field(
-        ..., max_length=50,
+        ...,
+        max_length=50,
         description="Type of resource affected (e.g. 'upload', 'experiment')",
     )
     resource_id: str = Field(
-        ..., description="UUID of the affected resource",
+        ...,
+        description="UUID of the affected resource",
     )
     details: Optional[dict[str, Any]] = Field(
-        None, description="Before/after values, context",
+        None,
+        description="Before/after values, context",
     )
     ip_address: Optional[str] = Field(
-        None, max_length=45, description="Client IP address",
+        None,
+        max_length=45,
+        description="Client IP address",
     )
     user_agent: Optional[str] = Field(
-        None, description="Client user-agent string",
+        None,
+        description="Client user-agent string",
     )
 
 
@@ -81,14 +90,16 @@ class AuditChainVerification(BaseModel):
     total_entries: int = Field(..., description="Total entries verified")
     invalid_entries: int = Field(0, description="Number of broken entries")
     first_invalid_id: Optional[str] = Field(
-        None, description="ID of the first invalid entry, if any",
+        None,
+        description="ID of the first invalid entry, if any",
     )
     details: list[AuditChainLink] = Field(
         default_factory=list,
         description="Per-entry verification details",
     )
     suggestion: Optional[str] = Field(
-        None, description="Agent-friendly suggestion if chain is broken",
+        None,
+        description="Agent-friendly suggestion if chain is broken",
     )
 
 

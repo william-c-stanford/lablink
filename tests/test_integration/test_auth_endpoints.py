@@ -16,13 +16,16 @@ class TestRegisterEndpoint:
 
     @pytest.mark.asyncio
     async def test_register_returns_201_with_envelope(self, client):
-        resp = await client.post("/api/v1/auth/register", json={
-            "email": f"new-{uuid.uuid4().hex[:6]}@lablink.io",
-            "password": "SecurePass123!",
-            "display_name": "New User",
-            "org_name": "New Lab",
-            "org_slug": f"new-lab-{uuid.uuid4().hex[:6]}",
-        })
+        resp = await client.post(
+            "/api/v1/auth/register",
+            json={
+                "email": f"new-{uuid.uuid4().hex[:6]}@lablink.io",
+                "password": "SecurePass123!",
+                "display_name": "New User",
+                "org_name": "New Lab",
+                "org_slug": f"new-lab-{uuid.uuid4().hex[:6]}",
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
 
@@ -40,13 +43,16 @@ class TestRegisterEndpoint:
 
     @pytest.mark.asyncio
     async def test_register_duplicate_email_returns_409(self, client, registered_user):
-        resp = await client.post("/api/v1/auth/register", json={
-            "email": registered_user["email"],
-            "password": "AnotherPass123!",
-            "display_name": "Duplicate",
-            "org_name": "Dup Org",
-            "org_slug": f"dup-{uuid.uuid4().hex[:6]}",
-        })
+        resp = await client.post(
+            "/api/v1/auth/register",
+            json={
+                "email": registered_user["email"],
+                "password": "AnotherPass123!",
+                "display_name": "Duplicate",
+                "org_name": "Dup Org",
+                "org_slug": f"dup-{uuid.uuid4().hex[:6]}",
+            },
+        )
         assert resp.status_code == 409
         body = resp.json()
         assert body["data"] is None
@@ -59,10 +65,13 @@ class TestLoginEndpoint:
 
     @pytest.mark.asyncio
     async def test_login_success_returns_200_with_token(self, client, registered_user):
-        resp = await client.post("/api/v1/auth/login", json={
-            "email": registered_user["email"],
-            "password": registered_user["password"],
-        })
+        resp = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": registered_user["email"],
+                "password": registered_user["password"],
+            },
+        )
         assert resp.status_code == 200
         body = resp.json()
 
@@ -74,10 +83,13 @@ class TestLoginEndpoint:
 
     @pytest.mark.asyncio
     async def test_login_wrong_password_returns_401(self, client, registered_user):
-        resp = await client.post("/api/v1/auth/login", json={
-            "email": registered_user["email"],
-            "password": "TotallyWrongPassword!",
-        })
+        resp = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": registered_user["email"],
+                "password": "TotallyWrongPassword!",
+            },
+        )
         assert resp.status_code == 401
         body = resp.json()
 
@@ -89,10 +101,13 @@ class TestLoginEndpoint:
 
     @pytest.mark.asyncio
     async def test_login_nonexistent_email_returns_401(self, client):
-        resp = await client.post("/api/v1/auth/login", json={
-            "email": "nobody@nowhere.com",
-            "password": "Whatever123!",
-        })
+        resp = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "nobody@nowhere.com",
+                "password": "Whatever123!",
+            },
+        )
         assert resp.status_code == 401
         body = resp.json()
         assert body["errors"][0]["code"] == "authentication_error"
@@ -171,21 +186,27 @@ class TestFullAuthFlow:
         password = "FlowTest123!"
 
         # 1. Register
-        reg_resp = await client.post("/api/v1/auth/register", json={
-            "email": email,
-            "password": password,
-            "display_name": "Flow User",
-            "org_name": "Flow Lab",
-            "org_slug": f"flow-lab-{uuid.uuid4().hex[:6]}",
-        })
+        reg_resp = await client.post(
+            "/api/v1/auth/register",
+            json={
+                "email": email,
+                "password": password,
+                "display_name": "Flow User",
+                "org_name": "Flow Lab",
+                "org_slug": f"flow-lab-{uuid.uuid4().hex[:6]}",
+            },
+        )
         assert reg_resp.status_code == 201
         reg_token = reg_resp.json()["data"]["access_token"]
 
         # 2. Login with the same credentials
-        login_resp = await client.post("/api/v1/auth/login", json={
-            "email": email,
-            "password": password,
-        })
+        login_resp = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": email,
+                "password": password,
+            },
+        )
         assert login_resp.status_code == 200
         login_token = login_resp.json()["data"]["access_token"]
 

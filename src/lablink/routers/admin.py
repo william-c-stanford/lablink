@@ -47,34 +47,22 @@ async def get_usage_stats(
     # Count resources
     member_count = (
         await db.execute(
-            select(func.count(Membership.id)).where(
-                Membership.organization_id == org.id
-            )
+            select(func.count(Membership.id)).where(Membership.organization_id == org.id)
         )
     ).scalar_one()
 
     instrument_count = (
         await db.execute(
-            select(func.count(Instrument.id)).where(
-                Instrument.organization_id == org.id
-            )
+            select(func.count(Instrument.id)).where(Instrument.organization_id == org.id)
         )
     ).scalar_one()
 
     agent_count = (
-        await db.execute(
-            select(func.count(Agent.id)).where(
-                Agent.organization_id == org.id
-            )
-        )
+        await db.execute(select(func.count(Agent.id)).where(Agent.organization_id == org.id))
     ).scalar_one()
 
     upload_count = (
-        await db.execute(
-            select(func.count(Upload.id)).where(
-                Upload.organization_id == org.id
-            )
-        )
+        await db.execute(select(func.count(Upload.id)).where(Upload.organization_id == org.id))
     ).scalar_one()
 
     total_storage = (
@@ -87,9 +75,7 @@ async def get_usage_stats(
 
     experiment_count = (
         await db.execute(
-            select(func.count(Experiment.id)).where(
-                Experiment.organization_id == org.id
-            )
+            select(func.count(Experiment.id)).where(Experiment.organization_id == org.id)
         )
     ).scalar_one()
 
@@ -114,9 +100,9 @@ async def get_usage_stats(
             "storage": {
                 "used_bytes": total_storage,
                 "limit_bytes": org.storage_limit_bytes,
-                "used_percent": round(
-                    (total_storage / org.storage_limit_bytes) * 100, 2
-                ) if org.storage_limit_bytes > 0 else 0.0,
+                "used_percent": round((total_storage / org.storage_limit_bytes) * 100, 2)
+                if org.storage_limit_bytes > 0
+                else 0.0,
             },
             "experiments": {
                 "count": experiment_count,

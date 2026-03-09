@@ -30,15 +30,25 @@ from app.schemas.audit import AuditEventCreate
 class TestComputeEntryHash:
     def test_deterministic(self) -> None:
         h1 = compute_entry_hash(
-            entry_id="e1", sequence=1, action="CREATE",
-            resource_type="experiment", resource_id="exp-1",
-            actor_id="u1", summary="Created", detail=None,
+            entry_id="e1",
+            sequence=1,
+            action="CREATE",
+            resource_type="experiment",
+            resource_id="exp-1",
+            actor_id="u1",
+            summary="Created",
+            detail=None,
             previous_hash=None,
         )
         h2 = compute_entry_hash(
-            entry_id="e1", sequence=1, action="CREATE",
-            resource_type="experiment", resource_id="exp-1",
-            actor_id="u1", summary="Created", detail=None,
+            entry_id="e1",
+            sequence=1,
+            action="CREATE",
+            resource_type="experiment",
+            resource_id="exp-1",
+            actor_id="u1",
+            summary="Created",
+            detail=None,
             previous_hash=None,
         )
         assert h1 == h2
@@ -46,15 +56,25 @@ class TestComputeEntryHash:
 
     def test_different_content_different_hash(self) -> None:
         h1 = compute_entry_hash(
-            entry_id="e1", sequence=1, action="CREATE",
-            resource_type="experiment", resource_id=None,
-            actor_id=None, summary="A", detail=None,
+            entry_id="e1",
+            sequence=1,
+            action="CREATE",
+            resource_type="experiment",
+            resource_id=None,
+            actor_id=None,
+            summary="A",
+            detail=None,
             previous_hash=None,
         )
         h2 = compute_entry_hash(
-            entry_id="e1", sequence=1, action="UPDATE",
-            resource_type="experiment", resource_id=None,
-            actor_id=None, summary="A", detail=None,
+            entry_id="e1",
+            sequence=1,
+            action="UPDATE",
+            resource_type="experiment",
+            resource_id=None,
+            actor_id=None,
+            summary="A",
+            detail=None,
             previous_hash=None,
         )
         assert h1 != h2
@@ -208,6 +228,7 @@ class TestVerifyChain:
 
         # Tamper with the second entry's hash
         from sqlalchemy import select
+
         stmt = select(AuditLog).where(AuditLog.sequence == 2)
         row = (await session.execute(stmt)).scalar_one()
         row.entry_hash = "tampered_hash_value_" + "0" * 44  # 64 chars
@@ -288,6 +309,7 @@ class TestVerifyAuditChain:
 
         # Tamper
         from sqlalchemy import select
+
         stmt = select(AuditLog).where(AuditLog.sequence == 2)
         row = (await session.execute(stmt)).scalar_one()
         row.entry_hash = "x" * 64
@@ -320,13 +342,17 @@ class TestVerifyAuditChain:
 class TestGetAuditLog:
     async def test_query_by_resource_type(self, session: AsyncSession) -> None:
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="experiment", summary="Exp",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="experiment",
+            summary="Exp",
         )
         await session.flush()
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="dataset", summary="DS",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="dataset",
+            summary="DS",
         )
         await session.flush()
 
@@ -336,13 +362,17 @@ class TestGetAuditLog:
 
     async def test_query_by_action(self, session: AsyncSession) -> None:
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="test", summary="Create",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="test",
+            summary="Create",
         )
         await session.flush()
         await create_audit_event(
-            session, action=AuditAction.DELETE,
-            resource_type="test", summary="Delete",
+            session,
+            action=AuditAction.DELETE,
+            resource_type="test",
+            summary="Delete",
         )
         await session.flush()
 
@@ -353,8 +383,10 @@ class TestGetAuditLog:
     async def test_pagination(self, session: AsyncSession) -> None:
         for i in range(10):
             await create_audit_event(
-                session, action=AuditAction.CREATE,
-                resource_type="test", summary=f"Event {i}",
+                session,
+                action=AuditAction.CREATE,
+                resource_type="test",
+                summary=f"Event {i}",
             )
             await session.flush()
 
@@ -367,8 +399,10 @@ class TestGetAuditLog:
     async def test_count(self, session: AsyncSession) -> None:
         for i in range(5):
             await create_audit_event(
-                session, action=AuditAction.CREATE,
-                resource_type="test", summary=f"Event {i}",
+                session,
+                action=AuditAction.CREATE,
+                resource_type="test",
+                summary=f"Event {i}",
             )
             await session.flush()
 
@@ -377,13 +411,17 @@ class TestGetAuditLog:
 
     async def test_count_filtered(self, session: AsyncSession) -> None:
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="experiment", summary="Exp",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="experiment",
+            summary="Exp",
         )
         await session.flush()
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="dataset", summary="DS",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="dataset",
+            summary="DS",
         )
         await session.flush()
 
@@ -415,8 +453,10 @@ class TestListAuditEvents:
     async def test_list_with_pagination(self, session: AsyncSession) -> None:
         for i in range(5):
             await create_audit_event(
-                session, action=AuditAction.CREATE,
-                resource_type="test", summary=f"Event {i}",
+                session,
+                action=AuditAction.CREATE,
+                resource_type="test",
+                summary=f"Event {i}",
             )
             await session.flush()
 
@@ -426,18 +466,23 @@ class TestListAuditEvents:
 
     async def test_list_filtered(self, session: AsyncSession) -> None:
         await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="experiment", summary="Exp",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="experiment",
+            summary="Exp",
         )
         await session.flush()
         await create_audit_event(
-            session, action=AuditAction.UPDATE,
-            resource_type="experiment", summary="Updated",
+            session,
+            action=AuditAction.UPDATE,
+            resource_type="experiment",
+            summary="Updated",
         )
         await session.flush()
 
         events, total = await list_audit_events(
-            session, action="UPDATE",
+            session,
+            action="UPDATE",
         )
         assert total == 1
         assert events[0].action == "UPDATE"
@@ -446,8 +491,10 @@ class TestListAuditEvents:
 class TestGetAuditEventById:
     async def test_found(self, session: AsyncSession) -> None:
         entry = await create_audit_event(
-            session, action=AuditAction.CREATE,
-            resource_type="test", summary="Test",
+            session,
+            action=AuditAction.CREATE,
+            resource_type="test",
+            summary="Test",
         )
         await session.flush()
 

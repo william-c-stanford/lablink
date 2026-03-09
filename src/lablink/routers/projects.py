@@ -80,12 +80,7 @@ async def list_projects(
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await db.execute(count_stmt)).scalar_one()
 
-    stmt = (
-        base
-        .order_by(Project.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-    )
+    stmt = base.order_by(Project.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(stmt)
     projects = [ProjectResponse.model_validate(p) for p in result.scalars().all()]
 

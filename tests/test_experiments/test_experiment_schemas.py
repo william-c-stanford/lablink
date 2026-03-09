@@ -197,22 +197,16 @@ class TestExperimentRead:
         assert schema.parameters == {"flow_rate": 1.0}
 
     def test_outcome_json_deserialized(self):
-        schema = ExperimentRead.model_validate(
-            self._base_data(outcome_json='{"yield": 92.5}')
-        )
+        schema = ExperimentRead.model_validate(self._base_data(outcome_json='{"yield": 92.5}'))
         assert schema.outcome == {"yield": 92.5}
 
     def test_parameters_dict_passthrough(self):
         """When parameters is already a dict (not JSON string)."""
-        schema = ExperimentRead.model_validate(
-            self._base_data(parameters_json={"temp": 25})
-        )
+        schema = ExperimentRead.model_validate(self._base_data(parameters_json={"temp": 25}))
         assert schema.parameters == {"temp": 25}
 
     def test_invalid_json_returns_none(self):
-        schema = ExperimentRead.model_validate(
-            self._base_data(parameters_json="not-json{{{")
-        )
+        schema = ExperimentRead.model_validate(self._base_data(parameters_json="not-json{{{"))
         assert schema.parameters is None
 
     def test_from_attributes_config(self):

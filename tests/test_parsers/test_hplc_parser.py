@@ -143,7 +143,9 @@ class TestAgilentPeaksParsing:
         data = (FIXTURES / "agilent_peaks.csv").read_bytes()
         result = parser.parse(data)
 
-        assert result.instrument_settings.extra.get("instrument_model") == "Agilent 1260 Infinity II"
+        assert (
+            result.instrument_settings.extra.get("instrument_model") == "Agilent 1260 Infinity II"
+        )
         assert result.instrument_settings.extra.get("serial_number") == "DE12345678"
 
     def test_format_detected_as_agilent(self, parser: HPLCParser):

@@ -33,7 +33,8 @@ async def _seed_instrument(session: AsyncSession) -> tuple[str, str]:
     await session.flush()
 
     driver = InstrumentDriver(
-        id="drv-1", name="Spec CSV",
+        id="drv-1",
+        name="Spec CSV",
         instrument_type="spectrophotometer",
         parser_module="app.parsers.spectrophotometer",
     )
@@ -41,7 +42,10 @@ async def _seed_instrument(session: AsyncSession) -> tuple[str, str]:
     await session.flush()
 
     inst = Instrument(
-        id="inst-1", name="UV-Vis", lab_id="org-1", driver_id="drv-1",
+        id="inst-1",
+        name="UV-Vis",
+        lab_id="org-1",
+        driver_id="drv-1",
     )
     session.add(inst)
     await session.flush()
@@ -90,7 +94,9 @@ class TestComputeSha256:
 
 class TestUploadFile:
     async def test_upload_new_file(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
         content = b"Sample,Absorbance\nS1,0.5\nS2,0.7\n"
@@ -115,21 +121,29 @@ class TestUploadFile:
         assert record.lab_id == lab_id
 
     async def test_upload_duplicate_returns_existing(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
         content = b"duplicate content here"
 
         rec1, is_new1 = await upload_file(
-            session, content=content, file_name="file1.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=content,
+            file_name="file1.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
         await session.flush()
 
         rec2, is_new2 = await upload_file(
-            session, content=content, file_name="file2.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=content,
+            file_name="file2.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
 
@@ -138,20 +152,28 @@ class TestUploadFile:
         assert rec2.id == rec1.id
 
     async def test_different_content_creates_new(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
 
         rec1, _ = await upload_file(
-            session, content=b"content A", file_name="a.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"content A",
+            file_name="a.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
         await session.flush()
 
         rec2, _ = await upload_file(
-            session, content=b"content B", file_name="b.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"content B",
+            file_name="b.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
 
@@ -159,20 +181,28 @@ class TestUploadFile:
         assert rec1.file_hash != rec2.file_hash
 
     async def test_hash_chain_linking(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
 
         rec1, _ = await upload_file(
-            session, content=b"first file", file_name="first.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"first file",
+            file_name="first.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
         await session.flush()
 
         rec2, _ = await upload_file(
-            session, content=b"second file", file_name="second.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"second file",
+            file_name="second.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
 
@@ -183,14 +213,19 @@ class TestUploadFile:
         assert rec2.prev_hash == rec1.compute_chain_hash()
 
     async def test_local_storage(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
         content = b"stored content"
 
         record, _ = await upload_file(
-            session, content=content, file_name="data.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=content,
+            file_name="data.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
 
@@ -204,26 +239,36 @@ class TestUploadFile:
             assert f.read() == content
 
     async def test_uploaded_by_tracked(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
 
         record, _ = await upload_file(
-            session, content=b"data", file_name="x.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"data",
+            file_name="x.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             uploaded_by="user-42",
             settings=file_settings,
         )
         assert record.uploaded_by == "user-42"
 
     async def test_agent_upload_no_user(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
 
         record, _ = await upload_file(
-            session, content=b"agent data", file_name="auto.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=b"agent data",
+            file_name="auto.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
         assert record.uploaded_by is None
@@ -236,15 +281,20 @@ class TestUploadFile:
 
 class TestFindByHash:
     async def test_find_existing(
-        self, session: AsyncSession, file_settings: Settings,
+        self,
+        session: AsyncSession,
+        file_settings: Settings,
     ) -> None:
         inst_id, lab_id = await _seed_instrument(session)
         content = b"findable content"
         file_hash = compute_sha256(content)
 
         await upload_file(
-            session, content=content, file_name="find.csv",
-            instrument_id=inst_id, lab_id=lab_id,
+            session,
+            content=content,
+            file_name="find.csv",
+            instrument_id=inst_id,
+            lab_id=lab_id,
             settings=file_settings,
         )
         await session.flush()

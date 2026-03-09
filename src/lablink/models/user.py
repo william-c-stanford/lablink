@@ -27,17 +27,27 @@ class User(Base, SoftDeleteMixin):
         default=lambda: str(uuid.uuid4()),
     )
     email: Mapped[str] = mapped_column(
-        String(255), nullable=False, unique=True, index=True,
+        String(255),
+        nullable=False,
+        unique=True,
+        index=True,
         doc="Unique email address",
     )
     password_hash: Mapped[str] = mapped_column(
-        String(255), nullable=False, doc="Bcrypt/argon2 password hash",
+        String(255),
+        nullable=False,
+        doc="Bcrypt/argon2 password hash",
     )
     full_name: Mapped[str] = mapped_column(
-        String(255), nullable=False, doc="Display name",
+        String(255),
+        nullable=False,
+        doc="Display name",
     )
     is_active: Mapped[bool] = mapped_column(
-        Boolean, default=True, nullable=False, doc="Account enabled flag",
+        Boolean,
+        default=True,
+        nullable=False,
+        doc="Account enabled flag",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

@@ -309,12 +309,8 @@ def build_search_query(
             }
         },
         "aggs": {
-            "instrument_types": {
-                "terms": {"field": "instrument_type", "size": 20}
-            },
-            "measurement_types": {
-                "terms": {"field": "measurement_type", "size": 20}
-            },
+            "instrument_types": {"terms": {"field": "instrument_type", "size": 20}},
+            "measurement_types": {"terms": {"field": "measurement_type", "size": 20}},
             "uploads_over_time": {
                 "date_histogram": {
                     "field": "created_at",
@@ -402,9 +398,7 @@ class SearchService:
                     request_timeout=30,
                 )
             except ImportError:
-                logger.warning(
-                    "elasticsearch-py not installed, falling back to mock index"
-                )
+                logger.warning("elasticsearch-py not installed, falling back to mock index")
                 self._use_es = False
         return self._es_client
 
@@ -470,10 +464,13 @@ class SearchService:
             document: The document body to index.
         """
         if not self._use_es:
-            self._mock.index_document(doc_id, {
-                **document,
-                "organization_id": str(org_id),
-            })
+            self._mock.index_document(
+                doc_id,
+                {
+                    **document,
+                    "organization_id": str(org_id),
+                },
+            )
             return
 
         client = await self._get_es_client()
@@ -536,10 +533,13 @@ class SearchService:
 
         if not self._use_es:
             for doc_id, doc in documents:
-                self._mock.index_document(doc_id, {
-                    **doc,
-                    "organization_id": str(org_id),
-                })
+                self._mock.index_document(
+                    doc_id,
+                    {
+                        **doc,
+                        "organization_id": str(org_id),
+                    },
+                )
             return len(documents)
 
         client = await self._get_es_client()
@@ -556,9 +556,7 @@ class SearchService:
             resp = await client.bulk(body=actions, refresh="wait_for")
             errors = resp.get("errors", False)
             if errors:
-                error_count = sum(
-                    1 for item in resp["items"] if "error" in item.get("index", {})
-                )
+                error_count = sum(1 for item in resp["items"] if "error" in item.get("index", {}))
                 logger.warning("Bulk index had %d errors", error_count)
                 return len(documents) - error_count
             return len(documents)

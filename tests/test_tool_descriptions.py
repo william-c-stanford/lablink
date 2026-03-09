@@ -64,8 +64,7 @@ class TestToolsetStructure:
         for tools in _TOOLSETS.values():
             all_names.extend(tools.keys())
         assert len(all_names) == len(set(all_names)), (
-            f"Duplicate tool names found: "
-            f"{[n for n in all_names if all_names.count(n) > 1]}"
+            f"Duplicate tool names found: {[n for n in all_names if all_names.count(n) > 1]}"
         )
 
 
@@ -189,8 +188,7 @@ class TestDiscoveryTools:
         for name, expected_count in EXPECTED_TOOLSETS.items():
             actual = result["data"][name]["tool_count"]
             assert actual == expected_count, (
-                f"list_toolsets() reports {actual} tools for '{name}', "
-                f"expected {expected_count}"
+                f"list_toolsets() reports {actual} tools for '{name}', expected {expected_count}"
             )
 
     def test_list_toolsets_includes_tool_names(self):

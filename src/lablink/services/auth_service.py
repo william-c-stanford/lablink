@@ -90,9 +90,7 @@ def create_access_token(
     return token, int(expires_delta.total_seconds())
 
 
-def decode_access_token(
-    token: str, *, settings: Settings | None = None
-) -> dict[str, Any]:
+def decode_access_token(token: str, *, settings: Settings | None = None) -> dict[str, Any]:
     """Decode and validate a JWT access token.
 
     Returns:
@@ -291,9 +289,7 @@ async def login_user(
 # ---------------------------------------------------------------------------
 
 
-async def get_user_by_id(
-    session: AsyncSession, user_id: str | uuid.UUID
-) -> User | None:
+async def get_user_by_id(session: AsyncSession, user_id: str | uuid.UUID) -> User | None:
     """Fetch a user by ID, returning None if not found."""
     if isinstance(user_id, str):
         try:
@@ -349,9 +345,7 @@ async def get_current_user_from_token(
 # ---------------------------------------------------------------------------
 
 
-async def validate_api_token(
-    session: AsyncSession, raw_token: str
-) -> tuple[ApiToken, User]:
+async def validate_api_token(session: AsyncSession, raw_token: str) -> tuple[ApiToken, User]:
     """Validate an API token and return the token record and owner user.
 
     Looks up the token by its SHA-256 hash, checks it is active and
@@ -388,9 +382,7 @@ async def validate_api_token(
     api_token.last_used_at = datetime.now(timezone.utc)
 
     # Resolve owner
-    user_result = await session.execute(
-        select(User).where(User.id == api_token.created_by)
-    )
+    user_result = await session.execute(select(User).where(User.id == api_token.created_by))
     user = user_result.scalar_one_or_none()
 
     if user is None or not user.is_active:

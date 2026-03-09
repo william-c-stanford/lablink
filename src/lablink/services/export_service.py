@@ -164,9 +164,7 @@ class ExportService:
             If no upload IDs or filters are provided, or format is unsupported.
         """
         if not request.upload_ids and not request.filters:
-            raise ValueError(
-                "Either upload_ids or filters must be provided for export"
-            )
+            raise ValueError("Either upload_ids or filters must be provided for export")
 
         job = ExportJob(
             organization_id=str(organization_id),
@@ -210,8 +208,7 @@ class ExportService:
         all_jobs = [
             j
             for j in self._jobs.values()
-            if j.organization_id == org_str
-            and (status is None or j.status == status)
+            if j.organization_id == org_str and (status is None or j.status == status)
         ]
         # Sort newest first
         all_jobs.sort(key=lambda j: j.created_at, reverse=True)
@@ -221,9 +218,7 @@ class ExportService:
 
     # ── Export execution ──────────────────────────────────────────────
 
-    async def _execute_export(
-        self, db: AsyncSession, job: ExportJob
-    ) -> None:
+    async def _execute_export(self, db: AsyncSession, job: ExportJob) -> None:
         """Fetch data and write to the target format."""
         # Fetch parsed data
         records = await self._fetch_data(db, job)
@@ -249,9 +244,7 @@ class ExportService:
         job.status = ExportStatus.completed
         job.completed_at = datetime.now(timezone.utc)
 
-    async def _fetch_data(
-        self, db: AsyncSession, job: ExportJob
-    ) -> list[dict[str, Any]]:
+    async def _fetch_data(self, db: AsyncSession, job: ExportJob) -> list[dict[str, Any]]:
         """Query ParsedData records based on job parameters."""
         stmt = select(ParsedData).where(
             ParsedData.organization_id == uuid.UUID(job.organization_id)
@@ -264,14 +257,10 @@ class ExportService:
         # Apply filters
         filters = job.filters
         if filters.get("instrument_type"):
-            stmt = stmt.where(
-                ParsedData.instrument_type == filters["instrument_type"]
-            )
+            stmt = stmt.where(ParsedData.instrument_type == filters["instrument_type"])
 
         if filters.get("measurement_type"):
-            stmt = stmt.where(
-                ParsedData.measurement_type == filters["measurement_type"]
-            )
+            stmt = stmt.where(ParsedData.measurement_type == filters["measurement_type"])
 
         result = await db.execute(stmt)
         parsed_rows = result.scalars().all()
@@ -320,9 +309,7 @@ class ExportService:
         else:
             raise ValueError(f"Unsupported export format: {fmt}")
 
-    def _render_csv(
-        self, records: list[dict[str, Any]], job_id: str
-    ) -> tuple[bytes, str]:
+    def _render_csv(self, records: list[dict[str, Any]], job_id: str) -> tuple[bytes, str]:
         """Render records as CSV."""
         if not records:
             return b"", f"export-{job_id}.csv"
@@ -352,9 +339,7 @@ class ExportService:
         content = buf.getvalue().encode("utf-8")
         return content, f"export-{job_id}.csv"
 
-    def _render_json(
-        self, records: list[dict[str, Any]], job_id: str
-    ) -> tuple[bytes, str]:
+    def _render_json(self, records: list[dict[str, Any]], job_id: str) -> tuple[bytes, str]:
         """Render records as JSON."""
         output = {
             "export_id": job_id,
@@ -365,9 +350,7 @@ class ExportService:
         content = json.dumps(output, indent=2, default=str).encode("utf-8")
         return content, f"export-{job_id}.json"
 
-    def _render_xlsx(
-        self, records: list[dict[str, Any]], job_id: str
-    ) -> tuple[bytes, str]:
+    def _render_xlsx(self, records: list[dict[str, Any]], job_id: str) -> tuple[bytes, str]:
         """Render records as XLSX.
 
         Falls back to CSV if openpyxl is not installed.
@@ -402,15 +385,11 @@ class ExportService:
             return content, f"export-{job_id}.xlsx"
 
         except ImportError:
-            logger.warning(
-                "openpyxl not installed; falling back to CSV for XLSX export"
-            )
+            logger.warning("openpyxl not installed; falling back to CSV for XLSX export")
             content, _ = self._render_csv(records, job_id)
             return content, f"export-{job_id}.csv"
 
-    def _render_pdf(
-        self, records: list[dict[str, Any]], job_id: str
-    ) -> tuple[bytes, str]:
+    def _render_pdf(self, records: list[dict[str, Any]], job_id: str) -> tuple[bytes, str]:
         """Render records as PDF.
 
         Falls back to JSON if no PDF library is available.
@@ -438,9 +417,7 @@ class ExportService:
             return buf.getvalue(), f"export-{job_id}.pdf"
 
         except ImportError:
-            logger.warning(
-                "reportlab not installed; falling back to JSON for PDF export"
-            )
+            logger.warning("reportlab not installed; falling back to JSON for PDF export")
             return self._render_json(records, job_id)
 
     # ── Storage ───────────────────────────────────────────────────────

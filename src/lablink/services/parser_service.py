@@ -137,12 +137,14 @@ class ParserService:
         _ensure_parsers_loaded()
         result = []
         for instrument_type, parser_cls in ParserRegistry.all().items():
-            result.append({
-                "name": parser_cls.name,
-                "version": parser_cls.version,
-                "instrument_type": instrument_type,
-                "supported_extensions": parser_cls.supported_extensions,
-            })
+            result.append(
+                {
+                    "name": parser_cls.name,
+                    "version": parser_cls.version,
+                    "instrument_type": instrument_type,
+                    "supported_extensions": parser_cls.supported_extensions,
+                }
+            )
         return result
 
     # -- Parse execution ---------------------------------------------------

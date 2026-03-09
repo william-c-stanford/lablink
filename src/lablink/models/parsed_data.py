@@ -59,10 +59,14 @@ class ParsedData(Base):
     measurements: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
     units: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
     instrument_settings: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True,
+        JSON,
+        nullable=True,
     )
     metadata_: Mapped[dict[str, Any]] = mapped_column(
-        "metadata", JSON, nullable=False, default=dict,
+        "metadata",
+        JSON,
+        nullable=False,
+        default=dict,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

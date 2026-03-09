@@ -18,13 +18,15 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 # Enums
 # ---------------------------------------------------------------------------
 
-INSTRUMENT_TYPES = frozenset({
-    "spectrophotometer",
-    "plate_reader",
-    "hplc",
-    "pcr",
-    "balance",
-})
+INSTRUMENT_TYPES = frozenset(
+    {
+        "spectrophotometer",
+        "plate_reader",
+        "hplc",
+        "pcr",
+        "balance",
+    }
+)
 
 
 class InstrumentType(str, PyEnum):
@@ -209,10 +211,22 @@ class InstrumentRead(BaseModel):
         if hasattr(data, "__dict__"):
             d: dict[str, Any] = {}
             for key in (
-                "id", "org_id", "organization_id", "name", "instrument_type",
-                "manufacturer", "model_name", "serial_number", "location",
-                "agent_id", "metadata_json", "metadata", "is_active",
-                "created_at", "updated_at", "deleted_at",
+                "id",
+                "org_id",
+                "organization_id",
+                "name",
+                "instrument_type",
+                "manufacturer",
+                "model_name",
+                "serial_number",
+                "location",
+                "agent_id",
+                "metadata_json",
+                "metadata",
+                "is_active",
+                "created_at",
+                "updated_at",
+                "deleted_at",
                 # backend/app model uses lab_id instead of org_id
                 "lab_id",
             ):

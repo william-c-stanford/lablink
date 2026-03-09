@@ -59,7 +59,9 @@ class TokenResponse(BaseModel):
     """JWT token pair returned after successful authentication."""
 
     access_token: str = Field(..., description="Short-lived JWT access token")
-    refresh_token: str = Field(..., description="Long-lived refresh token for obtaining new access tokens")
+    refresh_token: str = Field(
+        ..., description="Long-lived refresh token for obtaining new access tokens"
+    )
     token_type: str = Field(default="bearer", description="Token type (always 'bearer')")
     expires_in: int = Field(..., description="Access token expiry in seconds")
 
@@ -106,8 +108,12 @@ class ApiTokenResponse(BaseModel):
     scope: str = Field(..., description="Permission scope: read, write, or admin")
     identity_type: str = Field(..., description="Token identity type: user, agent, or integration")
     created_at: datetime = Field(..., description="Timestamp when the token was created")
-    expires_at: datetime | None = Field(None, description="Expiration timestamp, or null if no expiry")
-    last_used_at: datetime | None = Field(None, description="Timestamp of last API call using this token")
+    expires_at: datetime | None = Field(
+        None, description="Expiration timestamp, or null if no expiry"
+    )
+    last_used_at: datetime | None = Field(
+        None, description="Timestamp of last API call using this token"
+    )
     token: str | None = Field(
         default=None,
         description="Plaintext token value, returned only at creation time",

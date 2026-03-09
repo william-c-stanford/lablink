@@ -50,29 +50,38 @@ class AuditEvent(Base):
         index=True,
     )
     actor_type: Mapped[str] = mapped_column(
-        String(20), nullable=False,
+        String(20),
+        nullable=False,
     )  # user, agent, system
     actor_id: Mapped[Optional[str]] = mapped_column(
-        String(36), nullable=True,
+        String(36),
+        nullable=True,
     )
     action: Mapped[str] = mapped_column(
-        String(100), nullable=False,
+        String(100),
+        nullable=False,
     )  # e.g. upload.created, experiment.status_changed
     resource_type: Mapped[str] = mapped_column(
-        String(50), nullable=False,
+        String(50),
+        nullable=False,
     )  # upload, experiment, project, etc.
     resource_id: Mapped[str] = mapped_column(
-        String(36), nullable=False,
+        String(36),
+        nullable=False,
     )
     details: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, default=dict, nullable=True,
+        JSON,
+        default=dict,
+        nullable=True,
     )
     ip_address: Mapped[Optional[str]] = mapped_column(
-        String(45), nullable=True,
+        String(45),
+        nullable=True,
     )  # IPv4/IPv6 as string
     user_agent: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     hash: Mapped[str] = mapped_column(
-        String(64), nullable=False,
+        String(64),
+        nullable=False,
         doc="SHA-256 chain integrity hash",
     )
     created_at: Mapped[datetime] = mapped_column(

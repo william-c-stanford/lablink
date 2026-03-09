@@ -28,6 +28,7 @@ try:
     from allotropy.parser_factory import Vendor as _Vendor
     from allotropy.to_allotrope import allotrope_from_io as _allotrope_from_io
     from lablink.parsers.asm_mapper import asm_to_parsed_result as _asm_to_parsed_result
+
     _ALLOTROPY_AVAILABLE = True
 except ImportError:
     _ALLOTROPY_AVAILABLE = False
@@ -44,8 +45,17 @@ class HPLCParser(BaseParser):
 
     # Header keywords for format detection
     _HPLC_MARKERS = {
-        "retention time", "ret. time", "ret time", "rt (min)", "rt(min)",
-        "peak#", "peak #", "area %", "area%", "mau*s", "mau",
+        "retention time",
+        "ret. time",
+        "ret time",
+        "rt (min)",
+        "rt(min)",
+        "peak#",
+        "peak #",
+        "area %",
+        "area%",
+        "mau*s",
+        "mau",
     }
     _AGILENT_MARKERS = {"agilent", "chemstation", "openlab"}
     _SHIMADZU_MARKERS = {"shimadzu", "labsolutions", "nexera"}
@@ -57,9 +67,16 @@ class HPLCParser(BaseParser):
             header = file_bytes[:4096].decode("utf-8", errors="ignore").lower()
 
             # Check for HPLC-specific keywords
-            has_rt = any(marker in header for marker in (
-                "retention time", "ret. time", "ret time", "rt (min)", "rt(min)",
-            ))
+            has_rt = any(
+                marker in header
+                for marker in (
+                    "retention time",
+                    "ret. time",
+                    "ret time",
+                    "rt (min)",
+                    "rt(min)",
+                )
+            )
             has_peak = "peak" in header
             has_area = "area" in header
 
@@ -161,7 +178,9 @@ class HPLCParser(BaseParser):
             sample_count=len(sample_names) if sample_names else 1,
             run_metadata={
                 "format": fmt,
-                "peak_count": len([m for m in measurements if m.measurement_type == "retention_time"]),
+                "peak_count": len(
+                    [m for m in measurements if m.measurement_type == "retention_time"]
+                ),
                 "allotropy_attempted": is_agilent,
                 "allotropy_used": False,
                 **{k: v for k, v in instrument_meta.items()},
@@ -179,6 +198,7 @@ class HPLCParser(BaseParser):
             return None
         try:
             import io as _io
+
             vendor = getattr(_Vendor, vendor_name)
             asm = _allotrope_from_io(_io.BytesIO(file_bytes), filepath, vendor)
             return _asm_to_parsed_result(
@@ -207,9 +227,16 @@ class HPLCParser(BaseParser):
         for i, line in enumerate(lines):
             line_lower = line.lower().strip()
             # Detect table header row
-            if any(kw in line_lower for kw in (
-                "retention time", "ret. time", "ret time", "rt (min)", "rt(min)",
-            )):
+            if any(
+                kw in line_lower
+                for kw in (
+                    "retention time",
+                    "ret. time",
+                    "ret time",
+                    "rt (min)",
+                    "rt(min)",
+                )
+            ):
                 data_start = i
                 break
             header_lines.append(line)
@@ -275,25 +302,59 @@ class HPLCParser(BaseParser):
         header_map = {h.strip().lower(): h.strip() for h in headers}
 
         # Find key columns
-        rt_col = self._find_column(header_map, [
-            "retention time (min)", "retention time", "ret. time", "ret time",
-            "rt (min)", "rt(min)", "rt",
-        ])
-        area_col = self._find_column(header_map, [
-            "area (mau*s)", "area",
-        ])
-        height_col = self._find_column(header_map, [
-            "height (mau)", "height",
-        ])
-        area_pct_col = self._find_column(header_map, [
-            "area %", "area%", "area_pct",
-        ])
-        compound_col = self._find_column(header_map, [
-            "compound", "compound name", "name", "component",
-        ])
-        peak_col = self._find_column(header_map, [
-            "peak#", "peak #", "peak", "no.", "#",
-        ])
+        rt_col = self._find_column(
+            header_map,
+            [
+                "retention time (min)",
+                "retention time",
+                "ret. time",
+                "ret time",
+                "rt (min)",
+                "rt(min)",
+                "rt",
+            ],
+        )
+        area_col = self._find_column(
+            header_map,
+            [
+                "area (mau*s)",
+                "area",
+            ],
+        )
+        height_col = self._find_column(
+            header_map,
+            [
+                "height (mau)",
+                "height",
+            ],
+        )
+        area_pct_col = self._find_column(
+            header_map,
+            [
+                "area %",
+                "area%",
+                "area_pct",
+            ],
+        )
+        compound_col = self._find_column(
+            header_map,
+            [
+                "compound",
+                "compound name",
+                "name",
+                "component",
+            ],
+        )
+        peak_col = self._find_column(
+            header_map,
+            [
+                "peak#",
+                "peak #",
+                "peak",
+                "no.",
+                "#",
+            ],
+        )
 
         if not rt_col:
             raise ParseError(
@@ -351,9 +412,7 @@ class HPLCParser(BaseParser):
                         quality = None
                         if area_val < 0:
                             quality = "suspect"
-                            warnings.append(
-                                f"Peak {peak_num}: negative area {area_val}."
-                            )
+                            warnings.append(f"Peak {peak_num}: negative area {area_val}.")
                         measurements.append(
                             MeasurementValue(
                                 sample_id=sample_id,

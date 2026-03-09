@@ -179,10 +179,7 @@ async def list_campaigns(
 
     # Data
     data_stmt = (
-        select(Campaign)
-        .order_by(Campaign.created_at.desc())
-        .offset(offset)
-        .limit(page_size)
+        select(Campaign).order_by(Campaign.created_at.desc()).offset(offset).limit(page_size)
     )
     for cond in conditions:
         data_stmt = data_stmt.where(cond)
@@ -214,9 +211,7 @@ async def update_campaign(
         NotFoundError: If the campaign does not exist.
         ValidationError: If the campaign is in a terminal state.
     """
-    campaign = await get_campaign(
-        session, campaign_id, organization_id=organization_id
-    )
+    campaign = await get_campaign(session, campaign_id, organization_id=organization_id)
 
     if campaign.is_terminal:
         raise ValidationError(
@@ -255,21 +250,17 @@ async def transition_campaign(
         NotFoundError: If the campaign does not exist.
         StateTransitionError: If the transition is invalid.
     """
-    campaign = await get_campaign(
-        session, campaign_id, organization_id=organization_id
-    )
+    campaign = await get_campaign(session, campaign_id, organization_id=organization_id)
 
     current = CampaignStatus(campaign.status)
 
     if campaign.is_terminal:
         raise StateTransitionError(
             message=(
-                f"Cannot transition from terminal state '{current.value}' "
-                f"to '{new_status.value}'."
+                f"Cannot transition from terminal state '{current.value}' to '{new_status.value}'."
             ),
             suggestion=(
-                f"Campaign is in terminal state '{current.value}'. "
-                f"Create a new campaign instead."
+                f"Campaign is in terminal state '{current.value}'. Create a new campaign instead."
             ),
         )
 
@@ -277,10 +268,7 @@ async def transition_campaign(
     if new_status not in valid:
         valid_names = sorted(s.value for s in valid)
         raise StateTransitionError(
-            message=(
-                f"Cannot transition campaign from '{current.value}' to "
-                f"'{new_status.value}'."
-            ),
+            message=(f"Cannot transition campaign from '{current.value}' to '{new_status.value}'."),
             suggestion=(
                 f"Valid transitions from '{current.value}': "
                 f"{valid_names}. Use one of these statuses."
@@ -393,9 +381,7 @@ async def add_experiment_to_campaign(
         NotFoundError: If the campaign or experiment does not exist.
         ValidationError: If the campaign is completed.
     """
-    campaign = await get_campaign(
-        session, campaign_id, organization_id=organization_id
-    )
+    campaign = await get_campaign(session, campaign_id, organization_id=organization_id)
 
     if campaign.is_terminal:
         raise ValidationError(
@@ -406,9 +392,7 @@ async def add_experiment_to_campaign(
     # Import here to avoid circular dependency at module level
     from lablink.services.experiment_service import get_experiment
 
-    experiment = await get_experiment(
-        session, experiment_id, organization_id=organization_id
-    )
+    experiment = await get_experiment(session, experiment_id, organization_id=organization_id)
     experiment.campaign_id = campaign_id
     await session.flush()
     return experiment
@@ -429,9 +413,7 @@ async def remove_experiment_from_campaign(
     """
     from lablink.services.experiment_service import get_experiment
 
-    experiment = await get_experiment(
-        session, experiment_id, organization_id=organization_id
-    )
+    experiment = await get_experiment(session, experiment_id, organization_id=organization_id)
     experiment.campaign_id = None
     await session.flush()
     return experiment

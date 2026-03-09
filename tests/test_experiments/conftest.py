@@ -44,7 +44,9 @@ async def engine(test_settings):
 @pytest_asyncio.fixture
 async def session(engine):
     factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False,
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
     async with factory() as sess:
         yield sess
@@ -55,7 +57,9 @@ async def app(test_settings, engine):
     application = create_app(settings=test_settings)
 
     factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False,
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
     )
 
     async def override_session():
@@ -101,7 +105,8 @@ async def organization(session: AsyncSession, org_id: str) -> Organization:
 
 @pytest_asyncio.fixture
 async def draft_experiment(
-    session: AsyncSession, organization: Organization,
+    session: AsyncSession,
+    organization: Organization,
 ) -> Experiment:
     """Create an experiment in DRAFT state."""
     exp = Experiment(
@@ -118,7 +123,8 @@ async def draft_experiment(
 
 @pytest_asyncio.fixture
 async def running_experiment(
-    session: AsyncSession, organization: Organization,
+    session: AsyncSession,
+    organization: Organization,
 ) -> Experiment:
     """Create an experiment in RUNNING state."""
     exp = Experiment(
@@ -133,7 +139,8 @@ async def running_experiment(
 
 @pytest_asyncio.fixture
 async def completed_experiment(
-    session: AsyncSession, organization: Organization,
+    session: AsyncSession,
+    organization: Organization,
 ) -> Experiment:
     """Create an experiment in COMPLETED state."""
     exp = Experiment(

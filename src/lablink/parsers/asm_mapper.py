@@ -105,7 +105,10 @@ def asm_to_parsed_result(
 # qPCR mapper (Bio-Rad CFX Maestro, AppBio QuantStudio)
 # ---------------------------------------------------------------------------
 
-def _map_qpcr(asm: dict[str, Any]) -> tuple[list[MeasurementValue], InstrumentSettings, dict, list[str]]:
+
+def _map_qpcr(
+    asm: dict[str, Any],
+) -> tuple[list[MeasurementValue], InstrumentSettings, dict, list[str]]:
     """Extract measurements from a qPCR ASM document."""
     measurements: list[MeasurementValue] = []
     settings = InstrumentSettings()
@@ -146,7 +149,11 @@ def _map_qpcr(asm: dict[str, Any]) -> tuple[list[MeasurementValue], InstrumentSe
             if mv is not None:
                 measurements.append(mv)
 
-    ct_vals = [m.value for m in measurements if m.measurement_type == "ct_value" and m.quality_flag != "missing"]
+    ct_vals = [
+        m.value
+        for m in measurements
+        if m.measurement_type == "ct_value" and m.quality_flag != "missing"
+    ]
     if ct_vals:
         run_meta["summary"] = {
             "total_wells": len(measurements),
@@ -280,7 +287,9 @@ def _walk(
             _walk(item, measurements, settings, run_meta)
 
 
-def _generic_doc_to_mv(doc: dict[str, Any], settings: InstrumentSettings) -> MeasurementValue | None:
+def _generic_doc_to_mv(
+    doc: dict[str, Any], settings: InstrumentSettings
+) -> MeasurementValue | None:
     sample_doc = doc.get("sample document", {})
     sample_id = sample_doc.get("sample identifier") or sample_doc.get("well identifier")
     sample_name = sample_doc.get("sample name")
@@ -342,6 +351,7 @@ def _extract_device(node: dict[str, Any], settings: InstrumentSettings, run_meta
 # Utility helpers
 # ---------------------------------------------------------------------------
 
+
 def _infer_primary_type(measurements: list[MeasurementValue]) -> str:
     """Return the most common measurement_type, defaulting to 'absorbance'."""
     if not measurements:
@@ -351,14 +361,16 @@ def _infer_primary_type(measurements: list[MeasurementValue]) -> str:
 
 
 def _has_settings(s: InstrumentSettings) -> bool:
-    return any([
-        s.method_name,
-        s.temperature_c,
-        s.wavelength_nm,
-        s.flow_rate_ml_min,
-        s.injection_volume_ul,
-        s.column_type,
-        s.run_time_min,
-        s.cycle_count,
-        s.extra,
-    ])
+    return any(
+        [
+            s.method_name,
+            s.temperature_c,
+            s.wavelength_nm,
+            s.flow_rate_ml_min,
+            s.injection_volume_ul,
+            s.column_type,
+            s.run_time_min,
+            s.cycle_count,
+            s.extra,
+        ]
+    )

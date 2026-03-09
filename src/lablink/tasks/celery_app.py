@@ -38,11 +38,9 @@ app.conf.update(
     task_serializer="json",
     accept_content=["json"],
     result_serializer="json",
-
     # Timezone
     timezone="UTC",
     enable_utc=True,
-
     # Queue routing
     task_default_queue="parsing",
     task_queues={
@@ -59,18 +57,15 @@ app.conf.update(
             "routing_key": "indexing",
         },
     },
-
     # Task routing — map task names to queues
     task_routes={
         "lablink.tasks.parse_task.parse_upload_file": {"queue": "parsing"},
         "lablink.tasks.webhook_task.deliver_webhook": {"queue": "webhooks"},
         "lablink.tasks.index_task.index_parsed_data": {"queue": "indexing"},
     },
-
     # Retry / reliability
     task_acks_late=True,
     worker_prefetch_multiplier=1,
-
     # Result expiry (24 hours)
     result_expires=86400,
 )

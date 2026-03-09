@@ -35,6 +35,7 @@ from app.services.file_service import compute_sha256, find_by_hash, upload_file
 # Fixtures
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def test_settings(tmp_path) -> Settings:
     """Settings configured for in-memory SQLite testing."""
@@ -103,6 +104,7 @@ async def instrument(session: AsyncSession) -> Instrument:
 # SHA-256 hash computation tests
 # ---------------------------------------------------------------------------
 
+
 class TestSHA256Computation:
     """Tests for SHA-256 hash computation correctness."""
 
@@ -117,7 +119,10 @@ class TestSHA256Computation:
         expected = hashlib.sha256(b"").hexdigest()
         assert compute_sha256(b"") == expected
         # Known value: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-        assert compute_sha256(b"") == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        assert (
+            compute_sha256(b"")
+            == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        )
 
     def test_compute_sha256_returns_64_char_hex(self):
         """SHA-256 always returns a 64-character lowercase hex string."""
@@ -154,12 +159,16 @@ class TestSHA256Computation:
 # New file upload tests
 # ---------------------------------------------------------------------------
 
+
 class TestNewFileUpload:
     """Tests for uploading a new file (no duplicate)."""
 
     @pytest.mark.asyncio
     async def test_upload_creates_file_record(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Uploading a new file creates a FileRecord in the database."""
         content = b"wavelength,absorbance\n340,0.523\n350,0.612"
@@ -180,7 +189,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_correct_hash(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.file_hash matches SHA-256 of uploaded content."""
         content = b"wavelength,absorbance\n340,0.523"
@@ -199,7 +211,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_correct_file_size(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.file_size_bytes matches length of uploaded content."""
         content = b"data,value\n1,2\n3,4"
@@ -217,7 +232,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_filename(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.file_name preserves the original filename."""
         content = b"x,y\n1,2"
@@ -235,7 +253,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_initial_status_is_uploaded(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """New FileRecord starts with status 'uploaded'."""
         content = b"header\nrow1"
@@ -253,7 +274,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_mime_type(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.mime_type is stored when provided."""
         content = b"col1,col2\na,b"
@@ -272,7 +296,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_lab_and_instrument(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord correctly links to instrument and lab."""
         content = b"data"
@@ -291,7 +318,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_stores_uploaded_by(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.uploaded_by is set when provided."""
         content = b"data"
@@ -311,7 +341,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_first_upload_has_no_prev_hash(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """First FileRecord in the chain has prev_hash=None."""
         content = b"first file ever"
@@ -329,7 +362,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_second_upload_has_prev_hash(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Second FileRecord links to first via prev_hash (hash chain)."""
         content1 = b"first file"
@@ -359,7 +395,10 @@ class TestNewFileUpload:
 
     @pytest.mark.asyncio
     async def test_upload_persists_to_database(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord is queryable from the database after upload."""
         content = b"persisted data"
@@ -386,12 +425,16 @@ class TestNewFileUpload:
 # Duplicate detection tests
 # ---------------------------------------------------------------------------
 
+
 class TestDuplicateDetection:
     """Tests for SHA-256-based duplicate detection."""
 
     @pytest.mark.asyncio
     async def test_duplicate_returns_existing_record(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Uploading identical content returns the existing FileRecord."""
         content = b"wavelength,absorbance\n340,0.523\n350,0.612"
@@ -421,7 +464,10 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_duplicate_does_not_create_new_row(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Duplicate upload doesn't insert a new database row."""
         content = b"same content twice"
@@ -454,7 +500,10 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_duplicate_detected_with_different_filename(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Dedup is content-based, not filename-based. Same content + different name = duplicate."""
         content = b"identical instrument output"
@@ -485,7 +534,10 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_different_content_not_duplicate(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Different content with same filename creates separate records."""
         content1 = b"run 1 data: 0.523"
@@ -517,7 +569,8 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_find_by_hash_returns_none_for_unknown(
-        self, session: AsyncSession,
+        self,
+        session: AsyncSession,
     ):
         """find_by_hash returns None when no matching record exists."""
         result = await find_by_hash(session, "a" * 64)
@@ -525,7 +578,10 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_find_by_hash_returns_existing(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """find_by_hash returns the record when content matches."""
         content = b"findable content"
@@ -546,7 +602,10 @@ class TestDuplicateDetection:
 
     @pytest.mark.asyncio
     async def test_duplicate_across_instruments(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Same content uploaded to different instruments is still a duplicate (global dedup)."""
         content = b"universal calibration data"
@@ -581,12 +640,16 @@ class TestDuplicateDetection:
 # Hash chain integrity tests
 # ---------------------------------------------------------------------------
 
+
 class TestHashChainIntegrity:
     """Tests for the immutable audit trail hash chain."""
 
     @pytest.mark.asyncio
     async def test_chain_hash_computation(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """FileRecord.compute_chain_hash produces correct value."""
         content = b"chain test data"
@@ -608,7 +671,10 @@ class TestHashChainIntegrity:
 
     @pytest.mark.asyncio
     async def test_three_file_chain(
-        self, session: AsyncSession, instrument: Instrument, test_settings: Settings,
+        self,
+        session: AsyncSession,
+        instrument: Instrument,
+        test_settings: Settings,
     ):
         """Three sequential uploads form a valid hash chain."""
         records = []

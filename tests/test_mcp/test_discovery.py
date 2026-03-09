@@ -1,6 +1,5 @@
 """Tests for Discovery tools: list_toolsets, get_tool_help."""
 
-
 from app.mcp_server.server import list_toolsets, get_tool_help
 
 
@@ -112,9 +111,14 @@ class TestGetToolHelp:
     def test_help_for_all_explorer_tools(self, mcp_server, mcp_ctx):
         """get_tool_help works for every explorer tool."""
         explorer_tools = [
-            "search_files", "list_experiments", "get_file_metadata",
-            "get_experiment_detail", "list_datasets", "get_parse_result",
-            "list_instruments", "get_dataset_summary",
+            "search_files",
+            "list_experiments",
+            "get_file_metadata",
+            "get_experiment_detail",
+            "list_datasets",
+            "get_parse_result",
+            "list_instruments",
+            "get_dataset_summary",
         ]
         for tool_name in explorer_tools:
             result = get_tool_help(mcp_ctx, tool_name)

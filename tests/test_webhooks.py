@@ -127,7 +127,7 @@ class TestSignPayload:
         """sign_payload() returns 'sha256=<hex>' format."""
         sig = sign_payload({"event": "test"}, "mysecret")
         assert sig.startswith("sha256=")
-        hex_part = sig[len("sha256="):]
+        hex_part = sig[len("sha256=") :]
         assert len(hex_part) == 64
         assert all(c in "0123456789abcdef" for c in hex_part)
 
@@ -189,6 +189,7 @@ class TestVerifySignature:
         """verify_signature uses hmac.compare_digest (timing-safe comparison)."""
         import inspect
         import lablink.services.webhook_service as ws_module
+
         source = inspect.getsource(ws_module.verify_signature)
         assert "compare_digest" in source
 
@@ -207,9 +208,7 @@ class TestWebhookModel:
     def test_known_events_in_supported_events(self):
         """Core event types are present in SUPPORTED_EVENTS."""
         for event in ("upload.completed", "parsing.completed", "parsing.failed"):
-            assert event in Webhook.SUPPORTED_EVENTS, (
-                f"'{event}' missing from SUPPORTED_EVENTS"
-            )
+            assert event in Webhook.SUPPORTED_EVENTS, f"'{event}' missing from SUPPORTED_EVENTS"
 
     def test_subscribes_to_active_subscribed(self):
         """subscribes_to() returns True when active and event is subscribed."""
@@ -350,14 +349,10 @@ class TestWebhookRegistration:
             created_by=user.id,
         )
         other_org_id = uuid.uuid4()
-        fetched = await svc.get(
-            session, uuid.UUID(created.id), organization_id=other_org_id
-        )
+        fetched = await svc.get(session, uuid.UUID(created.id), organization_id=other_org_id)
         assert fetched is None
 
-    async def test_get_nonexistent_returns_none(
-        self, svc: WebhookService, session: AsyncSession
-    ):
+    async def test_get_nonexistent_returns_none(self, svc: WebhookService, session: AsyncSession):
         """get() returns None for a non-existent webhook ID."""
         result = await svc.get(session, uuid.uuid4())
         assert result is None
@@ -392,14 +387,10 @@ class TestWebhookRegistration:
         # Deactivate it
         await svc.update(session, wh.id, is_active=False)
 
-        active, active_count = await svc.list(
-            session, organization_id=org.id, is_active=True
-        )
+        active, active_count = await svc.list(session, organization_id=org.id, is_active=True)
         assert active_count == 0
 
-        inactive, inactive_count = await svc.list(
-            session, organization_id=org.id, is_active=False
-        )
+        inactive, inactive_count = await svc.list(session, organization_id=org.id, is_active=False)
         assert inactive_count == 1
 
     async def test_update_url(
@@ -413,9 +404,7 @@ class TestWebhookRegistration:
             events=["upload.completed"],
             created_by=user.id,
         )
-        updated = await svc.update(
-            session, wh.id, url="https://new.example.com/hook"
-        )
+        updated = await svc.update(session, wh.id, url="https://new.example.com/hook")
         assert updated.url == "https://new.example.com/hook"
 
     async def test_update_deactivate(
