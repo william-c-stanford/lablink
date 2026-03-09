@@ -15,10 +15,9 @@ import asyncio
 import hashlib
 import os
 import uuid
-from datetime import datetime, timezone
 from pathlib import Path
 
-from sqlalchemy import select, text
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -120,7 +119,7 @@ async def _seed(session: AsyncSession) -> None:
         await session.flush()
         print(f"  + membership: {USER_ID} → {ORG_ID} ({membership.role})")
     else:
-        print(f"  ~ membership already exists")
+        print("  ~ membership already exists")
 
     # ------------------------------------------------------------------
     # Instruments

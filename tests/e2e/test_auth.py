@@ -37,10 +37,7 @@ def test_login_invalid_credentials_shows_error(page: Page) -> None:
     # Wait for mutation to settle
     page.wait_for_timeout(2_000)
     assert "/login" in page.url
-    # Error UI: LoginPage renders error text in a div styled with #ef4444
-    # Match any visible non-empty div that appears in the card content
-    error_el = page.locator("form[data-testid='login-form'] p").first
-    # The error text must be visible and non-empty
+    # Form must still be visible after failed login (no redirect)
     assert page.locator("form[data-testid='login-form']").is_visible()
     # After a failed login, the form should still be on screen (no redirect)
     assert page.get_by_test_id("login-submit").is_visible()
