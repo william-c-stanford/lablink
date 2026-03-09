@@ -37,7 +37,5 @@ def test_agents_sse_indicator_visible(auth_page: Page) -> None:
     ap = AgentsPage(auth_page)
     ap.navigate()
     # The SSE indicator shows "Live" or "Connecting..."
-    indicator = auth_page.locator("text=Live").or_(
-        auth_page.locator("text=Connecting...")
-    )
+    indicator = auth_page.locator("text=Live").or_(auth_page.locator("text=Connecting..."))
     assert indicator.count() >= 1

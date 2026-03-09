@@ -25,7 +25,9 @@ import httpx
 import pytest
 
 # Skip this entire module if Playwright is not installed
-playwright = pytest.importorskip("playwright", reason="playwright not installed — run: uv run playwright install chromium")
+playwright = pytest.importorskip(
+    "playwright", reason="playwright not installed — run: uv run playwright install chromium"
+)
 from playwright.sync_api import BrowserContext, Page, sync_playwright  # noqa: E402
 
 # ---------------------------------------------------------------------------
@@ -61,8 +63,7 @@ def _wait_for_url(url: str, timeout: int = 60) -> None:
             last_exc = exc
         time.sleep(0.5)
     raise TimeoutError(
-        f"Service at {url} did not become healthy within {timeout}s. "
-        f"Last error: {last_exc}"
+        f"Service at {url} did not become healthy within {timeout}s. Last error: {last_exc}"
     )
 
 
@@ -85,6 +86,7 @@ def e2e_services() -> Generator[None, None, None]:
 
     # Verify E2E ports are free before starting
     import socket as _socket
+
     for port in (int(API_BASE_URL.split(":")[-1]), int(E2E_BASE_URL.split(":")[-1])):
         try:
             with _socket.create_connection(("localhost", port), timeout=0.5):

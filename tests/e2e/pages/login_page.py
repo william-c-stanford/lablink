@@ -11,6 +11,7 @@ class LoginPage:
 
     def goto(self) -> None:
         from tests.e2e.conftest import E2E_BASE_URL
+
         self.page.goto(f"{E2E_BASE_URL}/login")
 
     def fill_credentials(self, email: str, password: str) -> None:

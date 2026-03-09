@@ -79,9 +79,7 @@ async def _seed(session: AsyncSession) -> None:
     # ------------------------------------------------------------------
     # User
     # ------------------------------------------------------------------
-    existing_user = await session.scalar(
-        select(User).where(User.email == SEED_EMAIL)
-    )
+    existing_user = await session.scalar(select(User).where(User.email == SEED_EMAIL))
     if existing_user is None:
         # Import here to avoid circular at module level
         from lablink.services.auth_service import hash_password
@@ -128,9 +126,7 @@ async def _seed(session: AsyncSession) -> None:
         (INSTRUMENT_SPECTRO_ID, "NanoDrop 2000", "spectrophotometer"),
         (INSTRUMENT_PLATE_ID, "SpectraMax M5", "plate_reader"),
     ]:
-        existing = await session.scalar(
-            select(Instrument).where(Instrument.id == inst_id)
-        )
+        existing = await session.scalar(select(Instrument).where(Instrument.id == inst_id))
         if existing is None:
             instrument = Instrument(
                 id=inst_id,
@@ -170,9 +166,7 @@ async def _seed(session: AsyncSession) -> None:
     ]
 
     for upload_id, fixture_path, filename, inst_type, instrument_id in upload_fixtures:
-        existing = await session.scalar(
-            select(Upload).where(Upload.id == upload_id)
-        )
+        existing = await session.scalar(select(Upload).where(Upload.id == upload_id))
         if existing is not None:
             print(f"  ~ upload already exists: {filename}")
             continue
@@ -226,16 +220,13 @@ async def _seed(session: AsyncSession) -> None:
 
 
 async def main() -> None:
-    db_url = os.environ.get(
-        "LABLINK_DATABASE_URL", "sqlite+aiosqlite:///./lablink.db"
-    )
+    db_url = os.environ.get("LABLINK_DATABASE_URL", "sqlite+aiosqlite:///./lablink.db")
     print(f"Seeding: {db_url}")
 
     engine = create_async_engine(db_url, echo=False)
 
     # Enable WAL + FK pragmas for SQLite
     if "sqlite" in db_url:
-
         from sqlalchemy import event
 
         @event.listens_for(engine.sync_engine, "connect")
